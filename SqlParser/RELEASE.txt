@@ -1,0 +1,26 @@
+Release Notes for SqlParser 1.0
+===============================
+
+1.1.83
+Small changes making it easier in extended classes to match identifiers
+in a case-insensitive way for evaluation.
+
+1.1.69
+Added evaluation to CaseExpression
+
+1.1.58
+Added DEFAULT, NULL, empty ARRAY/MULTISET to SqlArgument
+ 
+1.1.0
+Release for JAVA 10
+Error in computation of milliseconds in Interval.toDuration() fixed.
+
+1.0.88:
+generate in build.xml fixed.
+
+1.0.82:
+.gitattributes added.
+src folder under sqlparser deleted.
+ 
+1.0.75:
+First release of SqlParser on GitHub.

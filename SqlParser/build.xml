@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- build.xml =========================================================
+ANT build file of SqlParser
+Application: SqlParser
+Description: ANT build file of SqlParser
+Platform   : JAVA, ANT
+========================================================================
+Copyright  : 2018, Enter AG, Rüti ZH, Switzerland
+Created    : 13.02.2018, Hartwig Thomas
+==================================================================== -->
+<project basedir="." default="build" name="sqlparser">
+	<!--
+		build properties contain local settings. They must reside in
+	   	the same folder as this build.xml. Use build.properties.template
+	   	as a guide for creating the local copy.
+  	-->
+	<property file="build.properties" />
+	<property name="debuglevel" value="source,lines,vars" />
+	<property name="target" value="1.8" />
+	<property name="source" value="1.8" />
+
+	<!-- the main folders of the project -->
+	<property name="dirsrc" value="src" />
+	<property name="dirtest" value="test/" />
+	<property name="dirlib" value="lib" />
+	<property name="dirdoc" value="doc" />
+	<property name="diretc" value="etc" />
+	<property name="dirvar" value="var" />
+	<property name="dirtmp" value="tmp" />
+	<property name="dirdist" value="dist" />
+	<property name="dirsqlparser" value="${dirvar}/sqlparser" />
+	<property name="dirjavadoc" value="${dirdoc}/javadoc" />
+	<property name="dirgenerated" value="${dirsrc}/ch/enterag/sqlparser/generated" />
+	<!-- enter utils jar -->
+	<property name="jarenterutils" value="enterutils.jar" />
+	<property name="cpenterutils" value="${dirlib}/${jarenterutils}" />
+	<!-- antlr 4 jars -->
+	<property name="jarantlr4runtime" value="antlr-runtime-4.5.2.jar" />
+	<property name="jarantlr4complete" value="antlr-4.5.2-complete.jar" />
+	<property name="cpantlr" value="${dirlib}/${jarantlr4runtime}" />
+	<!-- junit -->
+	<property name="jarhamcrest" value="hamcrest-core-1.3.jar" />
+	<property name="jarjunit4" value="junit-4.12.jar" />
+	<property name="cpjunit" value="${dirlib}/${jarhamcrest};${dirlib}/${jarjunit4}" />
+
+	<!-- delete build folders -->
+	<property name="dirbuild" value="build" />
+	<property name="dirbuildclasses" value="${dirbuild}/classes" />
+	<property name="dirbuildtests" value="${dirbuild}/tests" />
+	<target name="clean">
+		<echo message="${ant.project.name}: clean" />
+		<delete dir="${dirbuildclasses}" />
+		<delete dir="${dirbuildtests}" />
+		<delete dir="${dirtmp}" />
+		<delete dir="${dirdist}" />
+		<delete dir="${dirjavadoc}" />
+		<!-- <delete dir="${dirgenerated}"/> -->
+	</target>
+
+	<!-- create build folders -->
+	<target name="init" depends="clean">
+		<echo message="${ant.project.name}: init" />
+		<mkdir dir="${dirbuild}" />
+		<mkdir dir="${dirbuildclasses}" />
+		<mkdir dir="${dirbuildtests}" />
+		<mkdir dir="${dirtmp}" />
+		<mkdir dir="${dirdist}" />
+		<mkdir dir="${dirjavadoc}" />
+	</target>
+
+	<!-- check if mainfest and local build properties are available -->
+	<property name="filemanifest" value="${dirsrc}/META-INF/MANIFEST.MF" />
+	<property name="filerevoldproperties" value="${dirtmp}/revold.properties" />
+	<property name="filegithead" value=".git/HEAD" />
+	<property name="filebranchproperties" value="${dirtmp}/branch.properties" />
+	<target name="check">
+		<!-- get current date -->
+		<tstamp>
+			<format property="builtdate" pattern="dd. MMM yyyy" locale="en,CH" />
+		</tstamp>
+		<echo message="builddate: ${builtdate}" />
+		<!-- current version and revision are taken from manifest -->
+		<copy file="${filemanifest}" tofile="${filerevoldproperties}" />
+		<!-- reduce it to version and revision properties -->
+		<replaceregexp file="${filerevoldproperties}" match=".*Implementation-Version: (\d+\.\d+)\.(\d+).*" replace="version=\1&#x000A;revold=\2" flags="gms" />
+		<!-- load the properties -->
+		<property file="${filerevoldproperties}" />
+		<echo message="version: ${version}" />
+		<echo message="revold: ${revold}" />
+		<!-- fail if build.properties are not configured -->
+		<fail message="External build.properties not configured correctly!">
+			<condition>
+				<not>
+					<and>
+						<isset property="version" />
+						<isset property="revold" />
+						<isset property="java8rtjar" />
+						<isset property="javadocadd" />
+					</and>
+				</not>
+			</condition>
+		</fail>
+		<!-- check .git/HEAD for active branch name -->
+		<!-- <copy file="${filegithead}" tofile="${filebranchproperties}" /> -->
+		<!-- reduce it to branch property -->
+		<replaceregexp file="${filebranchproperties}" match="^ref: refs/heads/(.*)$" replace="branch=\1" flags="gms" />
+		<!-- load the property -->
+		<property file="${filebranchproperties}" />
+		<!-- compute branch.master -->
+		<condition property="branch.master">
+			<and>
+				<not>
+					<isset property="submit" />
+				</not>
+				<equals arg1="${branch}" arg2="master" />
+			</and>
+		</condition>
+		<echo message="branch: ${branch}" />
+		<echo message="branch.master: ${branch.master}" />
+		<echo message="build.properties.configured: ${build.properties.configured}" />
+	</target>
+
+	<!-- commit local work -->
+	<property name="fileadd" value="${dirtmp}/add.txt" />
+	<property name="filecommit" value="${dirtmp}/commit.txt" />
+	<target name="commit" depends="check" if="git">
+		<echo message="get recent SIARD JARs" />
+		<!-- TODO: get most recently released version of enterutils.jar -->
+		<copy file="../EnterUtilities/dist/enterutils.jar" todir="${dirlib}" failonerror="false" />
+		<!-- stage all changes -->
+		<echo message="${ant.project.name}: git add -A" />
+		<exec executable="${git}" output="${fileadd}" failonerror="true">
+			<arg value="add" />
+			<arg value="-A" />
+		</exec>
+		<!-- commit all changes -->
+		<echo message="${ant.project.name}: git commit -am &quot;${version}.${revold}&quot;" />
+		<exec executable="${git}" output="${filecommit}" resultproperty="resultcommit">
+			<arg value="commit" />
+			<arg value="-am" />
+			<arg value="${version}.${revold}" />
+		</exec>
+		<fail message="git commit failed!">
+			<condition>
+				<not>
+					<or>
+						<equals arg1="${resultcommit}" arg2="0" />
+						<!-- warning, that nothing needed to be committed: -->
+						<equals arg1="${resultcommit}" arg2="1" />
+					</or>
+				</not>
+			</condition>
+		</fail>
+	</target>
+
+	<!-- update from remote master -->
+	<property name="filepull" value="${dirtmp}/pull.txt" />
+	<target name="pull" depends="commit" if="git">
+		<!-- pull master branch
+    	<echo message="${ant.project.name}: git pull origin master"/>
+    	<exec executable="${git}" output="${filepull}">
+      		<arg value="pull"/>
+      		<arg value="origin"/>
+      		<arg value="master"/>
+    	</exec>
+    	-->
+		<!-- pull dev branch -->
+		<echo message="${ant.project.name}: git pull origin ${branch}" />
+		<exec executable="${git}" output="${filepull}" failonerror="true">
+			<arg value="pull" />
+			<arg value="origin" />
+			<arg value="${branch}" />
+		</exec>
+	</target>
+
+	<!-- increment revision and update manifest -->
+	<property name="filerevisionproperties" value="${dirtmp}/revision.properties" />
+	<target name="revision" depends="pull">
+		<echo message="${ant.project.name}: revision" />
+		<copy file="${filerevoldproperties}" tofile="${filerevisionproperties}" overwrite="true" />
+		<replaceregexp file="${filerevisionproperties}" match="^revold=(.*)$" replace="revision=\1" flags="gm" />
+		<propertyfile file="${filerevisionproperties}">
+			<entry key="revision" type="int" operation="+" value="1" />
+		</propertyfile>
+		<property file="${filerevisionproperties}" />
+		<echo message="revision: ${revision}" />
+		<replaceregexp file="${filemanifest}" match="^Implementation-Version: .*$" replace="Implementation-Version: ${version}.${revision}" flags="gm" />
+		<replaceregexp file="${filemanifest}" match="^Built-Date: .*$" replace="Built-Date: ${builtdate}" flags="gm" />
+	</target>
+
+	<!-- run ch.enterag.sqlparser.KeywordGenerator.class
+	  and antlr4 to generate the parser code -->
+	<property name="keywordgeneratorjava" value="ch/enterag/sqlparser/KeywordGenerator.java" />
+	<property name="keywordgeneratorclass" value="ch.enterag.sqlparser.KeywordGenerator" />
+	<target name="generate" depends="init">
+		<echo message="${ant.project.name}: generate" />
+		<!--
+    	<javac debug="true" debuglevel="${debuglevel}"
+      		includeantruntime="false"
+      		bootclasspath="${java8rtjar}"
+      		source="${source}"
+      		target="${target}"
+      		encoding="UTF-8"
+      		classpath="${cpenterutils}"
+      		srcdir="${dirtest}"
+      		destdir="${dirbuildtests}"
+    		includes="${keywordgeneratorjava}">
+    	</javac>
+		<echo message="generate keywords"/>
+		<java classpath="${dirbuildtests};${cpenterutils}"
+			classname="${keywordgeneratorclass}"
+      		fork="true"
+      		failonerror="true"/>
+		<echo message="generate parser classes"/>
+    	<java classpath="${dirlib}/${jarantlr4complete}"
+      		classname="org.antlr.v4.Tool"
+      		fork="true"
+    		dir="${dirsqlparser}"
+      		failonerror="true">
+      		<jvmarg value="-Dfile.encoding=UTF-8"/>
+	      	<arg value="-encoding"/>
+	      	<arg value="UTF-8"/>
+	      	<arg value="-visitor"/>
+	      	<arg value="-no-listener"/>
+	      	<arg value="-o"/>
+	      	<arg value="../../${dirgenerated}"/>
+	      	<arg value="-package"/>
+	      	<arg value="ch.enterag.sqlparser.generated"/>
+      		<arg value="Sql.g4"/>
+    	</java>
+    	-->
+	</target>
+
+	<!-- build the SqlParser classes -->
+	<target name="build" depends="init,revision">
+		<echo message="${ant.project.name}: build" />
+		<!-- without this, the package-info class is not generated! -->
+		<touch>
+			<fileset dir="${dirsrc}" includes="**/*.*" />
+		</touch>
+		<javac debug="true" debuglevel="${debuglevel}" includeantruntime="false" bootclasspath="${java8rtjar}" source="${source}" target="${target}" encoding="UTF-8" classpath="${cpantlr};${cpenterutils}" srcdir="${dirsrc}" destdir="${dirbuildclasses}">
+		</javac>
+	</target>
+
+	<!-- create the JAR file containing all classes -->
+	<property name="jarfile" value="${ant.project.name}.jar" />
+	<target name="jar" depends="build">
+		<echo message="${ant.project.name}: jar" />
+		<jar jarfile="${dirdist}/${jarfile}" manifest="${filemanifest}">
+			<fileset dir="${dirbuildclasses}">
+				<include name="**/*.class" />
+				<include name="**/res/*.*" />
+			</fileset>
+		</jar>
+	</target>
+
+	<!-- create and run all tests -->
+	<property name="classsqltester" value="ch.enterag.sqlparser.SqlTester" />
+	<property name="filesqltest" value="sql-test" />
+	<property name="classdatatypetestsuite" value="ch.enterag.sqlparser.datatype._DataTypeTestSuite" />
+	<property name="filedatatypetests" value="datatype-tests" />
+	<property name="classddltestsuite" value="ch.enterag.sqlparser.ddl._DdlTestSuite" />
+	<property name="fileddltests" value="ddl-tests" />
+	<property name="classdmltestsuite" value="ch.enterag.sqlparser.dml._DmlTestSuite" />
+	<property name="filedmltests" value="dml-tests" />
+	<property name="classexpressiontestsuite" value="ch.enterag.sqlparser.expression._ExpressionTestSuite" />
+	<property name="fileexpressiontests" value="expression-tests" />
+	<target name="test" depends="jar">
+		<echo message="${ant.project.name}: tests" />
+		<!-- build the tests -->
+		<javac debug="true" debuglevel="${debuglevel}" includeantruntime="false" bootclasspath="${java8rtjar}" source="${source}" target="${target}" encoding="UTF-8" classpath="${cpjunit};${cpenterutils};${dirdist}/${jarfile}" srcdir="${dirtest}" destdir="${dirbuildtests}">
+		</javac>
+		<!-- run the tests -->
+		<junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+			<sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties" />
+			<formatter type="plain" />
+			<classpath>
+				<pathelement path="${dirbuildtests}" />
+				<pathelement path="${cpantlr}" />
+				<pathelement path="${cpenterutils}" />
+				<pathelement path="${dirdist}/${jarfile}" />
+				<pathelement path="${cpjunit}" />
+			</classpath>
+			<test name="${classsqltester}" outfile="${filesqltest}" todir="${dirtmp}" />
+		</junit>
+		<sleep milliseconds="10" />
+		<junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+			<sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties" />
+			<formatter type="plain" />
+			<classpath>
+				<pathelement path="${dirbuildtests}" />
+				<pathelement path="${cpantlr}" />
+				<pathelement path="${cpenterutils}" />
+				<pathelement path="${dirdist}/${jarfile}" />
+				<pathelement path="${cpjunit}" />
+			</classpath>
+			<test name="${classdatatypetestsuite}" outfile="${filedatatypetests}" todir="${dirtmp}" />
+		</junit>
+		<sleep milliseconds="10" />
+		<junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+			<sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties" />
+			<formatter type="plain" />
+			<classpath>
+				<pathelement path="${dirbuildtests}" />
+				<pathelement path="${cpantlr}" />
+				<pathelement path="${cpenterutils}" />
+				<pathelement path="${dirdist}/${jarfile}" />
+				<pathelement path="${cpjunit}" />
+			</classpath>
+			<test name="${classddltestsuite}" outfile="${fileddltests}" todir="${dirtmp}" />
+		</junit>
+		<sleep milliseconds="10" />
+		<junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+			<sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties" />
+			<formatter type="plain" />
+			<classpath>
+				<pathelement path="${dirbuildtests}" />
+				<pathelement path="${cpantlr}" />
+				<pathelement path="${cpenterutils}" />
+				<pathelement path="${dirdist}/${jarfile}" />
+				<pathelement path="${cpjunit}" />
+			</classpath>
+			<test name="${classdmltestsuite}" outfile="${filedmltests}" todir="${dirtmp}" />
+		</junit>
+		<sleep milliseconds="10" />
+		<junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+			<sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties" />
+			<formatter type="plain" />
+			<classpath>
+				<pathelement path="${dirbuildtests}" />
+				<pathelement path="${cpantlr}" />
+				<pathelement path="${cpenterutils}" />
+				<pathelement path="${dirdist}/${jarfile}" />
+				<pathelement path="${cpjunit}" />
+			</classpath>
+			<test name="${classexpressiontestsuite}" outfile="${fileexpressiontests}" todir="${dirtmp}" />
+		</junit>
+		<sleep milliseconds="10" />
+	</target>
+
+	<!-- generate the javadocs -->
+	<property name="sqlpackage" value="ch.enterag.sqlparser" />
+	<property name="datatypepackage" value="ch.enterag.sqlparser.datatype" />
+	<property name="datatypeenums" value="ch.enterag.sqlparser.datatype.enums" />
+	<property name="ddlpackage" value="ch.enterag.sqlparser.ddl" />
+	<property name="ddlenums" value="ch.enterag.sqlparser.ddl.enums" />
+	<property name="dmlpackage" value="ch.enterag.sqlparser.dml" />
+	<property name="dmlenums" value="ch.enterag.sqlparser.dml.enums" />
+	<property name="expressionpackage" value="ch.enterag.sqlparser.expression" />
+	<property name="expressionenums" value="ch.enterag.sqlparser.expression.enums" />
+	<property name="identifierpackage" value="ch.enterag.sqlparser.identifier" />
+	<property name="packages" value="${datatypepackage},${datatypeenums},${ddlpackage},${ddlenums},${dmlpackage},${dmlenums},${expressionpackage},${expressionenums},${identifierpackage},${sqlpackage}" />
+	<target name="javadoc" depends="test">
+		<echo message="${ant.project.name}: javadoc" />
+		<!--
+		<javadoc access="public" author="true" additionalparam="${javadocadd}" classpath="${cpantlr};${cpenterutils}" destdir="${dirjavadoc}" doctitle="SQL Parser" packagenames="${packages}" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" source="${source}" sourcepath="${dirsrc}" splitindex="true" use="true" version="true" />
+		-->
+	</target>
+
+	<!-- create the ZIP file with binaries for Windows and LINUX -->
+	<target name="zip" depends="javadoc">
+		<echo message="${ant.project.name}: zip" />
+		<zip zipfile="${dirdist}/${ant.project.name}-${version}.${revision}.zip">
+			<zipfileset dir="${dirdist}" prefix="${ant.project.name}/${dirlib}">
+				<include name="${jarfile}" />
+			</zipfileset>
+			<zipfileset dir="${dirlib}" prefix="${ant.project.name}/${dirlib}">
+				<exclude name="${jarantlr4complete}" />
+				<exclude name="${jarhamcrest}" />
+				<exclude name="${jarjunit4}" />
+			</zipfileset>
+			<zipfileset dir="${dirdoc}" prefix="${ant.project.name}/${dirdoc}">
+				<include name="**/*.*" />
+				<exclude name="developer/**/*.*" />
+			</zipfileset>
+			<zipfileset dir="${diretc}" prefix="${ant.project.name}/${diretc}">
+				<exclude name="debug.properties" />
+			</zipfileset>
+			<zipfileset dir="." prefix="${ant.project.name}">
+				<include name="*.txt" />
+			</zipfileset>
+		</zip>
+	</target>
+
+	<!-- push to remote dev branch -->
+	<property name="filepush" value="${dirtmp}/push.txt" />
+	<target name="push" depends="zip" if="git" unless="branch.master">
+		<!-- commit -->
+		<echo message="${ant.project.name}: git commit -am &quot;Build: ${version}.${revision}&quot;" />
+		<exec executable="${git}" output="${filecommit}" failonerror="true">
+			<arg value="commit" />
+			<arg value="-am" />
+			<arg value="Build: ${version}.${revision}" />
+		</exec>
+		<!-- push to remote -->
+		<echo message="${ant.project.name}: git push origin ${branch}" />
+		<exec executable="${git}" output="${filepush}" failonerror="true">
+			<arg value="push" />
+			<arg value="origin" />
+			<arg value="${branch}" />
+		</exec>
+	</target>
+
+	<!-- deploy to file system -->
+	<target name="deploy" depends="push" if="dirdeploy">
+		<echo message="${ant.project.name}: deploy" />
+		<delete dir="${dirdeploy}/${ant.project.name}" />
+		<unzip dest="${dirdeploy}" src="${dirdist}/${ant.project.name}-${version}.${revision}.zip" />
+	</target>
+
+</project>
