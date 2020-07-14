@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- ===================================================================
+Users' Manual of JdbcBase: Usage
+Application: SIARD Suite 2.1
+Platform   : HTML5
+========================================================================
+Copyright  : Enter AG, Joweid Zentrum 1, 8036 Rüti ZH, Switzerland, 2018
+==================================================================== -->
+  <head>
+    <title>JdbcBase - Users' Manual - Usage</title>
+    <!-- character set -->
+    <meta charset="utf-8" />
+    <!-- Icon -->
+    <link rel="icon" type="image/gif" href="../assets/img/icon.gif" />
+    <!-- Global style sheet -->
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/print.css">
+    <link rel="stylesheet" href="../assets/css/siard.css" />
+  </head>
+  <body>
+
+    <div class="container container-main">
+      <header>
+        <div class="clearfix">
+          <div class="table-row">
+            <span class="header-logo">
+              <img src="../assets/img/swiss.svg" onerror="this.onerror=null; this.src='../assets/img/swiss.png'" alt="Confederatio Helvetica" />
+            </span>
+            <h1 class="header-title">JdbcBase - Users' Manual</h1>
+          </div>
+        </div>
+      </header>
+      
+      <div class="nav-main navbar" id="main-navigation"></div>
+    
+      <div class="container-fluid hidden-xs">
+        <div class="row">
+          <div class="col-sm-12">
+            <h2 id="br1" class="hidden">Breadcrumbs</h2>
+            <ol class="breadcrumb" role="navigation" aria-labelledby="br1">
+              <li><a href="./index.html">JdbcBase - Users' Manual</a><span class="icon icon--greater"></span></li>
+              <li class="active" aria-selected="true">Usage</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-12 main-column" id="content" role="main">
+            <div class="contentHead">
+              <div class="mod mod-contentpage">
+                <h1>JdbcBase - Users' Manual - Usage</h1>
+              </div>
+            </div>  
+            <div class="mod mod-text">
+              <section class="clearfix">
+                <h2>Using the Binaries of the Project</h2>
+                <h3>Creating a Standardized Wrapper for a Proprietary JDBC Driver</h3>
+                <p>The typical "users" of the <em>JdbcBase</em> binaries 
+                  are developers who want to implement a façade of the 
+                  JDBC driver of a proprietary JDBC implementation of a 
+                  database management system (DBMS).</p>
+                <p>They will usually make use of an extension of <em>SqlParser</em>
+                  which parses standard SQL:2008 statements and formats
+                  them to their proprietary syntax. This extension of
+                  <em>SqlParser</em> is then used to implement <em>Connection.nativeSQL()</em>.
+                  Implementations of <em>Statement.execute()</em> methods will then
+                  first call Connection.nativeSQL() to translate the query
+                  to native proprietary SQL which is then handed to the
+                  proprietary JDBC driver for execution.</p>
+                <h3>DatabaseMetaData</h3>
+                <p>The proprietary implementations of the interface <em>DatabaseMetaData</em>
+                  is often particularly weak. It will often be necessary to implement
+                  replacements based of the proprietary structures containing
+                  meta data information about the database.</p>
+                <h3>Data Types</h3>
+                <p>Almost all databases implement data types different from
+                  the SQL standard and fail to implement some of the standard types.
+                  As SIARD is particularly interested in obtaining the correct
+                  data stored in a database, the standardization of the data types
+                  becomes an important part of implementing a JDBC wrapper
+                  for SIARD.</p>
+                <h3>Strategy for creating a JDBC wrapper for SIARD</h3>
+                <p>First all proprietary "simple" (non-UDT) predefined data
+                  types must be listed using <em>DatabaseMetaData.getTypeInfo()</em>.
+                  Then it must be decided, how to map these data types to
+                  standard SQL:2008 types defined in the enumeration 
+                  <em>ch.enterag.sqlparser.datatype.enums.PreType</em>.
+                  Similarly the inverse mapping from standard data types to
+                  proprietary data types must be decided. These mappings must
+                  make sure that no data gets lost. These decisions about the
+                  mappings then will guide the implementations of 
+                  <em>DatabaseMetaData</em>, <em>ResultSetMetaData</em>
+                  and <em>ResultSet</em> to present that database as a 
+                  standard SQL:2008 database with standard type to the caller.</p>
+                <p>It is useful to create a test database <em>TestSqlDatabase</em>
+                  with a table using all SQL:2008 simple standard data types as well as a 
+                  test database <em>TestNativeDatabase</em> with a table 
+                  using all proprietary native data types.</p>
+                <p>If the database supports complex types (ARRAYs, UDTs)
+                  a table using complex datatypes should also be created
+                  in both databases.</p>
+                <p>The tests of <em>ResultSet</em> should then implement</p>
+                <ul>
+                  <li>testGetObjectSqlSimple()</li>
+                  <li>testGetObjectSqlComplex()</li>
+                  <li>testGetObjectNativeSimple()</li>
+                  <li>testGetObjectNativeComplex()</li>
+                </ul>
+                <p>to check, that the values retrieved for all columns 
+                  of the test tables are the same as the ones stored in 
+                  the test databases.</p>
+                <p>Similarly the round-trip tests</p>
+                <ul>
+                  <li>testInsertRowSimple()</li>
+                  <li>testInsertRowComplex()</li>
+                </ul>
+                <p>should be implemented, where one row is inserted
+                  into each table of <em>TestSqlDatabase</em> and then read
+                  again, comparing their values. (See the project <em>JdbcOracle</em>
+                  as an example.)</p>
+                <h3>Query Standardization</h3>
+                <p>SIARD makes extensive use of <em>DatabaseMetaData</em>.
+                  So the adherence to the standard API is very important
+                  for these methods. However, only very simple
+                  single-table queries are issued by SIARD used for reading
+                  the table values or the sizes and lengths. Also for the
+                  upload of a table, SIARD uses relatively simple CREATE
+                  statements for types and tables and makes use of JDBC
+                  <em>insert()</em> methods for filling the tables. 
+                  So for making use of a JDBC wrapper for SIARD it may 
+                  be sufficient, to support only a small subset of all 
+                  possible SQL queries.</p>
+                <p>On the other hand it may be of interest, to have general
+                  standardized JDBC interfaces to various databases that
+                  adhere all to the same standard and implement a large portion
+                  of the SQL ISO standard. In that case, the JDBC wrappers
+                  - originally only implemented to present the same interface
+                  to <em>SiardCmd</em> - may be extended to more fully
+                  support standard SQL as well as standard JDBC.</p>
+                
+                <h3>Javadoc Documentation</h3>
+                <p>The JDBC 4.1 standard is well documented. Therefore no Javadoc
+                  documentation is generated.</p>
+                  
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+                
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="container-fluid">
+          <hr class="footer-line">
+          <img src="../assets/img/logo-CH.svg" onerror="this.onerror=null; this.src='../assets/img/logo-CH.png'" />
+          <h1 class="hidden-xs">Swiss Federal Archives</h1>
+          <p class=pull-right><a href="../../../LICENSE.txt">License</a></p>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

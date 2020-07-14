@@ -1,0 +1,60 @@
+#== build.properties ===================================================
+# Properties of Ant build files of JdbcOracle
+# Application : SIARD Suite 2.0
+# Description : user-specific build properties of JdbcOracle
+#-----------------------------------------------------------------------
+# Copyright  : 2016, Enter AG, Rï¿½ti ZH, Switzerland
+# Created    : 16.06.2016, Simon Jutz
+#=======================================================================
+
+#-----------------------------------------------------------------------
+# DO NOT USE WHITESPACES IN PATHS; JAVA DOES NOT LIKE THEM:
+# Windows developers:
+# If you want to use backslashes (\) then you must repeat them twice, e.g.
+# c:\\foo\\bar
+# or - in path names - you can just use slashes, e.g.
+# c:/foo/bar
+#-----------------------------------------------------------------------
+#-----------------------------------------------------------------------
+# The deployment folder to which the binaries are to be unzipped.
+dirdeploy=/Users/Hartwig/test
+#dirdeploy=/home/hartwig/test
+#dirdeploy=D:/Temp
+
+#-----------------------------------------------------------------------
+# The bootstrap class (run-time jar) for compiling code compatible with JSE 1.8.
+#java8rtjar=C:/Program Files/Java/jdk1.8.0_144/jre/lib/rt.jar
+#java8rtjar=/usr/lib/jvm/java-8-oracle/jre/lib/rt.jar
+java8rtjar=/Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home/jre/lib/rt.jar
+
+#-----------------------------------------------------------------------
+# The following property definition signals, that git can be 
+# called with "git commit", "git pull" and "git push" from the project's
+# root folder. If that is not the case, it must be commented out.
+# (Setting it to "false" is not sufficient!)  
+git=/usr/bin/git
+#git=C:/Program Files (x86)/Git/bin/git.exe
+
+# ----------------------------------------------------------------------
+# db connection properties for test database
+# if dbuser is undefined, no tests with an Oracle database will be run by build 
+dbhost=vmw10.enterag.ch
+dbport=1521
+dbinstance=orcl
+dbcatalog=conn # not used for oracle
+dbuser=TESTUSER
+dbpassword=testpwd
+dbauser=SYSTEM
+dbapassword=SYSTEM
+
+# ----------------------------------------------------------------------
+# db connection properties for BFILE tests
+# if dbbfiledirectory is undefined, BFILE tests are skipped.
+# BFILE directory on server, where Oracle instance is running.
+dbbfiledirectory=D:/Temp/Bfile
+# Same folder seen from "here" (mounted)
+#dbbfileshare=D:/Temp/Bfile
+#dbbfileshare=/mnt/bfile
+dbbfileshare=/Volumes/Bfile
+# File to be used as value for BFILE column
+dbbfilefilename=004.flac

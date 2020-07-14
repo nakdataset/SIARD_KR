@@ -1,0 +1,12 @@
+Release Notes for JdbcPostgres 2.1
+==================================
+
+2.1.50
+Fixed problem with domains/types in schema public having an SQL keyword as name.
+DVD retail test database can now be downloaded.
+
+2.1.41
+First fully tested release in branch master
+
+2.1.0
+First release of JdbcPostgres on GitHub.

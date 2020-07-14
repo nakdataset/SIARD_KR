@@ -1,0 +1,71 @@
+#== build.properties ===================================================
+# Properties of Ant build files of JdbcMySql
+# Application : SIARD Suite 2.0
+# Description : user-specific build properties of JdbcMySql
+#-----------------------------------------------------------------------
+# Copyright  : 2016, Enter AG, Rüti ZH, Switzerland
+# Created    : 09.05.2015, Hartwig Thomas
+#=======================================================================
+
+#-----------------------------------------------------------------------
+# DO NOT USE WHITESPACES IN PATHS; JAVA DOES NOT LIKE THEM:
+# Windows developers:
+# If you want to use backslashes (\) then you must repeat them twice, e.g.
+# c:\\foo\\bar
+# or - in path names - you can just use slashes, e.g.
+# c:/foo/bar
+#-----------------------------------------------------------------------
+#-----------------------------------------------------------------------
+# The deployment folder to which the binaries are to be unzipped.
+dirdeploy=/Users/Hartwig/test
+#dirdeploy=/home/hartwig/test
+#dirdeploy=D:/Temp
+
+#-----------------------------------------------------------------------
+# The bootstrap class (run-time jar) for compiling code compatible with JSE 1.8.
+#java8rtjar=C:/Program Files/Java/jdk1.8.0_144/jre/lib/rt.jar
+#java8rtjar=/usr/lib/jvm/java-8-oracle/jre/lib/rt.jar
+java8rtjar=/Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home/jre/lib/rt.jar
+
+#-----------------------------------------------------------------------
+# The following property definition signals, that git can be 
+# called with "git commit", "git pull" and "git push" from the project's
+# root folder. If that is not the case, it must be commented out.
+# (Setting it to "false" is not sufficient!)  
+git=/usr/bin/git
+#git=C:/Program Files/Git/bin/git.exe
+
+# ----------------------------------------------------------------------
+# db connection properties
+# if dbuser is undefined, no tests with a MySQL database will be run by build 
+dbhost=vmw10.enterag.ch
+dbport=3306
+dbcatalog=testschema
+dbuser=testuser
+dbpassword=testpwd
+dbauser=root
+dbapassword=rootpwd
+
+#-----------------------------------------------------------------------
+# BLOB sample files (same number of PNGs and FLACs, at most 10 per type)
+blobpng0=D:/SFPD/18/000001/18-000001A.png
+blobpng1=D:/SFPD/18/000001/18-000001B.png
+blobpng2=D:/SFPD/18/000002/18-000002A.png
+blobpng3=D:/SFPD/18/000002/18-000002B.png
+blobpng4=D:/SFPD/18/000003/18-000003A.png
+blobpng5=D:/SFPD/18/000003/18-000003B.png
+#blobpng6=D:/SFPD/18/000004/18-000004A.png
+#blobpng7=D:/SFPD/18/000004/18-000004B.png
+#blobpng8=D:/SFPD/18/000005/18-000005A.png
+#blobpng9=D:/SFPD/18/000005/18-000005B.png
+
+blobflac0=D:/SFPD/18/000001/18-000001A.png
+blobflac1=D:/SFPD/18/000001/18-000001B.png
+blobflac2=D:/SFPD/18/000002/18-000002A.png
+blobflac3=D:/SFPD/18/000002/18-000002B.png
+blobflac4=D:/SFPD/18/000003/18-000003A.png
+blobflac5=D:/SFPD/18/000003/18-000003B.png
+#blobflac6=D:/SFPD/18/000004/18-000004A.png
+#blobflac7=D:/SFPD/18/000004/18-000004B.png
+#blobflac8=D:/SFPD/18/000005/18-000005A.png
+#blobflac9=D:/SFPD/18/000005/18-000005B.png

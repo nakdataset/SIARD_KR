@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- ===================================================================
+Developers' Manual of JdbcBase: Architecture
+Application: SIARD Suite 2.1
+Platform   : HTML5
+========================================================================
+Copyright  : Enter AG, Joweid Zentrum 1, 8036 Rüti ZH, Switzerland, 2018
+==================================================================== -->
+  <head>
+    <title>JdbcBase - Developers' Manual - Architecture</title>
+    <!-- character set -->
+    <meta charset="utf-8" />
+    <!-- Icon -->
+    <link rel="icon" type="image/gif" href="../assets/img/icon.gif" />
+    <!-- Global style sheet -->
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/print.css">
+    <link rel="stylesheet" href="../assets/css/siard.css" />
+  </head>
+  <body>
+
+    <div class="container container-main">
+      <header>
+        <div class="clearfix">
+          <div class="table-row">
+            <span class="header-logo">
+              <img src="../assets/img/swiss.svg" onerror="this.onerror=null; this.src='../assets/img/swiss.png'" alt="Confederatio Helvetica" />
+            </span>
+            <h1 class="header-title">JdbcBase - Developers' Manual</h1>
+          </div>
+        </div>
+      </header>
+      
+      <div class="nav-main navbar" id="main-navigation"></div>
+    
+      <div class="container-fluid hidden-xs">
+        <div class="row">
+          <div class="col-sm-12">
+            <h2 id="br1" class="hidden">Breadcrumbs</h2>
+            <ol class="breadcrumb" role="navigation" aria-labelledby="br1">
+              <li><a href="./index.html">JdbcBase - Developers' Manual</a><span class="icon icon--greater"></span></li>
+              <li class="active" aria-selected="true">Architecture</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-12 main-column" id="content" role="main">
+            <div class="contentHead">
+              <div class="mod mod-contentpage">
+                <h1>JdbcBase - Developers' Manual - Architecture</h1>
+              </div>
+            </div>  
+            <div class="mod mod-text">
+              <section class="clearfix">
+                <h2>Architecture</h2>
+                <p>The project <em>JdbcBase</em> is part of the 
+                <em>SIARD (Software-Independent Archival of Relational Databases) Suite</em>.
+                The description of its architecture has two parts:</p>
+                <ul>
+                  <li>Global architecture of <em>SIARD Suite</em> and the position of <em>JdbcBase</em> in it,</li>
+                  <li>Local architecture of <em>JdbcBase</em>. 
+                </ul>
+                
+                <p class="pull-right">
+                  <small>
+                    <a href="#" class="icon icon--before icon--power hidden-print">Top of page</a>
+                  </small>
+                </p>
+                
+                <h3>Global Architecture</h3>
+                
+                <p>The SIARD project interacts with files containing 
+                  archived relational databases in the SIARD Format 2.1 
+                  using the SIARD API.</p>
+                <p>The SIARD project interacts with relational databases 
+                  using the <a href="http://download.oracle.com/otndocs/jcp/jdbc-4_1-mrel-spec/index.html" target="_blank">JDBC API (4.1)</a> 
+                  and the <a href="https://en.wikibooks.org/wiki/Structured_Query_Language" target="_blank">SQL:2008 standard</a>.</p>
+                
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+
+                <h4>SIARD Runtime Architecture</h4>
+                <img src="siard-runtime.png" alt="SIARD Runtime Architecture"/>
+                <p>Standards are bold and italics. The modules implement them.</p>
+
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+                
+                <h4>SIARD Development Architecture</h4>
+                <p>The SIARD project is based on the following sub-projects:</p>
+                <dl>
+                  <dt>SiardGui</dt>
+                  <dd>graphical user interface for downloading and uploading relational databases and editing their metadata</dd>
+                  <dt>SiardCmd</dt>
+                  <dd>command-line executables for downloading and uploading relational databases</dd>
+                  <dt>SiardApi</dt>
+                  <dd>API for reading an writing files in the SIARD Format 2.1</dd>
+                  <dt>Zip64File</dt>
+                  <dd>implementation of the ZIP 64 standard</dd>
+                  <dt>JdbcAccess</dt>
+                  <dd>JDBC interface (pure Java) to MS Access databases</dd>
+                  <dt>JdbcDb2</dt>
+                  <dd>JDBC interface to DB/2 databases</dd>
+                  <dt>JdbcH2</dt>
+                  <dd>JDBC interface to H2 databases</dd>
+                  <dt>JdbcMsSql</dt>
+                  <dd>JDBC interface to MS SQL Server databases</dd>
+                  <dt>JdbcMySql</dt>
+                  <dd>JDBC interface to MySql databases</dd>
+                  <dt>JdbcOracle</dt>
+                  <dd>JDBC interface to Oracle databases</dd>
+                  <dt class="bg-info">JdbcBase</dt>
+                  <dd class="bg-info">base classes for all JDBC 4.1 implementations</dd>
+                  <dt>SqlParser</dt>
+                  <dd>SQL:2008 Parser</dd>
+                  <dt>EnterUtilities</dt>
+                  <dd>various small utilities used by most projects</dd>
+                </dl>
+                <p>These projects depend on each other:</p>
+                <img src="siard-projects.png" alt="SIARD Projects"/>
+                <p><em>JdbcBase</em> is implemented as a separate
+                  project, because all standardized JDBC drivers
+                  - including future ones - should use it as a base.</p> 
+                
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+                
+                <h3>Local Architecture</h3>
+                <p>The project <em>JdbcBase</em> and its resulting <em>jdbcbase.jar</em>
+                  contains the common base of all JDBC wrappers for specific database systems. 
+                  All important JDBC-APIs are represented with an “empty” implementation. 
+                  For all methods of those APIs a test is defined in <em>jdbcbase-test.jar</em>.
+                  Both the JDBC wrappers as well as the tests are abstract classes from which 
+                  concrete classes need to be derived.</p>
+                 <h4>Registering a JDBC Wrapper</h4>
+                 <p>The class <em>BaseDriver</em> implements the static method 
+                   <em>register()</em>, which makes sure, that the wrapped
+                   JDBC driver is not activated instead of the wrapper.
+                   It is recommended, that every wrapper derived from
+                   <em>JdbcBase</em> use it for registering itself
+                   with the <em>DriverManager</em>.</p>
+                  <p>An important method to override in a JDBC wrapper is
+                    <em>Driver.acceptsURL()</em>. It defines which JDBC
+                    connection URLs are handles by the wrapper.</p> 
+                  <h4>Tests</h4>
+                  <p>The main verification of the implementation of an interface
+                    like the JDBC interface lies in the tests applied to all
+                    methods defined in the interface. The tests implemented in
+                    <em>jdbcbase-test.jar</em> all implement very primitive
+                    test which should be overridden in concrete JDBC wrappers.
+                    However, it is only necessary to override tests, where something more
+                    elaborate is needed.</p>
+                  <p>In addition to a test for every JDBC interface method a number
+                    of utilities for generating random strings and random binary
+                    files is implemented which will be needed, when verifying, that
+                    a value inserted in a database is unchanged, when read from it.</p>
+                                      
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+                
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="container-fluid">
+          <hr class="footer-line">
+          <img src="../assets/img/logo-CH.svg" onerror="this.onerror=null; this.src='../assets/img/logo-CH.png'" />
+          <h1 class="hidden-xs">Swiss Federal Archives</h1>
+          <p class=pull-right><a href="../../../LICENSE.txt" target="_blank">License</a></p>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

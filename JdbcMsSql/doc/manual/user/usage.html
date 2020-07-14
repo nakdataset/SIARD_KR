@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- ===================================================================
+Users' Manual of JdbcMsSql: Usage
+Application: SIARD Suite 2.1
+Platform   : HTML5
+========================================================================
+Copyright  : Enter AG, Joweid Zentrum 1, 8036 Rüti ZH, Switzerland, 2018
+==================================================================== -->
+  <head>
+    <title>JdbcMsSql - Users' Manual - Usage</title>
+    <!-- character set -->
+    <meta charset="utf-8" />
+    <!-- Icon -->
+    <link rel="icon" type="image/gif" href="../assets/img/icon.gif" />
+    <!-- Global style sheet -->
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/print.css">
+    <link rel="stylesheet" href="../assets/css/siard.css" />
+  </head>
+  <body>
+
+    <div class="container container-main">
+      <header>
+        <div class="clearfix">
+          <div class="table-row">
+            <span class="header-logo">
+              <img src="../assets/img/swiss.svg" onerror="this.onerror=null; this.src='../assets/img/swiss.png'" alt="Confederatio Helvetica" />
+            </span>
+            <h1 class="header-title">JdbcMsSql - Users' Manual</h1>
+          </div>
+        </div>
+      </header>
+      
+      <div class="nav-main navbar" id="main-navigation"></div>
+    
+      <div class="container-fluid hidden-xs">
+        <div class="row">
+          <div class="col-sm-12">
+            <h2 id="br1" class="hidden">Breadcrumbs</h2>
+            <ol class="breadcrumb" role="navigation" aria-labelledby="br1">
+              <li><a href="./index.html">JdbcMsSql - Users' Manual</a><span class="icon icon--greater"></span></li>
+              <li class="active" aria-selected="true">Usage</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-12 main-column" id="content" role="main">
+            <div class="contentHead">
+              <div class="mod mod-contentpage">
+                <h1>JdbcMsSql - Users' Manual - Usage</h1>
+              </div>
+            </div>  
+            <div class="mod mod-text">
+              <section class="clearfix">
+                <h2>Using the Binaries of the Project</h2>
+                <p>This JDBC driver for DB/2 is to be used like any
+                  other JDBC driver. It is recommended, that the static
+                  method <em>Db2Driver.register()</em> is used to register
+                  it with the DriverManager.</p>
+                <p>The support for executing SQL is based on a parser for 
+                  SQL:2008 and is limited to the single-table query functionality 
+                  needed for SIARD Suite 2.1.</p>
+
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+                
+                <h3>A GUI for JdbcMsSql</h3>
+                <p><em>JdbcMsSql</em> is distributed as a collection of 
+                  JAR files without a graphical user interface. However, 
+                  the versatile free application <a href="http://squirrel-sql.sourceforge.net/" target="_blank">SQuirreL SQL Client</a>
+                  can be used to make use of it.</p>                   
+
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+                
+               <h3>JdbcMsSql Data Type Mapping</h3>
+               <p><em>JdbcMsSql</em> being a standardized database
+                 interface to DB/2 databases must map all possible
+                 DB/2 data types to SQL:2008 data types and <em>vice versa</em>
+                 making sure that no data is lost.</p>
+              <p>The following type mapping is implemented by <em>JdbcMsSql</em>:</p>
+              <table>
+                <caption>Mapping of SQL Server Data Types to SQL:2008 Data Types</caption>
+                <thead>
+                  <tr><th>SQL Server Data Type</th><th>SQL:2008 Data Type</th><th>java.sql.Types Data Type</th><th>JAVA value type</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>tinyint</td><td>SMALLINT</td><td>SMALLINT</td><td>Short</td></tr>
+                  <tr><td>smallint</td><td>SMALLINT</td><td>SMALLINT</td><td>Short</td></tr>
+                  <tr><td>int</td><td>INTEGER</td><td>INTEGER</td><td>Integer</td></tr>
+                  <tr><td>bigint</td><td>BIGINT</td><td>BIGINT</td><td>Long</td></tr>
+                  <tr><td>smallmoney</td><td>DECIMAL</td><td>DECIMAL</td><td>BigDecimal</td></tr>
+                  <tr><td>money</td><td>DECIMAL</td><td>DECIMAL</td><td>BigDecimal</td></tr>
+                  <tr><td>decimal(p,q)</td><td>DECIMAL(p,q)</td><td>DECIMAL</td><td>BigDecimal</td></tr>
+                  <tr><td>numeric(p,q)</td><td>NUMERIC(p,q)</td><td>NUMERIC</td><td>BigDecimal</td></tr>
+                  <tr><td>float</td><td>DOUBLE</td><td>DOUBLE</td><td>Double</td></tr>
+                  <tr><td>real</td><td>REAL</td><td>REAL</td><td>Float</td></tr>
+
+                  <tr><td>char(n)</td><td>CHAR(n)</td><td>CHAR</td><td>String</td></tr>
+                  <tr><td>nchar(n)</td><td>NCHAR(n)</td><td>NCHAR</td><td>String</td></tr>
+                  <tr><td>varchar(n)</td><td>VARCHAR(n)</td><td>VARCHAR</td><td>String</td></tr>
+                  <tr><td>nvarchar(n)</td><td>NVARCHAR(n)</td><td>NVARCHAR</td><td>String</td></tr>
+                  <tr><td>sysname</td><td>NVARCHAR</td><td>NVARCHAR</td><td>String</td></tr>
+                  <tr><td>hierarchyid</td><td>VARCHAR</td><td>VARCHAR</td><td>String</td></tr>
+                  <tr><td>uniqueidentifier</td><td>CHAR(38)</td><td>VARCHAR</td><td>String</td></tr>
+                  <tr><td>text</td><td>CLOB</td><td>CLOB</td><td>Reader</td></tr>
+                  <tr><td>ntext</td><td>NCLOB</td><td>NCLOB</td><td>Reader</td></tr>
+                  <tr><td>xml</td><td>XML</td><td>SQLXML</td><td>Reader</td></tr>
+
+                  <tr><td>binary(n)</td><td>BINARY(n)</td><td>BINARY</td><td>byte[]</td></tr>
+                  <tr><td>varbinary(n)</td><td>VARBINARY(n)</td><td>VARBINARY</td><td>byte[]</td></tr>
+                  <tr><td>image</td><td>BLOB</td><td>BLOB</td><td>InputStream</td></tr>
+                  <tr><td>sql_variant</td><td>BLOB</td><td>BLOB</td><td>InputStream</td></tr>
+                  <tr><td>timestamp</td><td>BINARY(8)</td><td>BINARY</td><td>byte[]</td></tr>
+                  <tr><td>bit</td><td>BOOLEAN</td><td>BOOLEAN</td><td>Boolean</td></tr>
+                  
+                  <tr><td>date</td><td>DATE</td><td>DATE</td><td>java.sql.Date</td></tr>
+                  <tr><td>time</td><td>TIME</td><td>TIME</td><td>java.sql.Time</td></tr>
+                  <tr><td>smalldatetime</td><td>TIMESTAMP</td><td>TIMESTAMP</td><td>java.sql.Timestamp</td></tr>
+                  <tr><td>datetime</td><td>TIMESTAMP</td><td>TIMESTAMP</td><td>java.sql.Timestamp</td></tr>
+                  <tr><td>datetime2</td><td>TIMESTAMP</td><td>TIMESTAMP</td><td>java.sql.Timestamp</td></tr>
+                  <tr><td>datetimeoffset</td><td>TIMESTAMP</td><td>TIMESTAMP</td><td>java.sql.Timestamp</td></tr>
+                  
+                  <!-- geometry is read as Well-Known Text -->
+                  <tr><td>geometry</td><td>VARCHAR</td><td>VARCHAR</td><td>String</td></tr>
+                  <!-- geography is read as Well-Known Text -->
+                  <tr><td>geography</td><td>VARCHAR</td><td>VARCHAR</td><td>String</td></tr>
+                </tbody>
+              </table>
+              
+              <p class="pull-right">
+                <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+              </p>
+              
+              <table>
+                <caption>Mapping of SQL:2008 Data Types to SQL Server Data Types</caption>
+                <thead>
+                  <tr><th>SQL:2008 Data Type</th><th>SQL Server Data Type</th><th>JAVA value type</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>SMALLINT</td><td>smallint</td><td>Short</td></tr>
+                  <tr><td>INTEGER</td><td>integer</td><td>Integer</td></tr>
+                  <tr><td>BIGINT</td><td>bigint</td><td>Long</td></tr>
+                  <tr><td>REAL</td><td>real</td><td>Float</td></tr>
+                  <tr><td>FLOAT</td><td>float</td><td>Double</td></tr>
+                  <tr><td>DOUBLE</td><td>float</td><td>Double</td></tr>
+                  <tr><td>NUMERIC(p,q)</td><td>numeric(p,q)</td><td>BigDecimal</td></tr>
+                  <tr><td>DECIMAL(p,q)</td><td>decimal(p,q></td><td>BigDecimal</td></tr>
+
+                  <tr><td>CHAR(n)</td><td>char(n)</td><td>String</td></tr>
+                  <tr><td>NCHAR(n)</td><td>nchar(n)</td><td>String</td></tr>
+                  <tr><td>VARCHAR(n)</td><td>varchar(n)</td><td>String</td></tr>
+                  <tr><td>NVARCHAR(n)</td><td>nvarchar(n)</td><td>String</td></tr>
+                  <tr><td>CLOB</td><td>text</td><td>Reader</td></tr>
+                  <tr><td>NCLOB</td><td>ntext</td><td>Reader</td></tr>
+                  <tr><td>XML</td><td>xml</td><td>Reader</td></tr>
+
+                  <tr><td>BINARY(n)</td><td>binary(n)</td><td>byte[]</td></tr>
+                  <tr><td>VARBINARY(n)</td><td>varbinary(n)</td><td>byte[]</td></tr>
+                  <tr><td>BLOB</td><td>image</td><td>InputStream</td></tr>
+                  <tr><td>BOOLEAN</td><td>bit</td><td>Boolean</td></tr>
+
+                  <tr><td>DATE</td><td>date</td><td>java.sql.Date</td></tr>
+                  <tr><td>TIME</td><td>time</td><td>java.sql.Time</td></tr>
+                  <tr><td>TIMESTAMP</td><td>datetime2</td><td>java.sql.Timestamp</td></tr>
+                  <tr><td>INTERVAL (YEAR-MONTH)</td><td>NVARCHAR(128)</td><td>ch.enterag.sqlparser.Interval</td></tr>
+                  <tr><td>INTERVAL (DAY-SECONDS)</td><td>NVARCHAR(128)</td><td>ch.enterag.sqlparser.Interval</td></tr>
+                </tbody>
+              </table>
+              
+              <p class="pull-right">
+                <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+              </p>
+              
+              <h3>UDT-Handling</h3>
+              <p>The Microsoft implementation of <em>dmd.getTypeInfo()</em>
+                returns DISTINCT types, which should really be returned in 
+                <em>dmd.getUDTs()</em>. And <em>dmd.getUDTs()</em> returns 
+                an empty <em>ResultSet</em>. The wrapper only returns the 
+                predefined types in <em>dmd.getTypeInfo()</em> and returns 
+                “alias” types as DISTINCT, Table-types as STRUCT, and CLR 
+                user-defined types as JAVA_OBJECT in <em>dmd.getUDTs()</em>.</p>
+              <p>However, SQL Server 2012 (up to 2016) does not make it 
+                possible to access the “attributes” of either (Table or CLR) 
+                UDT. Only CLR-UDTs really are of interest for database 
+                archival (SIARD). All CLR-UDTs implement <em>Parse()</em> and 
+                <em>ToString()</em>. Therefore all CLR UDTs are inserted 
+                using a parsable character string and are to be retrieved as 
+                strings (varchar) by selecting <em>&lt;col&gt;.ToString()</em>
+                as <em>&lt;col&gt;</em>. If just the value <em>&lt;col&gt;</em>
+                is selected, the serialized “binary” data is returned.</p>
+                
+              <p class="pull-right">
+                <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+              </p>
+              
+                <h3>Javadoc Documentation</h3>
+                <p>The JDBC 4.1 standard is well documented. Therefore no Javadoc
+                  documentation is generated.</p>
+                  
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+                
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="container-fluid">
+          <hr class="footer-line">
+          <img src="../assets/img/logo-CH.svg" onerror="this.onerror=null; this.src='../assets/img/logo-CH.png'" />
+          <h1 class="hidden-xs">Swiss Federal Archives</h1>
+          <p class=pull-right><a href="../../../LICENSE.txt">License</a></p>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
