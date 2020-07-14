@@ -1,7 +1,7 @@
-/*====================================================================== 
-SiardGui implements the graphical user interface of SIARD Suite 2.x 
+/*======================================================================
+SiardGui implements the graphical user interface of SIARD Suite 2.x
 Application: SIARD GUI
-Description: SiardGui implements the graphical user interface of 
+Description: SiardGui implements the graphical user interface of
               SIARD Suite 2.x
 Platform   : JAVA 1.7, JavaFX 2.2
 ------------------------------------------------------------------------
@@ -65,7 +65,7 @@ public class SiardGui extends Application
 {
   /** singleton */
   private static SiardGui _sg = null;
-  /** logger */  
+  /** logger */
   private static IndentLogger _il = IndentLogger.getIndentLogger(SiardGui.class.getName());
   /** return codes */
   private static final int iRETURN_OK = 0;
@@ -95,7 +95,7 @@ public class SiardGui extends Application
       "Swiss Federal Archives, Berne, Switzerland"
     });
   public static List<String> getProvenances() { return listPROVENANCES; }
-  
+
   /** info */
   public static ProgramInfo _pi = ProgramInfo.getProgramInfo(
     "SIARD Suite",MF.getSpecificationVersion(),
@@ -105,7 +105,7 @@ public class SiardGui extends Application
 
   /** splash stage */
   private Stage _stageSplash = null;
-  
+
   /** primary stage */
   private Stage _stage = null;
   public Stage getStage() { return _stage; }
@@ -119,13 +119,13 @@ public class SiardGui extends Application
   /** archive */
   private Archive _archive = null;
   public Archive getArchive() { return _archive; }
-  public void setArchive(Archive archive) 
-  { 
+  public void setArchive(Archive archive)
+  {
     _archive = archive;
   }
 
   public StopWatch swOpen = StopWatch.getInstance();
-  
+
   /*------------------------------------------------------------------*/
   /** logPerformance prints memory and stop watches.
    */
@@ -138,7 +138,7 @@ public class SiardGui extends Application
       ", Open: "+swOpen.formatMs()+
       ", Valid: "+((ArchiveImpl)getArchive())._swValid.formatMs());
   } /* logPerformance */
-  
+
   /*------------------------------------------------------------------*/
   /** setTitle sets the title with file name and change indicator */
   public void setTitle()
@@ -154,7 +154,7 @@ public class SiardGui extends Application
 
 	_stage.setTitle("SIARD_KR 1.1");
   } /* setTitle */
-  
+
   private Cursor _cursor = Cursor.DEFAULT;
   /*------------------------------------------------------------------*/
   /** check, whether a background action is running.
@@ -164,11 +164,11 @@ public class SiardGui extends Application
   {
     return getScene().getCursor().equals(Cursor.WAIT);
   } /* inAction */
-  
+
   /*------------------------------------------------------------------*/
   /** indicate start of a modal background action.
    * @param sStatus status to be displayed in status line.
-   * @return true, if no other background action is active. 
+   * @return true, if no other background action is active.
    */
   public boolean startAction(String sStatus)
   {
@@ -202,7 +202,7 @@ public class SiardGui extends Application
     }
     _il.exit();
   } /* terminateAction */
-  
+
   /*------------------------------------------------------------------*/
   /** compare version of running instance to given version.
    * @param sVersion version to compare running instance to.
@@ -219,8 +219,8 @@ public class SiardGui extends Application
       String[] asInstalled = sVersion.split("\\.");
       String sRunningVersion = SiardGui.getVersion();
       String[] asRunning = sRunningVersion.split("\\.");
-      for (int iVersionComponent = 0; 
-        (iCompare == 0) && (iVersionComponent < Math.min(asInstalled.length, asRunning.length)); 
+      for (int iVersionComponent = 0;
+        (iCompare == 0) && (iVersionComponent < Math.min(asInstalled.length, asRunning.length));
         iVersionComponent++)
         iCompare = Integer.compare(Integer.parseInt(asRunning[iVersionComponent]),Integer.parseInt(asInstalled[iVersionComponent]));
       if (iCompare == 0)
@@ -237,7 +237,7 @@ public class SiardGui extends Application
   {
     return new File(SpecialFolder.getUserDataHome(SiardGui.getApplication()+" "+Archive.sMETA_DATA_VERSION));
   } /* getDefaultDataDirectory */
-  
+
   /*------------------------------------------------------------------*/
   /** checks whether the current instance is running from a JAR installed
    * in the given folder.
@@ -263,7 +263,7 @@ public class SiardGui extends Application
     }
     return bRunningFromFolder;
   } /* isRunningFrom */
-  
+
   /*------------------------------------------------------------------*/
   /** check if running instance is installed instance.
    * N.B.: Otherwise UserProperties are not stored.
@@ -272,10 +272,10 @@ public class SiardGui extends Application
   public static boolean isRunningInstalled()
   {
     UserProperties up = UserProperties.getUserProperties();
-    return ((compareVersion(up.getInstalledVersion(null)) == 0) && 
+    return ((compareVersion(up.getInstalledVersion(null)) == 0) &&
       isRunningFrom(up.getInstalledPath(null)));
   } /* is RunningInstalled */
-  
+
   /*------------------------------------------------------------------*/
   /** initialize language, size and state of stage from user data.
    */
@@ -298,7 +298,7 @@ public class SiardGui extends Application
       _stage.setY(0.15*rectScreen.getHeight());
 //      _stage.setWidth(0.7 * rectScreen.getWidth());
 //      _stage.setHeight(0.7 * rectScreen.getHeight());
-	} 
+	}
     else
     {
       _stage.setX(up.getStageX(0.15*rectScreen.getWidth()));
@@ -308,7 +308,7 @@ public class SiardGui extends Application
     }
     _stage.setWidth(1024);
     _stage.setHeight(768);
-    
+
     System.setProperty(FS.sUSE_NATIVE_PROPERTY, String.valueOf(up.getFileChooserNative(true)));
     _il.exit(up);
     return up;
@@ -353,7 +353,7 @@ public class SiardGui extends Application
     _il.enter();
     UserProperties up = UserProperties.getUserProperties();
     SiardBundle sb = SiardBundle.getSiardBundle();
-    String sLanguagePrevious = up.getUiLanguage(null); 
+    String sLanguagePrevious = up.getUiLanguage(null);
     if (!sLanguage.equals(sLanguagePrevious))
     {
       String[] asLanguage = sb.getMainLanguages();
@@ -370,7 +370,7 @@ public class SiardGui extends Application
     }
     _il.exit();
   } /* setLanguage */
-  
+
   /*------------------------------------------------------------------*/
   /** download action
    */
@@ -384,7 +384,7 @@ public class SiardGui extends Application
       MainPane.getMainPane().setArchive();
     }
   } /* download */
-  
+
   /*------------------------------------------------------------------*/
   /** download action
    */
@@ -392,7 +392,7 @@ public class SiardGui extends Application
   {
     download(null, null);
   } /* download */
-  
+
   /*------------------------------------------------------------------*/
   /** upload action
    */
@@ -401,7 +401,7 @@ public class SiardGui extends Application
     UploadDownloadAction.newUploadDownloadAction().upload(sConnectionUrl, sDbUser, _archive);
     MainMenuBar.getMainMenuBar().restrict();
   } /* upload */
-  
+
   /*------------------------------------------------------------------*/
   /** upload action
    */
@@ -409,7 +409,7 @@ public class SiardGui extends Application
   {
     upload(null,null);
   } /* upload */
-  
+
   /*------------------------------------------------------------------*/
   /** open action
    */
@@ -423,7 +423,7 @@ public class SiardGui extends Application
     MainMenuBar.getMainMenuBar().restrict();
     MainPane.getMainPane().setArchive();
   } /* openArchive */
-  
+
   /*------------------------------------------------------------------*/
   /** open action
    */
@@ -431,7 +431,7 @@ public class SiardGui extends Application
   {
     openArchive(null);
   } /* openArchive */
-  
+
   /*------------------------------------------------------------------*/
   /** save action
    */
@@ -441,7 +441,7 @@ public class SiardGui extends Application
     setTitle();
     MainMenuBar.getMainMenuBar().restrict();
   } /* save */
-  
+
   /*------------------------------------------------------------------*/
   /** display meta data action
    */
@@ -466,7 +466,7 @@ public class SiardGui extends Application
     MainMenuBar.getMainMenuBar().restrict();
     MainPane.getMainPane().setArchive();
   } /* augmentMetaData */
-  
+
   /*------------------------------------------------------------------*/
   /** close action
    */
@@ -518,7 +518,7 @@ public class SiardGui extends Application
     MainMenuBar.getMainMenuBar().restrict();
     MainPane.getMainPane().setArchive();
   } /* closeArchive */
-  
+
   /*------------------------------------------------------------------*/
   /** exit action
    */
@@ -527,7 +527,7 @@ public class SiardGui extends Application
     if (canClose())
       _stage.close(); // internal call generates no close request
   } /* exit */
-  
+
   /*------------------------------------------------------------------*/
   /** copyAll action
    */
@@ -537,7 +537,7 @@ public class SiardGui extends Application
     if (oltv != null)
       oltv.copyTable();
   } /* copyAll */
-  
+
   /*------------------------------------------------------------------*/
   /** copyRow action
    */
@@ -551,7 +551,7 @@ public class SiardGui extends Application
       oltv.copyRow(iSelectedRow);
     }
   } /* copyRow */
-  
+
   /*------------------------------------------------------------------*/
   /** exportTable action
    */
@@ -561,7 +561,7 @@ public class SiardGui extends Application
     if (table != null)
       ExportAction.newExportAction(table).exportAsHtml();
   } /* exportTable */
-  
+
   /*------------------------------------------------------------------*/
   /** find (meta data) action
    */
@@ -570,7 +570,7 @@ public class SiardGui extends Application
     if (FindAction.newFindAction().find())
       findNext();
   } /* find */
-  
+
   /*------------------------------------------------------------------*/
   /** findNext (meta data) action
    */
@@ -587,11 +587,11 @@ public class SiardGui extends Application
     else
       MB.show(getStage(),
         sb.getFindTitle(),
-        sb.getFindEndMessage(sFindString), 
+        sb.getFindEndMessage(sFindString),
         sb.getOk(), null);
     MainMenuBar.getMainMenuBar().restrict();
   } /* findNext */
-  
+
   /*------------------------------------------------------------------*/
   /** search (current table primary data) action
    */
@@ -600,7 +600,7 @@ public class SiardGui extends Application
     if (SearchAction.newSearchAction().search(MainPane.getMainPane().getSelectedTable()))
       searchNext();
   } /* search */
-  
+
   /*------------------------------------------------------------------*/
   /** searchNext (table primary data) action
    */
@@ -608,7 +608,7 @@ public class SiardGui extends Application
   {
     SearchAction.newSearchAction().searchNext(MainPane.getMainPane().getSelectedTable());
   } /* searchNext */
-  
+
   /*------------------------------------------------------------------*/
   /** install SIARD Suite
    */
@@ -616,7 +616,7 @@ public class SiardGui extends Application
   {
     InstallUninstallHandler.getInstallUninstallHandler().install();
   } /* install */
-  
+
   /*------------------------------------------------------------------*/
   /** uninstall SIARD Suite
    */
@@ -624,7 +624,7 @@ public class SiardGui extends Application
   {
     InstallUninstallHandler.getInstallUninstallHandler().uninstall(bQuiet);
   } /* uninstall */
-  
+
   /*------------------------------------------------------------------*/
   /** checks integrity
    */
@@ -637,18 +637,18 @@ public class SiardGui extends Application
         SiardBundle sb = SiardBundle.getSiardBundle();
         String sResultMessage = null;
         if (_archive.isPrimaryDataUnchanged())
-          sResultMessage = sb.getIntegrityCheckPassMessage(_archive.getFile()); 
+          sResultMessage = sb.getIntegrityCheckPassMessage(_archive.getFile());
         else
-          sResultMessage = sb.getIntegrityCheckFailMessage(_archive.getFile()); 
+          sResultMessage = sb.getIntegrityCheckFailMessage(_archive.getFile());
         MB.show(getStage(),
           sb.getIntegrityCheckTitle(_archive.getFile()),
-          sResultMessage, 
+          sResultMessage,
           sb.getOk(), null);
       }
       catch(IOException ie) { _il.exception(ie); }
     }
   } /* integrity */
-  
+
   /*------------------------------------------------------------------*/
   /** sets options (user properties)
    */
@@ -656,7 +656,7 @@ public class SiardGui extends Application
   {
     OptionDialog.showOptionDialog(getStage());
   } /* options */
-  
+
   /*------------------------------------------------------------------*/
   /** display help HTML
    */
@@ -664,7 +664,7 @@ public class SiardGui extends Application
   {
     HelpDialog.showHelpDialog(getStage(),"index.html");
   } /* help */
-  
+
   /*------------------------------------------------------------------*/
   /** display info dialog
    */
@@ -672,7 +672,7 @@ public class SiardGui extends Application
   {
     InfoDialog.showInfoDialog(getStage());
   } /* info */
-  
+
   /*------------------------------------------------------------------*/
   /** show object in the details pane.
    * @param oMetaData meta data or RecordExtract object.
@@ -682,9 +682,9 @@ public class SiardGui extends Application
   {
     MainPane.getMainPane().showMetaData(oMetaData,clsTableData);
   } /* showDetails */
-  
+
   /*------------------------------------------------------------------*/
-  /** collapse currently selected record extract and its parents up to 
+  /** collapse currently selected record extract and its parents up to
    * the rows entry of the table tree item.
    */
   public void collapseToRows()
@@ -712,7 +712,7 @@ public class SiardGui extends Application
       _il.event("InstalledPath: "+up.getInstalledPath(null));
       //System.out.println("InstalledVersion: "+up.getInstalledVersion(null));
       //System.out.println("InstalledPath: "+up.getInstalledPath(null));
-      if ((compareVersion(up.getInstalledVersion(null)) == 0) && 
+      if ((compareVersion(up.getInstalledVersion(null)) == 0) &&
            isRunningFrom(up.getInstalledPath(null)))
       {
         System.out.println("Storing properties ...");
@@ -723,7 +723,7 @@ public class SiardGui extends Application
     _il.exit(String.valueOf(bCanClose));
     return bCanClose;
   } /* canClose */
-  
+
   /*------------------------------------------------------------------*/
   /** handle close request.
    */
@@ -733,7 +733,7 @@ public class SiardGui extends Application
     if (!canClose())
       we.consume();
   } /* handle */
-  
+
   /*------------------------------------------------------------------*/
   /** make sure, all changes are saved or discarded.
    */
@@ -748,7 +748,7 @@ public class SiardGui extends Application
 
   /*------------------------------------------------------------------*/
   /** compare current version with installed version and offer installation
-   * if the current version is new or more recent. 
+   * if the current version is new or more recent.
    * @return
    */
   public boolean checkInstall()
@@ -773,7 +773,7 @@ public class SiardGui extends Application
       {
         // display message, that an older version is installed
         iResult = MB.show(getStage(), sb.getInstalledOlderTitle(),
-          sb.getInstalledOlderMessage(sInstalledVersion, up.getFile(), up.getInstalledPath(null), getVersion()), 
+          sb.getInstalledOlderMessage(sInstalledVersion, up.getFile(), up.getInstalledPath(null), getVersion()),
           sb.getYes(),sb.getNo());
       }
     }
@@ -781,7 +781,7 @@ public class SiardGui extends Application
     {
       // display message, that a more recent version is installed
       MB.show(getStage(), sb.getInstalledNewerTitle(),
-        sb.getInstalledNewerMessage(sInstalledVersion, up.getFile(), up.getInstalledPath(null), getVersion()), 
+        sb.getInstalledNewerMessage(sInstalledVersion, up.getFile(), up.getInstalledPath(null), getVersion()),
         sb.getOk(), null);
     }
     if (iResult != 0)
@@ -789,7 +789,7 @@ public class SiardGui extends Application
     _il.exit(String.valueOf(bInstall));
     return bInstall;
   } /* checkInstall */
-  
+
   /*------------------------------------------------------------------*/
   /** start SIARD GUI.
    * @param stage primary stage.
@@ -811,7 +811,7 @@ public class SiardGui extends Application
     int iSplashMs = up.getSplashMs(1000);
     if (_bInitialInstall)
       iSplashMs = 0;
-    SleeperTask.runSleeperTask(iSplashMs,new EventHandler<WorkerStateEvent>() 
+    SleeperTask.runSleeperTask(iSplashMs,new EventHandler<WorkerStateEvent>()
     {
       /*----------------------------------------------------------------*/
       /** this is called after the splash panel has terminated.
@@ -854,11 +854,11 @@ public class SiardGui extends Application
     if (listParameters.size() > 0)
       _fileInitialOpen = new File(listParameters.get(0));
     _sg = this;
-    
+
 	/* S: log 디렉토리 생성 */
 	makeLogDir();
 	/* E: log 디렉토리 생성 */
-	
+
     _il.exit();
   } /* init */
 
@@ -870,10 +870,11 @@ public class SiardGui extends Application
   {
     return _sg;
   } /* getSiardGui */
-  
+
   /*------------------------------------------------------------------*/
   /** start JavaFX application.
    * @param args optional file name of SIARD file to be opened.
+   * 테스트
    */
   public static void main(String[] args)
   {
@@ -883,7 +884,7 @@ public class SiardGui extends Application
     _il.systemProperties();
     _il.info("JavaFX runtime version: "+com.sun.javafx.runtime.VersionInfo.getRuntimeVersion());
     try
-    { 
+    {
       launch(args);
       iReturn = iRETURN_OK;
     }
@@ -894,7 +895,7 @@ public class SiardGui extends Application
   /* S: log 디렉토리 생성 메서드 */
   /**
    * make log directory
-   *  
+   *
    * logging.properties의 "java.util.logging.FileHandler.pattern" 값을 읽어 log
    * 디렉토리 생성
    */
@@ -924,12 +925,12 @@ public class SiardGui extends Application
 		  logDir.mkdirs();
 		}
 	  }
-	} 
+	}
 	catch (IOException e)
 	{
 		e.printStackTrace();
 	}
   } /* makeLogDir */
   /* E: log 디렉토리 생성 메서드 */
-  
+
 } /* class SiardGui */
