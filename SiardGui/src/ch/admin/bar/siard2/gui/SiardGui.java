@@ -874,7 +874,7 @@ public class SiardGui extends Application
   /*------------------------------------------------------------------*/
   /** start JavaFX application.
    * @param args optional file name of SIARD file to be opened.
-   * 테스트 싫은데
+   * 테스트 싫은데ㅁ!!!!!!
    */
   public static void main(String[] args)
   {
