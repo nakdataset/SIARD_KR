@@ -12,13 +12,18 @@ package ch.admin.bar.siard2.gui;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 import ch.admin.bar.siard2.api.Archive;
 import ch.admin.bar.siard2.api.MetaSearch;
@@ -34,6 +39,7 @@ import ch.admin.bar.siard2.gui.actions.UploadDownloadAction;
 import ch.admin.bar.siard2.gui.dialogs.HelpDialog;
 import ch.admin.bar.siard2.gui.dialogs.InfoDialog;
 import ch.admin.bar.siard2.gui.dialogs.OptionDialog;
+import ch.config.db.SQLiteConnection;
 import ch.enterag.utils.DU;
 import ch.enterag.utils.ProgramInfo;
 import ch.enterag.utils.StopWatch;
@@ -67,6 +73,10 @@ public class SiardGui extends Application
   private static SiardGui _sg = null;
   /** logger */
   private static IndentLogger _il = IndentLogger.getIndentLogger(SiardGui.class.getName());
+
+  // 최창근 추가 - 로그
+  private static final Logger LOG = Logger.getLogger(SiardGui.class);
+
   /** return codes */
   private static final int iRETURN_OK = 0;
   private static final int iRETURN_ERROR = 8;
@@ -849,6 +859,11 @@ public class SiardGui extends Application
     throws Exception
   {
     super.init();
+
+    // 최창근 추가 - 로그, SQLite Set
+    logSettingInit();
+    sqliteSettingInit();
+
     _il.enter();
     List<String> listParameters = getParameters().getRaw();
     if (listParameters.size() > 0)
@@ -878,6 +893,8 @@ public class SiardGui extends Application
    */
   public static void main(String[] args)
   {
+	LOG.info("main");
+
     int iReturn = iRETURN_ERROR;
     for (int i = 0; i < args.length; i++)
       _il.info("arg["+String.valueOf(i)+"]: "+args[i]);
@@ -933,4 +950,20 @@ public class SiardGui extends Application
   } /* makeLogDir */
   /* E: log 디렉토리 생성 메서드 */
 
+
+  // 최창근 추가 - log4j 사용을 properties 위한 설정 메소드
+  private static void logSettingInit(){
+	try {
+		FileInputStream log4jRead = new FileInputStream("log4j.properties");
+			Properties log4jProperty = new Properties();
+			log4jProperty.load(log4jRead);
+			PropertyConfigurator.configure(log4jProperty);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	// 최창근 추가 - SQLite 사용을 위한 설정 메소드
+	private static void sqliteSettingInit() {
+		Connection conn = SQLiteConnection.getConnection();
+	}
 } /* class SiardGui */
