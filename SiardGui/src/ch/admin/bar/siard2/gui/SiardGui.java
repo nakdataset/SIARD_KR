@@ -860,10 +860,6 @@ public class SiardGui extends Application
   {
     super.init();
 
-    // 최창근 추가 - 로그, SQLite Set
-    logSettingInit();
-    sqliteSettingInit();
-
     _il.enter();
     List<String> listParameters = getParameters().getRaw();
     if (listParameters.size() > 0)
@@ -893,6 +889,10 @@ public class SiardGui extends Application
    */
   public static void main(String[] args)
   {
+	// 최창근 추가 - 로그, SQLite Set
+    logSettingInit();
+	sqliteSettingInit();
+
 	LOG.info("main");
 
     int iReturn = iRETURN_ERROR;
