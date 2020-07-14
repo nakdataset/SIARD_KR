@@ -1,0 +1,12 @@
+Release Notes for EnterUtilities 2.1
+====================================
+
+2.1.58
+Fixed error for limiting timestamps.
+
+2.1.0
+Release for JAVA 10
+GPL3 license removed. CDDL 1.0 license added.
+
+2.0.1
+First release of EnterUtilities on GitLab.
