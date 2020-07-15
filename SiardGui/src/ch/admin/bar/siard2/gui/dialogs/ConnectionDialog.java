@@ -1205,6 +1205,7 @@ public abstract class ConnectionDialog
 
 		String sqlOracle 			= "";
 		String sqlMysql 			= "SHOW FULL TABLES WHERE TABLE_TYPE = 'BASE TABLE'";
+		String sqlMssql 			= "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES";
 		String sqlMsAccess			= "SELECT MsysObjects.Name FROM MSysObjects WHERE Type = 1";
 		String sqlCubrid 			= "";
 
@@ -1254,6 +1255,16 @@ public abstract class ConnectionDialog
 			sqlCubrid	 = "SELECT CLASS_NAME FROM DB_CLASS WHERE OWNER_NAME = '" + owner.toUpperCase() + "'" + " AND CLASS_TYPE = 'CLASS' AND IS_SYSTEM_CLASS = 'NO'";
 			sql 		 = sqlCubrid;
 			/* E: Cubrid 테이블 목록조회 쿼리 오류 수정 */
+		}
+		/*2020.07.14 - MsSQL(SQL Server) 드라이버 추가*/
+		else if(dbsystem.equals("SQL Server"))
+		{
+			driverName 	= driverNameMssql;
+
+			sql 		= sqlMssql;
+			url 		= _tfConnectionUrl.getText();
+			user 		= _tfUser.getText();
+			password 	= _pfTable.getText();
 		}
 
 		try
