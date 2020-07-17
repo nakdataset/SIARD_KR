@@ -72,11 +72,16 @@ public class InstallUninstallHandler
     _il.enter(it);
     SiardBundle sb = SiardBundle.getSiardBundle();
     UserProperties up = UserProperties.getUserProperties();
+
     boolean bInstalled = it.getValue().booleanValue();
+    LOG.info("bInstalled " + bInstalled);
     if (bInstalled)
     {
       _il.event("Installation succeeded");
       String sMessage = sb.getInstallationSuccessMessage(it.getInstallationFolder());
+
+      LOG.info("sMessage " + sMessage);
+
       if (it.getDesktopResult() != 0)
         MB.show(SiardGui.getSiardGui().getStage(),
           sb.getInstallationErrorTitle(),
@@ -84,16 +89,21 @@ public class InstallUninstallHandler
           sb.getOk(), null);
       else
         sMessage = sb.getInstallationSuccessDesktopMessage(it.getInstallationFolder());
+
       MB.show(SiardGui.getSiardGui().getStage(),
         sb.getInstallationSuccessTitle(), sMessage,
         sb.getOk(), null);
+
       _il.event("Setting installation folder to "+it.getInstallationFolder().getAbsolutePath()+" ...");
       up.setInstalledPath(it.getInstallationFolder());
+
       _il.event("Setting installation version "+SiardGui.getVersion()+" ...");
       up.setInstalledVersion(SiardGui.getVersion());
+
       _il.event("Storing installation ...");
       up.store();
       _il.event("Stored "+up.getInstalledVersion(null)+" ("+up.getInstalledPath(null)+") to "+ up.getFile().getAbsolutePath());
+
       SiardGui.getSiardGui().exit();
     }
     else
@@ -104,6 +114,7 @@ public class InstallUninstallHandler
         sb.getInstallationErrorCopyMessage(it.getInstallationFolder()),
         sb.getOk(), null);
     }
+
     _il.exit();
   } /* handleInstallerResult */
 
@@ -177,38 +188,59 @@ public class InstallUninstallHandler
 
     _il.enter(String.valueOf(_bContinueInstall));
     _bContinueInstall = false;
+
     UserProperties up = UserProperties.getUserProperties();
     SiardBundle sb = SiardBundle.getSiardBundle();
     Stage stage = SiardGui.getSiardGui().getStage();
+
     /* folder of running instance */
     File folderSource = SpecialFolder.getMainJar();
+
     if (folderSource.isFile())
       folderSource = folderSource.getParentFile().getParentFile();
     else
       folderSource = folderSource.getParentFile();
+
     _il.event("folderSource: "+folderSource.getAbsolutePath());
+
     /* get initial value for from previously installed version */
     File folderInstallation = up.getInstalledPath(null);
+
+    LOG.info("(up.getInstalledVersion(null) == null) " + (up.getInstalledVersion(null) == null));
     if (up.getInstalledVersion(null) == null)
     {
+
+      LOG.info("folderInstallation " + folderInstallation);
       /* if completely new, then set it to application folder in local home */
       if (folderInstallation == null)
       {
         _il.event("New installation!");
+        LOG.info("New installation!");
         folderInstallation = new File(SpecialFolder.getUserLocalHome(up.getApplicationName()));
       }
+
       _il.event("Initial installation folder: "+folderInstallation.getAbsolutePath());
+      LOG.info("Initial installation folder: "+folderInstallation.getAbsolutePath());
       /* now select folder where SIARD Suite is to be installed. */
       try
       {
         /* do not use native directory chooser here */
         boolean bNative = Boolean.valueOf(System.getProperty(FS.sUSE_NATIVE_PROPERTY));
         System.setProperty(FS.sUSE_NATIVE_PROPERTY, String.valueOf(false));
+        LOG.info("FS.sUSE_NATIVE_PROPERTY " + FS.sUSE_NATIVE_PROPERTY);
+
         do
         {
           folderInstallation = FS.chooseNewFolder(stage,
               sb.getInstallationSelectorTitle(), sb.getInstallationSelectorMessage(),
               sb, folderInstallation);
+
+          LOG.info("folderInstallation " + folderInstallation);
+          LOG.info("stage " + stage);
+          LOG.info("sb.getInstallationSelectorTitle() " + sb.getInstallationSelectorTitle());
+          LOG.info("sb.getInstallationSelectorMessage() " + sb.getInstallationSelectorMessage());
+          LOG.info("sb " + sb);
+
         } while ((folderInstallation != null) &&
           folderInstallation.exists() &&
           (folderInstallation.listFiles().length > 0) &&
@@ -216,19 +248,30 @@ public class InstallUninstallHandler
             sb.getInstallationNotemptyTitle(),
             sb.getInstallationNotemptyMessage(), sb.getOk(), null) == 1)
           );
+
         System.setProperty(FS.sUSE_NATIVE_PROPERTY, String.valueOf(bNative));
+
         /* install */
         _il.event("Selected installation folder: "+((folderInstallation == null)? "null" : folderInstallation.getAbsolutePath()));
+        LOG.info("Selected installation folder: "+((folderInstallation == null)? "null" : folderInstallation.getAbsolutePath()));
+
+        LOG.info("(folderInstallation != null) " + (folderInstallation != null));
         if (folderInstallation != null) // else DirectorySelector was cancelled
         {
           SiardGui.getSiardGui().startAction(sb.getInstallingStatus(folderInstallation));
           _il.event("Starting InstallerTask from "+
             "\""+folderSource.getAbsolutePath()+"\" to "+
             "\""+folderInstallation.getAbsolutePath()+"\".");
+          LOG.info("Starting InstallerTask from "+
+        	  "\""+folderSource.getAbsolutePath()+"\" to "+
+        	  "\""+folderInstallation.getAbsolutePath()+"\".");
           InstallerTask.installTask(folderSource, folderInstallation, this);
         }
-        else
-          _il.event("Selection of installation folder cancelled!");
+        else {
+        	_il.event("Selection of installation folder cancelled!");
+        	LOG.info("Selection of installation folder cancelled!");
+        }
+
       }
       catch(IOException ie) { _il.exception(ie); }
     }
@@ -237,6 +280,7 @@ public class InstallUninstallHandler
       _bContinueInstall = true;
       SiardGui.getSiardGui().uninstall(true);
     }
+
     _il.exit();
   } /* install */
 

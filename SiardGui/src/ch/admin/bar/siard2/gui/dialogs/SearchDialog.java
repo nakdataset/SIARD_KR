@@ -1,44 +1,62 @@
 /*======================================================================
 SearchDialog asks for a string to find in the table data.
 Application : Siard2
-Description : SearchDialog asks for a string to find in the table data. 
-Platform    : Java 7, JavaFX 2.2   
+Description : SearchDialog asks for a string to find in the table data.
+Platform    : Java 7, JavaFX 2.2
 ------------------------------------------------------------------------
 Copyright  : 2017, Enter AG, Rüti ZH, Switzerland
 Created    : 31.08.2017, Hartwig Thomas
 ======================================================================*/
 package ch.admin.bar.siard2.gui.dialogs;
 
-import java.util.*;
-import javafx.beans.value.*;
-import javafx.event.*;
-import javafx.geometry.*;
-import javafx.scene.*;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.stage.*;
-import ch.enterag.utils.fx.*;
-import ch.admin.bar.siard2.api.*;
-import ch.admin.bar.siard2.gui.*;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
+import ch.admin.bar.siard2.api.MetaColumn;
+import ch.admin.bar.siard2.api.MetaTable;
+import ch.admin.bar.siard2.gui.SiardBundle;
+import ch.enterag.utils.fx.FxSizes;
+import ch.enterag.utils.fx.FxStyles;
+import ch.enterag.utils.fx.ScrollableDialog;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 /*====================================================================*/
 /** SearchDialog asks for a string to find in the table data.
  * @author Hartwig Thomas
  */
 public class SearchDialog
-  extends ScrollableDialog 
+  extends ScrollableDialog
   implements EventHandler<ActionEvent>
 {
+  // 최창근 추가 - 로그
+  private static final Logger LOG = Logger.getLogger(SearchDialog.class);
+
   private static final double dINNER_PADDING = 10.0;
   private static final double dVSPACING = 10.0;
   private static final double dHSPACING = 10.0;
   private static final int iTEXT_COLUMNS = 32;
   private boolean _bCanceled = true; // just closing with the close button is canceling
   public boolean isCanceled() { return _bCanceled; }
-  
+
   private TextField _tfFindString = null;
-  public String getFindString() 
-  { 
+  public String getFindString()
+  {
     return _tfFindString.getText();
   }
   private CheckBox _cbMatchCase = null;
@@ -52,7 +70,7 @@ public class SearchDialog
   {
     _btnOk.setDisable((getFindString().length() == 0) || (getSelection().size() == 0));
   } /* disableOk */
-  
+
   /*==================================================================*/
   private class BooleanChangeListener
     implements ChangeListener<Boolean>
@@ -68,7 +86,7 @@ public class SearchDialog
     } /* changed */
   } /* class BooleanChangeListener */
   private BooleanChangeListener _bcl = new BooleanChangeListener();
-  
+
   /*==================================================================*/
   private class StringChangeListener
     implements ChangeListener<String>
@@ -83,7 +101,7 @@ public class SearchDialog
     } /* changed */
   } /* class StringChangeListener */
   private StringChangeListener _scl = new StringChangeListener();
-  
+
   /*------------------------------------------------------------------*/
   /** handle pressed button.
    * @param ae action event.
@@ -95,7 +113,7 @@ public class SearchDialog
       _bCanceled = false;
     close();
   } /* handle */
-  
+
   /*------------------------------------------------------------------*/
   /** create a HBox with OK and Cancel button.
    * @param sOk text on OK button.
@@ -132,7 +150,7 @@ public class SearchDialog
     _mcvb.addSelectionChangeListener(_bcl);
     return _mcvb;
   } /* createColumnsVBox */
-  
+
   /*------------------------------------------------------------------*/
   /** create HBox with label and check box for match case.
    * @param sMatchCaseLabel label.
@@ -163,7 +181,7 @@ public class SearchDialog
    * @param sFindString initial value of find string.
    * @return HBox with label and text field.
    */
-  private HBox createFindStringHBox(String sFindStringLabel, double dLabelWidth, 
+  private HBox createFindStringHBox(String sFindStringLabel, double dLabelWidth,
     String sFindString)
   {
     HBox hbox = new HBox();
@@ -174,6 +192,10 @@ public class SearchDialog
       _tfFindString.setText(sFindString);
     _tfFindString.setMinWidth(FxSizes.fromEms(iTEXT_COLUMNS));
     _tfFindString.textProperty().addListener(_scl);
+
+    // 최창근 추가 - 텍스트필드 가변크기 변환을 위한 설정
+    hbox.setHgrow(_tfFindString, Priority.ALWAYS);
+
     Label lblFindString = new Label(sFindStringLabel);
     lblFindString.setMinWidth(dLabelWidth);
     lblFindString.setLabelFor(_tfFindString);
@@ -182,7 +204,7 @@ public class SearchDialog
     hbox.getChildren().add(_tfFindString);
     return hbox;
   } /* createFindStringHBox */
-  
+
   /*------------------------------------------------------------------*/
   /** create the main VBox of the dialog.
    * @param sb string pool.
@@ -197,22 +219,26 @@ public class SearchDialog
     vbox.setPadding(new Insets(dINNER_PADDING));
     vbox.setSpacing(dVSPACING);
     vbox.setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
+
     String sFindStringLabel = sb.getFindStringLabel();
     String sMatchCaseLabel = sb.getFindMatchCaseLabel();
+
     double dLabelWidth = FxSizes.getTextWidth(sFindStringLabel);
     if (dLabelWidth < FxSizes.getTextWidth(sMatchCaseLabel))
       dLabelWidth = FxSizes.getTextWidth(sMatchCaseLabel);
+
     vbox.getChildren().add(createFindStringHBox(sFindStringLabel, dLabelWidth, sFindString));
-    vbox.getChildren().add(createMatchCaseHBox(sMatchCaseLabel, dLabelWidth,bMatchCase));
+    vbox.getChildren().add(createMatchCaseHBox(sMatchCaseLabel, dLabelWidth, bMatchCase));
     vbox.getChildren().add(new Separator());
     vbox.getChildren().add(this.createColumnsVBox(sb,mt));
     vbox.getChildren().add(new Separator());
     vbox.getChildren().add(createButtonsHBox(sb.getOk(),sb.getCancel()));
+
     vbox.setMinWidth(FxSizes.getNodeWidth(vbox));
     vbox.setMinHeight(FxSizes.getNodeHeight(vbox));
     return vbox;
   } /* createVBox */
-  
+
   /*------------------------------------------------------------------*/
   /** constructor
    * @param stageOwner owner window.
@@ -225,11 +251,15 @@ public class SearchDialog
     super(stageOwner,SiardBundle.getSiardBundle().getSearchTitle(mt.getName()));
     SiardBundle sb = SiardBundle.getSiardBundle();
     VBox vbox = createVBox(sb, mt, sFindString, bMatchCase);
+
+    // 최창근 수정 - 가로, 세로 스크롤 제거를 위한 넓이, 높이 값 수정
     /* scene */
-    Scene scene = new Scene(vbox, vbox.getMinWidth()+10.0, vbox.getMinHeight()+10.0);
+    // Scene scene = new Scene(vbox, vbox.getMinWidth()+10.0, vbox.getMinHeight()+10.0);
+    Scene scene = new Scene(vbox, vbox.getMinWidth()+20.0, vbox.getMinHeight()+20.0);
+
     setScene(scene);
   } /* constructor */
-  
+
   /*------------------------------------------------------------------*/
   /** shows search dialog.
    * @param stageOwner owner window.
@@ -238,9 +268,11 @@ public class SearchDialog
    * @param bMatchCase initial match case value.
    * @return search dialog with result.
    */
-  public static SearchDialog showSearchDialog(Stage stageOwner, 
+  public static SearchDialog showSearchDialog(Stage stageOwner,
     MetaTable mt, String sFindString, boolean bMatchCase)
   {
+	LOG.info("showSearchDialog");
+
     SearchDialog sd = new SearchDialog(stageOwner,mt,sFindString,bMatchCase);
     sd.showAndWait();
     return sd;

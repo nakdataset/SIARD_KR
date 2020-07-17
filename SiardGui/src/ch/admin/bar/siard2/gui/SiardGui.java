@@ -209,6 +209,8 @@ public class SiardGui extends Application
     Scene scene = getScene();
     if (scene != null)
     {
+      LOG.info("terminateAction");
+
       MainPane.getMainPane().setModal(null);
       scene.setCursor(_cursor);
     }
@@ -589,6 +591,7 @@ public class SiardGui extends Application
    */
   public void find()
   {
+	LOG.info("find");
     if (FindAction.newFindAction().find())
       findNext();
   } /* find */
@@ -619,6 +622,7 @@ public class SiardGui extends Application
    */
   public void search()
   {
+	LOG.info("search");
     if (SearchAction.newSearchAction().search(MainPane.getMainPane().getSelectedTable()))
       searchNext();
   } /* search */
@@ -636,6 +640,7 @@ public class SiardGui extends Application
    */
   public void install()
   {
+    LOG.info("install");
     InstallUninstallHandler.getInstallUninstallHandler().install();
   } /* install */
 

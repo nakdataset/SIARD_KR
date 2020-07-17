@@ -1,19 +1,26 @@
 /*======================================================================
-FS implements convenience calls to the static methods in FC.  
+FS implements convenience calls to the static methods in FC.
 Application : JavaFX Utilities
 Description : FS implements convenience calls to the static methods in FC
-  getting the relevant strings from an language-dependent FxBundle. 
+  getting the relevant strings from an language-dependent FxBundle.
 ------------------------------------------------------------------------
 Copyright  : Enter AG, Rüti ZH, Switzerland
 Created    : 21.12.2015, Hartwig Thomas
 ======================================================================*/
 package ch.enterag.utils.fx.dialogs;
 
-import java.io.*;
-import java.util.*;
-import javafx.stage.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import ch.enterag.utils.fx.*;
+import org.apache.log4j.Logger;
+
+import ch.enterag.utils.fx.FxBundle;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 /*====================================================================*/
 /** FS implements convenience calls to the static methods in FC
@@ -26,7 +33,10 @@ import ch.enterag.utils.fx.*;
 public abstract class FS
 {
   public static final String sUSE_NATIVE_PROPERTY = "ch.enterag.utils.fx.dialogs.FS.useNative";
-  
+
+  //최창근 추가 - 로그
+  private static final Logger LOG = Logger.getLogger(FS.class);
+
   /*------------------------------------------------------------------*/
   /** convenience method with standard strings from bundle and no hidden files.
    * @param stageOwner owner stage or null.
@@ -56,7 +66,7 @@ public abstract class FS
           fileInitialFolder,false);
     return fileFolder;
   } /* chooseExistingFolder */
-  
+
   /*------------------------------------------------------------------*/
   /** convenience method with standard strings from bundle and no hidden files.
    * @param stageOwner owner stage or null.
@@ -73,10 +83,20 @@ public abstract class FS
     throws IOException
   {
     File fileFolder = null;
+    LOG.info("chooseNewFolder");
+    LOG.info("stageOwner " + stageOwner);
+    LOG.info("sTitle " + sTitle);
+    LOG.info("sMessage " + sMessage);
+    LOG.info("fileInitialFolder " + fileInitialFolder);
+
+    LOG.info("sUSE_NATIVE_PROPERTY " + sUSE_NATIVE_PROPERTY);
+    LOG.info("Boolean.valueOf(System.getProperty(sUSE_NATIVE_PROPERTY)) " + Boolean.valueOf(System.getProperty(sUSE_NATIVE_PROPERTY)));
     if (Boolean.valueOf(System.getProperty(sUSE_NATIVE_PROPERTY)))
     {
       DirectoryChooser dc = new DirectoryChooser();
       dc.setTitle(sTitle);
+      LOG.info("sTitle " + sTitle);
+
       /* if the initial folder does not exist, create it */
       int iCreated = 0;
       for (File folder = fileInitialFolder; !folder.exists(); folder = folder.getParentFile())
@@ -90,21 +110,22 @@ public abstract class FS
         fileInitialFolder.delete();
         iCreated--;
       }
+    }else {
+    	fileFolder = FC.chooseNewFolder(stageOwner,sTitle,sMessage,
+    		fb.getOk(),fb.getCancel(),fb.getPathLabel(),fb.getFolderLabel(),
+    		fileInitialFolder,false);
     }
-    else
-      fileFolder = FC.chooseNewFolder(stageOwner,sTitle,sMessage,
-        fb.getOk(),fb.getCancel(),fb.getPathLabel(),fb.getFolderLabel(),
-        fileInitialFolder,false);
+
     return fileFolder;
   } /* chooseNewFolder */
-  
+
   /*------------------------------------------------------------------*/
   /** convenience method with standard strings from bundle and no hidden files.
    * @param stageOwner owner stage or null.
    * @param sTitle title of selector dialog.
    * @param sMessage message in selector dialog.
    * @param fb bundle for Ok, Cancel, file name label.
-   * @param fileInitialFile initial file - must exist and have one of the 
+   * @param fileInitialFile initial file - must exist and have one of the
    *   accepted extensions - may have a wild card file name (e.g. *.ext or *.* or *).
    * @param sExtension accepted extension (without period) or null
    *   with descriptive text in fb under "&lt;extension&gt;.files".
@@ -143,14 +164,14 @@ public abstract class FS
     }
     return file;
   } /* chooseExistingFile */
-  
+
   /*------------------------------------------------------------------*/
   /** convenience method with standard strings from bundle and no hidden files.
    * @param stageOwner owner stage or null.
    * @param sTitle title of selector dialog.
    * @param sMessage message in selector dialog.
    * @param fb bundle for Ok, Cancel, file name label.
-   * @param fileInitialFile - may not exist but must have one of the 
+   * @param fileInitialFile - may not exist but must have one of the
    *   accepted extensions  - may have a wild card file name (e.g. *.ext or *.* or *).
    * @param sExtension accepted extension (without period) or null
    *   with descriptive text in fb under "&lt;extension&gt;.files".
@@ -195,10 +216,10 @@ public abstract class FS
       }
       file = FC.chooseNewFile(stageOwner,sTitle,sMessage,
           fb.getOk(),fb.getCancel(),fb.getPathLabel(),fb.getFileLabel(),
-          fileInitialFile,false,listExtensions, 
+          fileInitialFile,false,listExtensions,
           sOverwriteQuery, sYes, sNo);
     }
     return file;
   } /* chooseNewFile */
-  
+
 } /* class FS */

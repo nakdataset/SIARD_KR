@@ -1,38 +1,60 @@
 /*======================================================================
-FC replaces the rather deficient "native" FileChooser and DirectoryChooser. 
+FC replaces the rather deficient "native" FileChooser and DirectoryChooser.
 Application : JavaFX Utilities
-Description : FC replaces the rather deficient "native" FileChooser and 
+Description : FC replaces the rather deficient "native" FileChooser and
   DirectoryChooser by an all-JAVA implementation which can be localized,
-  because all strings are parametrized. 
+  because all strings are parametrized.
 ------------------------------------------------------------------------
 Copyright  : Enter AG, Rüti ZH, Switzerland
 Created    : 21.12.2015, Hartwig Thomas
 ======================================================================*/
 package ch.enterag.utils.fx.dialogs;
 
-import java.io.*;
-import java.text.*;
-import java.util.*;
-import javafx.beans.value.*;
-import javafx.collections.*;
-import javafx.event.*;
-import javafx.geometry.*;
-import javafx.scene.*;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.stage.*;
-import javafx.util.*;
-import ch.enterag.utils.fx.*;
-import ch.enterag.utils.fx.controls.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import ch.enterag.utils.fx.FxSizes;
+import ch.enterag.utils.fx.FxStyles;
+import ch.enterag.utils.fx.ScrollableDialog;
+import ch.enterag.utils.fx.controls.DynamicTreeItem;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.OverrunStyle;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TreeCell;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.util.Callback;
 
 /*====================================================================*/
-/** FC replaces the rather deficient "native" FileChooser and 
+/** FC replaces the rather deficient "native" FileChooser and
   DirectoryChooser by an all-JAVA implementation which can be localized,
   because all strings are parametrized.
  * @author Hartwig Thomas
  */
 public class FC
-  extends ScrollableDialog 
+  extends ScrollableDialog
   implements EventHandler<ActionEvent>
 {
   private static final double dINNER_PADDING = 10.0;
@@ -68,8 +90,8 @@ public class FC
   private static boolean isHidden(File file)
   {
     boolean bHidden = false;
-    for (; 
-        (!bHidden) && (file != null); 
+    for (;
+        (!bHidden) && (file != null);
         file = file.getParentFile())
     {
       if (file.exists() && file.isHidden())
@@ -77,9 +99,9 @@ public class FC
     }
     return bHidden;
   } /* isHidden */
-  
+
   /*------------------------------------------------------------------*/
-  /** Handle the fact, that file roots in Windows incorrectly are not 
+  /** Handle the fact, that file roots in Windows incorrectly are not
    * marked as directories.
    * @param file file to be examined.
    * @return true, if it is a folder.
@@ -91,7 +113,7 @@ public class FC
       bIsFolder = file.isDirectory();
     return bIsFolder;
   } /* isFolder */
-  
+
   /*------------------------------------------------------------------*/
   /** create the label for displaying the message.
    * @return message label.
@@ -104,7 +126,7 @@ public class FC
     lbl.minWidthProperty().bind(_vbox.widthProperty());
     return lbl;
   } /* createMessage */
-  
+
   /*==================================================================*/
   /** selection change in TreeView displays new content in ListView and
    * changes Path.
@@ -152,7 +174,7 @@ public class FC
   } /* mustBeHidden */
 
   /*------------------------------------------------------------------*/
-  /** compute the list of not-to-be-hidden child folders from a parent 
+  /** compute the list of not-to-be-hidden child folders from a parent
    * folder.
    * @param fileParent parentFolder
    * @return list of not-to-be-hidden child folders.
@@ -183,7 +205,7 @@ public class FC
     }
     return listChildFolders;
   } /* getChildFolders */
-  
+
   /*==================================================================*/
   /** class FileTreeItem implements a dynamic tree item with folders as items.
    */
@@ -198,7 +220,7 @@ public class FC
     @Override
     protected void addChildren()
     {
-      List<File> listFolders = getChildFolders((File)getValue());
+      List<File> listFolders = getChildFolders(getValue());
       for (Iterator<File> iterFolder = listFolders.iterator(); iterFolder.hasNext(); )
       {
         File fileChild = iterFolder.next();
@@ -212,7 +234,7 @@ public class FC
   /*==================================================================*/
 
   /*------------------------------------------------------------------*/
-  /** expand the parent file tree item to the parent of the initial 
+  /** expand the parent file tree item to the parent of the initial
    * file recursively.
    * @param fileParent parent of initial file.
    * @param ftiParent parent file tree item.
@@ -264,9 +286,9 @@ public class FC
     } /* updateItem */
   } /* class FileTreeCell */
   /*==================================================================*/
-  
+
   /*------------------------------------------------------------------*/
-  /** create the tree view and open it to the last existing parent of 
+  /** create the tree view and open it to the last existing parent of
    * the initial file/folder.
    * @param fileInitial initial file/folder.
    * @return created tree view.
@@ -295,7 +317,7 @@ public class FC
     _tv.scrollTo(_tv.getSelectionModel().getSelectedIndex());
     return _tv;
   } /* createTreeView */
-  
+
   /*==================================================================*/
   /** selection change in ListView displays new content in text field.
    */
@@ -385,7 +407,7 @@ public class FC
     }
     return ef;
   } /* getExtensionFilter */
-  
+
   /*==================================================================*/
   /** FileListCell displays a file in the list view.
    */
@@ -411,7 +433,7 @@ public class FC
     }
   } /* FileListCell */
   /*==================================================================*/
-  
+
   /*------------------------------------------------------------------*/
   /** create the list view containing the choosable files.
    * @param fileInitial initial file.
@@ -441,7 +463,7 @@ public class FC
     }
     return _lv;
   } /* createListView */
-  
+
   /*------------------------------------------------------------------*/
   /** create a HBox with the folder tree and the list of names.
    * @param fileInitial initial file/folder.
@@ -456,9 +478,14 @@ public class FC
     hbox.getChildren().add(_tv);
     _lv = createListView(fileInitial, listExtensions);
     hbox.getChildren().add(_lv);
+
+    // 최창근 추가 - TreeView, ListView 동적 크기변환 설정
+    HBox.setHgrow(_tv, Priority.ALWAYS);
+    HBox.setHgrow(_lv, Priority.ALWAYS);
+
     return hbox;
   } /* createTreeAndList */
-  
+
   /*==================================================================*/
   /** selection change in ComboBox displays new content in list view
    */
@@ -475,7 +502,7 @@ public class FC
   } /* class ExtensionFilterListener */
   /*==================================================================*/
   private ExtensionFilterListener _efl = new ExtensionFilterListener();
-  
+
   /*==================================================================*/
   private class StringListener
     implements ChangeListener<String>
@@ -489,7 +516,7 @@ public class FC
         boolean bDisable = true;
         if (sNew.length() > 0)
         {
-          // if the root is selected and the text does not start with a 
+          // if the root is selected and the text does not start with a
           // root folder then disable
           if (_tv.getSelectionModel().getSelectedItem().getValue() == null)
           {
@@ -534,7 +561,7 @@ public class FC
     hbox.getChildren().add(_lblPath);
     return hbox;
   } /* createPath */
-  
+
   /*------------------------------------------------------------------*/
   /** create the HBox containing the text field for the name and the
    * combo box for the filter.
@@ -605,7 +632,7 @@ public class FC
     hbox.getChildren().add(_btnCancel);
     return hbox;
   } /* createButtons */
-  
+
   /*------------------------------------------------------------------*/
   /** main VBox consists of message area,
    * tree and list area.
@@ -615,14 +642,14 @@ public class FC
    * @param fileInitial initial file/folder name.
    * @param sPathLabel text for label for path.
    * @param sNameLabel label for name text field.
-   * @param listExtensions list of extension filters. 
+   * @param listExtensions list of extension filters.
    * @param sOk text on OK button.
    * @param sCancel text on cancel button.
    * @return main VBox.
    */
-  private VBox createVBox(String sMessage, 
+  private VBox createVBox(String sMessage,
       File fileInitial,
-      String sPathLabel, String sNameLabel, 
+      String sPathLabel, String sNameLabel,
       List<ExtensionFilter> listExtensions,
       String sOk,String sCancel)
   {
@@ -640,7 +667,7 @@ public class FC
     _vbox.setMinHeight(FxSizes.getNodeHeight(_vbox));
     return _vbox;
   } /* createVBox */
-  
+
   /*------------------------------------------------------------------*/
   /** constructor creates the dialog.
    * @param stageOwner owner stage or null.
@@ -651,11 +678,11 @@ public class FC
    * @param sOk text on OK button.
    * @param sCancel text on cancel button.
    * @param sPathLabel text for label for path.
-   * @param sNameLabel text for label for name. 
+   * @param sNameLabel text for label for name.
    * @param fileInitial initial file/folder.
    * @param bIncludeHidden true, if hidden files are to be included.
-   * @param listExtensions lists accepted extensions 
-   *   (without period, null for all) and their descriptive texts, 
+   * @param listExtensions lists accepted extensions
+   *   (without period, null for all) and their descriptive texts,
    *   or null, if no filtering is to be applied.
    * @param sOverwriteQuery text to display, if the chosen new file already
    *    exists. While this is answered in the negative, the selector stays
@@ -663,7 +690,7 @@ public class FC
    * @param sYes text on yes button of the overwrite query.
    * @param sNo text on the no button of the overwrite query.
    */
-  private FC(Stage stageOwner, boolean bExisting, boolean bFolder, 
+  private FC(Stage stageOwner, boolean bExisting, boolean bFolder,
       String sTitle, String sMessage, String sOk, String sCancel, String sPathLabel, String sNameLabel,
       File fileInitial, boolean bIncludeHidden, List<ExtensionFilter> listExtensions,
       String sOverwriteQuery, String sYes, String sNo)
@@ -688,7 +715,11 @@ public class FC
       sPathLabel, sNameLabel,
       listExtensions,
       sOk,sCancel);
-    Scene scene = new Scene(vbox, vbox.getMinWidth()+10.0, vbox.getMinHeight()+10.0);
+
+    // 최창근 수정 - 가로, 세로 스크롤 제거를 위한 넓이, 높이 값 수정
+    /* scene */
+    // Scene scene = new Scene(vbox, vbox.getMinWidth()+10.0, vbox.getMinHeight()+10.0);
+    Scene scene = new Scene(vbox, vbox.getMinWidth()+20.0, vbox.getMinHeight()+20.0);
     setScene(scene);
   } /* constructor FS */
 
@@ -719,9 +750,9 @@ public class FC
       _fileResult = new File(sName);
       if ((_sOverwriteQuery != null) && (_fileResult != null) && _fileResult.exists())
       {
-        int iResult = MB.show(this, getTitle(), 
-            MessageFormat.format(_sOverwriteQuery,_fileResult.getAbsolutePath()), 
-            _sYes, _sNo); 
+        int iResult = MB.show(this, getTitle(),
+            MessageFormat.format(_sOverwriteQuery,_fileResult.getAbsolutePath()),
+            _sYes, _sNo);
         if (iResult != 1)
         {
           _fileResult = null;
@@ -735,7 +766,7 @@ public class FC
 
   /*==================================================================*/
   /** ExtensionFilter describes a single extension together with
-   * a descriptive text to be displayed in the extension combo box. 
+   * a descriptive text to be displayed in the extension combo box.
    */
   public static class ExtensionFilter
   {
@@ -763,7 +794,7 @@ public class FC
     } /* toString */
   } /* class ExtensionFilter */
   /*==================================================================*/
-  
+
   /*------------------------------------------------------------------*/
   /** choose an existing folder.
    * @param stageOwner owner stage or null.
@@ -772,7 +803,7 @@ public class FC
    * @param sOk text on OK button.
    * @param sCancel text on cancel button.
    * @param sPathLabel text for label for path.
-   * @param sFolderLabel text for label for folder name. 
+   * @param sFolderLabel text for label for folder name.
    * @param fileInitialFolder initial folder - must exist.
    *   If it or a parent of it is hidden, hidden folders are displayed
    *   irrespective of the parameter bIncludeHidden.
@@ -781,8 +812,8 @@ public class FC
    * @return selected existing folder or null, if dialog was canceled.
    * @throws FileNotFoundException, if the initial folder does not exist.
    */
-  public static File chooseExistingFolder(Stage stageOwner, 
-      String sTitle, String sMessage, String sOk, String sCancel, String sPathLabel, String sFolderLabel, 
+  public static File chooseExistingFolder(Stage stageOwner,
+      String sTitle, String sMessage, String sOk, String sCancel, String sPathLabel, String sFolderLabel,
       File fileInitialFolder,boolean bIncludeHidden)
     throws FileNotFoundException
   {
@@ -805,7 +836,7 @@ public class FC
         fs.showAndWait();
       fileResultFolder = fs.getResult();
     }
-    else 
+    else
       throw new FileNotFoundException("Initial folder \""+fileInitialFolder.getAbsolutePath()+"\" does not exist!");
     return fileResultFolder;
   } /* chooseExistingFolder */
@@ -818,7 +849,7 @@ public class FC
    * @param sOk text on OK button.
    * @param sCancel text on cancel button.
    * @param sPathLabel text for label for path.
-   * @param sFolderLabel text for label for name. 
+   * @param sFolderLabel text for label for name.
    * @param fileInitialFolder initial folder - must not necessarily exist.
    *   If it or a parent of it is hidden, hidden folders are displayed
    *   irrespective of the parameter bIncludeHidden.
@@ -827,7 +858,7 @@ public class FC
    * @return selected new folder (may not exist yet) or null, if dialog was canceled.
    * @throws IOException if the initial folder is not a folder.
    */
-  public static File chooseNewFolder(Stage stageOwner, 
+  public static File chooseNewFolder(Stage stageOwner,
       String sTitle, String sMessage, String sOk, String sCancel, String sPathLabel, String sFolderLabel,
       File fileInitialFolder, boolean bIncludeHidden)
           throws IOException
@@ -883,7 +914,7 @@ public class FC
       bMatch = true;
     return bMatch;
   } /* matchesExtensions */
-  
+
   /*------------------------------------------------------------------*/
   /** choose an existing file (for open).
    * @param stageOwner owner stage or null.
@@ -892,21 +923,21 @@ public class FC
    * @param sOk text on OK button.
    * @param sCancel text on cancel button.
    * @param sPathLabel text for label for path.
-   * @param sFileLabel text for label for file name. 
-   * @param fileInitialFile initial file - must exist and have one of the 
+   * @param sFileLabel text for label for file name.
+   * @param fileInitialFile initial file - must exist and have one of the
    *   accepted extensions - may have a wild card file name (e.g. *.ext or *.* or *).
    *   If it or a parent of it is hidden, hidden files are displayed
    *   irrespective of the parameter bIncludeHidden.
    *   If its parent does not exist, it is created.
    * @param bIncludeHidden true, if hidden files are to be included.
-   * @param listExtensions lists accepted extensions 
-   *   (without period, null for all) and their descriptive texts, 
+   * @param listExtensions lists accepted extensions
+   *   (without period, null for all) and their descriptive texts,
    *   or null, if no filtering is to be applied.
    * @return selected existing file conforming to one of the extensions in the map.
    * @throws FileNotFoundException if the initial file does not exist or
    *   match one of the extensions.
    */
-  public static File chooseExistingFile(Stage stageOwner, 
+  public static File chooseExistingFile(Stage stageOwner,
       String sTitle, String sMessage, String sOk, String sCancel, String sPathLabel, String sFileLabel,
       File fileInitialFile, boolean bIncludeHidden, List<ExtensionFilter> listExtensions)
     throws FileNotFoundException
@@ -950,14 +981,14 @@ public class FC
    * @param sCancel text on cancel button.
    * @param sPathLabel text for label for path.
    * @param sFileLabel text for label for file name.
-   * @param fileInitialFile - may not exist but must have one of the 
+   * @param fileInitialFile - may not exist but must have one of the
    *   accepted extensions  - may have a wild card file name (e.g. *.ext or *.* or *).
    *   If it or a parent of it is hidden, hidden files are displayed
    *   irrespective of the parameter bIncludeHidden.
    *   If its parent does not exist, it is created.
    * @param bIncludeHidden true, if hidden files are to be included.
-   * @param listExtensions lists accepted extensions 
-   *   (without period, null for all) and their descriptive texts, 
+   * @param listExtensions lists accepted extensions
+   *   (without period, null for all) and their descriptive texts,
    *   or null, if no filtering is to be applied.
    * @param sOverwriteQuery text to display, if the chosen new file already
    *    exists. While this is answered in the negative, the selector stays
@@ -969,10 +1000,10 @@ public class FC
    * @throws IOException if the initial file is not a file or does not
    *   match one of the extensions.
    */
-  public static File chooseNewFile(Stage stageOwner, 
+  public static File chooseNewFile(Stage stageOwner,
     String sTitle, String sMessage, String sOk, String sCancel, String sPathLabel, String sFileLabel,
-    File fileInitialFile, boolean bIncludeHidden, 
-    List<ExtensionFilter> listExtensions, 
+    File fileInitialFile, boolean bIncludeHidden,
+    List<ExtensionFilter> listExtensions,
     String sOverwriteQuery, String sYes, String sNo)
     throws IOException
   {

@@ -1,37 +1,52 @@
 /*======================================================================
 OptionDialog display options for modification.
 Application : Siard2
-Description : OptionDialog display options for modification. 
-Platform    : Java 7, JavaFX 2.2   
+Description : OptionDialog display options for modification.
+Platform    : Java 7, JavaFX 2.2
 ------------------------------------------------------------------------
 Copyright  : 2017, Enter AG, Rüti ZH, Switzerland
 Created    : 16.08.2017, Hartwig Thomas
 ======================================================================*/
 package ch.admin.bar.siard2.gui.dialogs;
 
-import java.io.*;
-import javafx.event.*;
-import javafx.geometry.*;
-import javafx.scene.*;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.stage.*;
-import ch.enterag.utils.fx.*;
+import java.io.File;
+
+import org.apache.log4j.Logger;
+
+import ch.admin.bar.siard2.gui.SiardBundle;
+import ch.admin.bar.siard2.gui.SiardGui;
+import ch.admin.bar.siard2.gui.UserProperties;
+import ch.enterag.utils.fx.FxSizes;
+import ch.enterag.utils.fx.FxStyles;
+import ch.enterag.utils.fx.ScrollableDialog;
 import ch.enterag.utils.fx.dialogs.FS;
-import ch.admin.bar.siard2.gui.*;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 /*====================================================================*/
 /** OptionDialog display options for modification.
  * @author Hartwig Thomas
  */
 public class OptionDialog
-  extends ScrollableDialog 
+  extends ScrollableDialog
   implements EventHandler<ActionEvent>
 {
+
+  // 최창근 추가 - 로그
+  private static final Logger LOG = Logger.getLogger(OptionDialog.class);
+
   // limits for column width
   private static final int iMIN_COLUMN_WIDTH = 4;
   private static final int iMAX_COLUMN_WIDTH = 80;
-  
+
   private boolean _bCanceled = true;  // just closing with the close button is canceling
   public boolean isCanceled() { return _bCanceled; }
   private OptionVBox<Integer> _ovbLoginTimeout = null;
@@ -72,13 +87,13 @@ public class OptionDialog
       boolean bFileChooserNative = _ovbFileChooserNative.getValue().booleanValue();
       System.setProperty(FS.sUSE_NATIVE_PROPERTY, String.valueOf(bFileChooserNative));
       File fileTextEditor = _ovbTextEditor.getValue();
-      if ((fileTextEditor != null) && 
-          fileTextEditor.exists() && 
+      if ((fileTextEditor != null) &&
+          fileTextEditor.exists() &&
           fileTextEditor.isFile())
         up.setTextEditor(fileTextEditor);
       File fileBinaryEditor = _ovbBinaryEditor.getValue();
-      if ((fileBinaryEditor != null) && 
-          fileBinaryEditor.exists() && 
+      if ((fileBinaryEditor != null) &&
+          fileBinaryEditor.exists() &&
           fileBinaryEditor.isFile())
         up.setBinEditor(fileBinaryEditor);
       File fileXslFile = _ovbXslFile.getValue();
@@ -109,7 +124,7 @@ public class OptionDialog
     }
     return dWidth;
   } /* getMaxWidth */
-  
+
   /*------------------------------------------------------------------*/
   /** create the HBox with the OK button.
    * @return HBox with OK button.
@@ -144,7 +159,7 @@ public class OptionDialog
   } /* createHBoxButtons */
 
   /*------------------------------------------------------------------*/
-  /** create the dialog pane containing the option editors and 
+  /** create the dialog pane containing the option editors and
    * the ok and cancel button.
    * @return
    */
@@ -156,16 +171,16 @@ public class OptionDialog
     vbox.setPadding(new Insets(dOUTER_PADDING));
     vbox.setSpacing(dVSPACING);
     vbox.setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
-    
-    String sLoginTimeoutLabel = sb.getOptionLoginTimeoutLabel(); 
-    String sQueryTimeoutLabel = sb.getOptionQueryTimeoutLabel(); 
-    String sColumnWidthLabel = sb.getOptionColumnWidthLabel(); 
-    String sFileChooserNativeLabel = sb.getOptionFileChooserNativeLabel(); 
-    String sTextEditorLabel = sb.getOptionTextEditorLabel(); 
-    String sBinaryEditorLabel = sb.getOptionBinaryEditorLabel(); 
-    String sXslFileLabel = sb.getOptionXslFileLabel(); 
+
+    String sLoginTimeoutLabel = sb.getOptionLoginTimeoutLabel();
+    String sQueryTimeoutLabel = sb.getOptionQueryTimeoutLabel();
+    String sColumnWidthLabel = sb.getOptionColumnWidthLabel();
+    String sFileChooserNativeLabel = sb.getOptionFileChooserNativeLabel();
+    String sTextEditorLabel = sb.getOptionTextEditorLabel();
+    String sBinaryEditorLabel = sb.getOptionBinaryEditorLabel();
+    String sXslFileLabel = sb.getOptionXslFileLabel();
     String sLobsFolderLabel = sb.getOptionLobsFolderLabel();
-    double dLabelWidth = getMaxWidth(new String[] 
+    double dLabelWidth = getMaxWidth(new String[]
       {
           sLoginTimeoutLabel,
           sQueryTimeoutLabel,
@@ -199,13 +214,16 @@ public class OptionDialog
     vbox.getChildren().add(_ovbXslFile);
     _ovbLobsFolder = new OptionVBox<File>(this,sb.getOptionLobsFolderExplanation(),
       sLobsFolderLabel,dLabelWidth,File.class,up.getLobsFolder());
+
     vbox.getChildren().add(_ovbLobsFolder);
     vbox.getChildren().add(createHBoxButtons());
+
     vbox.setMinWidth(FxSizes.getNodeWidth(vbox));
     vbox.setMinHeight(FxSizes.getNodeHeight(vbox));
+
     return vbox;
   } /* createVBoxDialog */
-  
+
   /*------------------------------------------------------------------*/
   /** create the option dialog.
    * @param stageOwner owner stage.
@@ -214,11 +232,14 @@ public class OptionDialog
   {
     super(stageOwner,SiardBundle.getSiardBundle().getOptionTitle());
     VBox vbox = createVBoxDialog();
+
+    // 최창근 수정 - 가로, 세로 스크롤 제거를 위한 넓이, 높이 값 수정
     /* scene */
-    Scene scene = new Scene(vbox, vbox.getMinWidth()+10.0, vbox.getMinHeight()+10.0);
+//    Scene scene = new Scene(vbox, vbox.getMinWidth()+10.0, vbox.getMinHeight()+10.0);
+    Scene scene = new Scene(vbox, vbox.getMinWidth()+20.0, vbox.getMinHeight()+20.0);
     setScene(scene);
   } /* constructor */
-  
+
   /*------------------------------------------------------------------*/
   /** shows the option dialog.
    * @param stageOwner owner window.
@@ -227,6 +248,7 @@ public class OptionDialog
   public static OptionDialog showOptionDialog(Stage stageOwner)
   {
     OptionDialog od = new OptionDialog(stageOwner);
+
     od.showAndWait();
     return od;
   } /* showOptionDialog */
