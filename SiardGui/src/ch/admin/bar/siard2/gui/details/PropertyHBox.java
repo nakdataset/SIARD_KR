@@ -1,7 +1,7 @@
 /*======================================================================
-The editor HBox of a single property of a meta data object.  
+The editor HBox of a single property of a meta data object.
 Application: SIARD GUI
-Description: The editor BHox of a single property of a meta data object. 
+Description: The editor BHox of a single property of a meta data object.
 Platform   : JAVA 1.7, JavaFX 2.2
 ------------------------------------------------------------------------
 Copyright  : Swiss Federal Archives, Berne, Switzerland, 2017
@@ -9,27 +9,37 @@ Created    : 25.07.2017, Hartwig Thomas, Enter AG, Rüti ZH
 ======================================================================*/
 package ch.admin.bar.siard2.gui.details;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
-import javafx.beans.*;
-import javafx.beans.value.*;
-import javafx.geometry.*;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.stage.*;
+import org.apache.log4j.Logger;
 
-import ch.enterag.utils.fx.*;
-import ch.enterag.utils.fx.dialogs.*;
-import ch.admin.bar.siard2.gui.*;
+import ch.admin.bar.siard2.gui.SiardBundle;
+import ch.enterag.utils.fx.FxSizes;
+import ch.enterag.utils.fx.FxStyles;
+import ch.enterag.utils.fx.dialogs.MB;
+import javafx.beans.InvalidationListener;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.stage.Stage;
 
 /*====================================================================*/
 /** The editor BHox of a single property of a meta data object.
  * @author Hartwig Thomas
  */
-public class PropertyHBox
-  extends HBox
-  implements ObservableValue<String>
-{
+public class PropertyHBox extends HBox implements ObservableValue<String>{
+
+  // 최창근 추가 - 로그
+  private static final Logger LOG = Logger.getLogger(PropertyHBox.class);
+
   // padding inside
   private static final double dINNER_PADDING = 0.0;
   // horizontal spacing of elements
@@ -38,12 +48,12 @@ public class PropertyHBox
   private static int iCOLUMNS = 40;
   // rows for text area
   private static int iROWS = 5;
-  /** invalidation listener belongs to being observable */  
-  private Set<InvalidationListener> _setIvl = new HashSet<InvalidationListener>(); 
+  /** invalidation listener belongs to being observable */
+  private Set<InvalidationListener> _setIvl = new HashSet<InvalidationListener>();
   @Override public void addListener(InvalidationListener il) { _setIvl.add(il); }
   @Override public void removeListener(InvalidationListener il) { _setIvl.remove(il); }
   /** change listener belongs to being observable */
-  private Set<ChangeListener<? super String>> _setCl = new HashSet<ChangeListener<? super String>>(); 
+  private Set<ChangeListener<? super String>> _setCl = new HashSet<ChangeListener<? super String>>();
   @Override public void addListener(ChangeListener<? super String> cl) { _setCl.add(cl); }
   @Override public void removeListener(ChangeListener<? super String> cl) { _setCl.remove(cl); }
 
@@ -51,18 +61,18 @@ public class PropertyHBox
   private Label _lbl = null;
   /** the text field or text area */
   private TextInputControl _tic = null;
-  
+
   private String _sProperty = null;
   public String getProperty() { return _sProperty; }
   private boolean _bEditable = false;
   public boolean isEditable() { return _bEditable; }
   private boolean _bMandatory = false;
-  
+
   /*==================================================================*/
   private class TextChangeListener implements ChangeListener<String>
   {
     /*------------------------------------------------------------------*/
-    /** Reacts to a change in the textProperty of _tf or _ta: 
+    /** Reacts to a change in the textProperty of _tf or _ta:
      * Passes notification on to all ChangeListeners of this observable.
      * @param ov observable value (text property of _tf or _ta).
      * @param sOld old value.
@@ -106,48 +116,70 @@ public class PropertyHBox
     String sValue, boolean bEditable, boolean bMultiline, boolean bMandatory)
   {
     super();
+
+    LOG.info("PropertyHBox");
+    LOG.info("PropertyHBox sProperty " + sProperty);
+    LOG.info("PropertyHBox sLabel " + sLabel);
+    LOG.info("PropertyHBox sValue " + sValue);
+    LOG.info("PropertyHBox bMultiline " + bMultiline);
+
     setPadding(new Insets(dINNER_PADDING));
     setSpacing(dHSPACING);
+
     _sProperty = sProperty;
     _bEditable = bEditable;
+
     TextField tf = new TextField();
     tf.setText(sValue);
     tf.setPrefColumnCount(iCOLUMNS);
+
     double dTextHeight = FxSizes.getNodeHeight(tf);
     tf.setMinHeight(dTextHeight);
-    if (!bMultiline)
-      _tic = tf;
-    else
-    {
+
+    LOG.info("!bMultiline " + !bMultiline);
+    if (!bMultiline) {
+    	_tic = tf;
+
+    }else{
       TextArea ta = new TextArea();
       ta.setText(sValue);
       ta.setWrapText(true);
       ta.setPrefColumnCount(iCOLUMNS);
-      if (_bEditable)
-        ta.setPrefRowCount(iROWS);
-      else
-      {
+
+      if (_bEditable) {
+    	  ta.setPrefRowCount(iROWS);
+
+      }else{
         int iRows = (int)Math.ceil(FxSizes.getTextHeight(sValue)/FxSizes.getTextHeight("X"));
-        if (iRows > iROWS)
-          iRows = iROWS;
+        if (iRows > iROWS) {
+        	iRows = iROWS;
+        }
         ta.setPrefRowCount(iRows);
       }
       _tic = ta;
     }
     _tic.setEditable(_bEditable);
     _tic.setFocusTraversable(_bEditable);
+
     if (_bEditable)
       _tic.textProperty().addListener(_tcl);
     else
       _tic.setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
+
+    //TODO 최창근 추가 - 동적 크기 조절을 위한 설정 추가
+    super.setHgrow(_tic, Priority.ALWAYS);
+
     _bMandatory = bMandatory;
+
     if (_bMandatory)
       sLabel = sLabel + "*";
+
     _lbl = new Label(sLabel);
     _lbl.setLabelFor(_tic);
     _lbl.setAlignment(Pos.BASELINE_RIGHT);
     _lbl.setMinWidth(dLabelWidth);
     _lbl.setMinHeight(dTextHeight);
+
     getChildren().add(_lbl);
     getChildren().add(_tic);
     setMinWidth(computeMinWidth(getHeight()));
@@ -182,5 +214,5 @@ public class PropertyHBox
   {
     _tic.deselect();
   } /* deselect */
-  
+
 } /* PropertyHBox */

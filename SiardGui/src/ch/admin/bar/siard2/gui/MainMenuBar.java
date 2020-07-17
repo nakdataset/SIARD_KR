@@ -9,6 +9,8 @@ Created    : 10.05.2017, Hartwig Thomas, Enter AG, Rüti ZH
 ======================================================================*/
 package ch.admin.bar.siard2.gui;
 
+import org.apache.log4j.Logger;
+
 import ch.admin.bar.siard2.api.Archive;
 import ch.admin.bar.siard2.api.Table;
 import ch.enterag.utils.fx.FxStyles;
@@ -40,6 +42,10 @@ public class MainMenuBar
 {
   /** singleton */
   private static MainMenuBar _mmb = null;
+
+  // 최창근 추가 - 로그
+  private static final Logger LOG = Logger.getLogger(MainMenuBar.class);
+
   /** menus and menu items */
   private Menu _menuFile = null;
   private MenuItem _miDownload = null;
@@ -70,6 +76,9 @@ public class MainMenuBar
   private Menu _menuHelp = null;
   private MenuItem _miHelp = null;
   private MenuItem _miInfo = null;
+
+  // 최창근 추가 - 사용자 이벤트 내역 버튼
+  private MenuItem _miHistory = null;
 
   /*==================================================================*/
   private class ToggleChangeListener
@@ -123,6 +132,12 @@ public class MainMenuBar
   {
     SiardGui sg = SiardGui.getSiardGui();
     MenuItem mi = (MenuItem)ae.getSource();
+
+    LOG.info("mi : " + mi);
+    LOG.info("mi.getClass() : " + mi.getClass());
+    LOG.info("mi.getId() : " + mi.getId());
+    LOG.info("mi.getText() : " + mi.getText());
+
     if (mi == _miDownload)
       sg.download();
     else if (mi.getParentMenu() == _menuDownloadMru)
@@ -178,6 +193,12 @@ public class MainMenuBar
       sg.help();
     else if (mi == _miInfo)
       sg.info(); // display Info dialog
+
+    // 최창근 추가 - 사용자 이벤트 내역 버튼 이벤트처리
+    else if (mi == _miHistory) {
+      sg.history();
+    }
+
   } /* handle */
 
   /*------------------------------------------------------------------*/
@@ -190,6 +211,7 @@ public class MainMenuBar
     boolean bValid = false;
     Archive archive = SiardGui.getSiardGui().getArchive();
     MainPane mp = MainPane.getMainPane();
+
     if (archive != null)
     {
       bAvailable = true;
@@ -199,21 +221,22 @@ public class MainMenuBar
         bChanged = true;
     }
     _miDownload.setDisable(bChanged && bValid);
-    boolean bDisableMruDownloads = _miDownload.isDisable() ||
-      (MruConnection.getMruConnection(true).getMruConnections() == 0);
+
+    boolean bDisableMruDownloads = _miDownload.isDisable() || (MruConnection.getMruConnection(true).getMruConnections() == 0);
     _menuDownloadMru.setDisable(bDisableMruDownloads);
     _miUpload.setDisable((!bAvailable) || (!bValid));
-    boolean bDisableMruUploads = _miUpload.isDisable() ||
-      (MruConnection.getMruConnection(false).getMruConnections() == 0);
+
+    boolean bDisableMruUploads = _miUpload.isDisable() || (MruConnection.getMruConnection(false).getMruConnections() == 0);
     _menuUploadMru.setDisable(bDisableMruUploads);
     _miOpen.setDisable(bAvailable && bChanged);
-    boolean bDisableMruFiles = _miOpen.isDisable() ||
-      (MruFile.getMruFile().getMruFiles() == 0);
+
+    boolean bDisableMruFiles = _miOpen.isDisable() || (MruFile.getMruFile().getMruFiles() == 0);
     _menuOpenMru.setDisable(bDisableMruFiles);
     _miSave.setDisable((!bAvailable) || (!bChanged) || (!bValid));
     _miDisplayMetaData.setDisable(!bAvailable);
     _miAugmentMetaData.setDisable(false);
     _miClose.setDisable(!bAvailable);
+
     Table table = mp.getSelectedTable();
     _miCopyAll.setDisable(mp.getDisplayedTableView() == null);
     _miCopyRow.setDisable(mp.getSelectedTableRow() < 0);
@@ -222,6 +245,7 @@ public class MainMenuBar
     _miFindNext.setDisable((!bAvailable) || (!archive.getMetaData().canFindNext()));
     _miSearch.setDisable(table == null);
     _miSearchNext.setDisable((table == null) || (!table.canFindNext()));
+
     // for install/uninstall we need to look at locations and versions
     String sInstalledVersion = UserProperties.getUserProperties().getInstalledVersion(null);
     _miInstall.setDisable(SiardGui.compareVersion(sInstalledVersion) <= 0);
@@ -273,6 +297,9 @@ public class MainMenuBar
     _menuHelp.setText(sb.getMenuHelp());
     _miHelp.setText(sb.getMenuHelpHelp());
     _miInfo.setText(sb.getMenuHelpInfo());
+
+    // 최창근 추가 - 사용자 이벤트 내역 버튼명
+    _miHistory.setText(sb.getMenuHelpHistory());
   } /* refreshLanguage */
 
   /*------------------------------------------------------------------*/
@@ -331,6 +358,9 @@ public class MainMenuBar
   private MainMenuBar()
   {
     super();
+
+    LOG.info("");
+
     _menuFile = new Menu();
 
     _miDownload = createMenuItem();
@@ -463,6 +493,10 @@ public class MainMenuBar
 
     _miHelp = createMenuItem();
     _menuHelp.getItems().add(_miHelp);
+
+    // 최창근 추가 - 사용자 이벤트 내역 버튼
+    _miHistory = createMenuItem();
+    _menuHelp.getItems().add(_miHistory);
 
     _menuHelp.getItems().add(new SeparatorMenuItem());
 

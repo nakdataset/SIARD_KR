@@ -23,9 +23,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import ch.admin.bar.siard2.cmd.SiardConnection;
 import ch.admin.bar.siard2.gui.SiardBundle;
 import ch.admin.bar.siard2.gui.UserProperties;
+import ch.config.db.CommonDAO;
 import ch.enterag.utils.fx.FxSizes;
 import ch.enterag.utils.fx.FxStyles;
 import ch.enterag.utils.fx.ScrollableDialog;
@@ -76,11 +79,14 @@ import javafx.stage.Stage;
  * Abstract base class for DownloadConnectionDialog and UploadConnectionDialog.
  * @author Hartwig Thomas
  */
-public abstract class ConnectionDialog
-  extends ScrollableDialog
+public abstract class ConnectionDialog extends ScrollableDialog
 {
   /** logger */
   private static IndentLogger _il = IndentLogger.getIndentLogger(ConnectionDialog.class.getName());
+
+  // 최창근 추가 - 로그
+  private static final Logger LOG = Logger.getLogger(ConnectionDialog.class);
+
   // width of JDBC URL input box
   protected static final double dWIDTH_URL = FxSizes.getScreenBounds().getWidth()/2.0;
 
@@ -262,17 +268,30 @@ public abstract class ConnectionDialog
   {
     UserProperties up = UserProperties.getUserProperties();
     SiardConnection sc = SiardConnection.getSiardConnection();
+
     String sDbScheme = _mapSchemes.get(getSelectedTitle());
     up.setDatabaseScheme(sDbScheme);
+
     String sDbHost = _tfDbHost.getText();
     if ((sDbHost != null) && (sDbHost.length() > 0))
       up.setDatabaseHost(sDbHost);
+
     String sDbName = _tfDbName.getText();
     up.setDatabaseName(sDbName);
+
     if (sc.getOptions(sDbScheme) > 1)
       up.setDatabaseOption(getSelectedOption());
+
     _sDbUser = _tfDbUser.getText();
+
     up.setDatabaseUser(_sDbUser);
+
+    LOG.info("sDbScheme : " + sDbScheme);
+    LOG.info("sDbHost : " + sDbHost);
+    LOG.info("sDbName : " + sDbName);
+    LOG.info("getSelectedOption() : " + getSelectedOption());
+    LOG.info("_tfDbUser.getText() : " + _tfDbUser.getText());
+
   } /* persist */
 
   protected String validate()
@@ -306,8 +325,10 @@ public abstract class ConnectionDialog
         String sError = validate();
         if (sError == null)
         {
+          LOG.info("sError " + sError);
           persist();
           _iResult = iRESULT_SUCCESS;
+          LOG.info("_iResult " + _iResult);
           close();
         }
         else
@@ -668,10 +689,21 @@ public abstract class ConnectionDialog
     hbox.getChildren().add(lbl);
     hbox.getChildren().add(node);
     double dWidth = 0.0;
-    if (node instanceof TextField) // PasswordField is a TextField
+
+    /**
+     * AS-IS
+    if (node instanceof TextField)// PasswordField is a TextField
       dWidth = ((TextField)node).getPrefWidth();
     else if (node instanceof CheckBox)
       dWidth = ((CheckBox)node).getWidth();
+    */
+
+    // TODO 최창근 수정 - 동적 크기조절을 위한 설정
+    HBox.setHgrow(node, Priority.ALWAYS);
+    if (node instanceof TextField) // PasswordField is a TextField
+    	dWidth = ((TextField)node).getPrefWidth();
+    else if (node instanceof CheckBox)
+    	dWidth = ((CheckBox)node).getWidth();
     hbox.setMinWidth(lbl.getPrefWidth() + dHSPACING + dWidth);
     return hbox;
   } /* createHBox */
@@ -906,13 +938,16 @@ public abstract class ConnectionDialog
       _tfDbUser.setText(up.getDatabaseUser());
     _tfDbUser.setTooltip(new Tooltip(sb.getConnectionDbUserTooltip()));
     _tfDbUser.textProperty().addListener(_scl);
+
     Label lblDbUser = createLabel(sb.getConnectionDbUserLabel()+":",_tfDbUser);
     _pfDbPassword = new PasswordField();
     _pfDbPassword.setTooltip(new Tooltip(sb.getConnectionDbPasswordTooltip()));
+
     Label lblDbPassword = createLabel(sb.getConnectionDbPasswordLabel()+":",_pfDbPassword);
     _cbMetaDataOnly = new CheckBox();
     _cbMetaDataOnly.setTooltip(new Tooltip(sLoadMetaDataOnlyTooltip));
     _cbMetaDataOnly.setAllowIndeterminate(false);
+
     Label lblMetaDataOnly = createLabel(sLoadMetaDataOnlyLabel+":",_cbMetaDataOnly);
     Label lblOverwrite = null;
     if (sLoadOverwriteLabel != null)
@@ -1161,6 +1196,18 @@ public abstract class ConnectionDialog
     String sLoadViewsAsTablesLabel, String sLoadViewsAsTablesTooltip)
   {
     super(stageOwner,sTitle);
+
+    LOG.info("");
+
+    //TODO 최창근 추가 - SQLite insert 테스트 후 삭제
+	CommonDAO dao = new CommonDAO();
+	try {
+		dao.insertHistory();
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+
     _sConnectionUrl = sConnectionUrl;
     _sDbUser = sDbUser;
     double dMinWidth = FxSizes.getTextWidth(sTitle)+FxSizes.getCloseWidth()+dHSPACING;
@@ -1177,6 +1224,9 @@ public abstract class ConnectionDialog
     /* scene */
     Scene scene = new Scene(vboxDialog);
     setScene(scene);
+
+    // TODO 최창근 추가 - 테스트 후 삭제
+    testInit();
   } /* constructor DownloadConnectionDialog */
 
 	// 테이블명을 가져온다.
@@ -1379,5 +1429,25 @@ public abstract class ConnectionDialog
 
     		tablename_check.setCheck(b);
     	}
+	}
+
+	/* 최창근 추가 - 테스트를 위한 LocalDB 정보로 Set */
+	void testInit() {
+
+		_cbDbScheme.getSelectionModel().select("MySQL");
+
+		_tfDbHost.setText("192.168.1.152");
+
+		_tfDbName.setText("MYSQL");
+
+		_tfConnectionUrl.setText("jdbc:mysql://192.168.1.152:3306/Mysql?serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8");
+
+		_tfDbUser.setText("root");
+
+		_pfDbPassword.setText("root");
+
+		_tfUser.setText("root");
+
+		_pfTable.setText("root");
 	}
 } /* class ConnectionDialog */

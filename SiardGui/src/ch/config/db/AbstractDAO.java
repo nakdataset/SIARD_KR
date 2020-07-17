@@ -12,12 +12,25 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class AbstractDAO {
+
+	protected Log log = LogFactory.getLog(AbstractDAO.class);
 
 	private Connection conn = SQLiteConnection.getConnection();
 
+	protected void printQueryId(String queryId) {
+//		if(log.isDebugEnabled()){
+			log.info("Query \t: " + queryId);
+//		}
+	}
+
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public List selectList(String query) throws Exception {
+		printQueryId(query);
+
 		List resultList = new ArrayList();
 		Map<String, String> resultMap = new HashMap<String, String>();
 
@@ -44,6 +57,8 @@ public class AbstractDAO {
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public List selectList(String query, Map<String, String> params) throws Exception {
+		printQueryId(query);
+
 		List resultList = new ArrayList();
 		Map<String, String> resultMap = new HashMap<String, String>();
 
@@ -71,6 +86,8 @@ public class AbstractDAO {
 	}
 
 	public Object selectByOne(String query) throws Exception {
+		printQueryId(query);
+
 		Map<String, String> resultMap = new HashMap<String, String>();
 		PreparedStatement pstmt = conn.prepareStatement(query);
 
@@ -94,6 +111,8 @@ public class AbstractDAO {
 	}
 
 	public Object selectByOne(String query, Map<String, String> params) throws Exception {
+		printQueryId(query);
+
 		Map<String, String> resultMap = new HashMap<String, String>();
 		PreparedStatement pstmt = conn.prepareStatement(query);
 
@@ -119,6 +138,8 @@ public class AbstractDAO {
 	}
 
 	public Object insert(String query) throws Exception {
+		printQueryId(query);
+
 		PreparedStatement pstmt = conn.prepareStatement(query);
 		int cnt = pstmt.executeUpdate();
 		if(pstmt != null) pstmt.close();
@@ -126,6 +147,8 @@ public class AbstractDAO {
 	}
 
 	public Object insert(String query, Map<String, String> params) throws Exception {
+		printQueryId(query);
+
 		PreparedStatement pstmt = conn.prepareStatement(query);
 		initParam(pstmt, params);
 		int cnt = pstmt.executeUpdate();
@@ -135,6 +158,8 @@ public class AbstractDAO {
 
 
 	public Object update(String query) throws Exception {
+		printQueryId(query);
+
 		PreparedStatement pstmt = conn.prepareStatement(query);
 		int cnt = pstmt.executeUpdate();
 		if(pstmt != null) pstmt.close();
@@ -142,6 +167,8 @@ public class AbstractDAO {
 	}
 
 	public Object update(String query, Map<String, String> params) throws Exception {
+		printQueryId(query);
+
 		PreparedStatement pstmt = conn.prepareStatement(query);
 		initParam(pstmt, params);
 		int cnt = pstmt.executeUpdate();
@@ -150,6 +177,8 @@ public class AbstractDAO {
 	}
 
 	public Object delete(String query) throws Exception {
+		printQueryId(query);
+
 		PreparedStatement pstmt = conn.prepareStatement(query);
 		int cnt = pstmt.executeUpdate();
 		if(pstmt != null) pstmt.close();
@@ -157,6 +186,8 @@ public class AbstractDAO {
 	}
 
 	public Object delete(String query, Map<String, String> params) throws Exception {
+		printQueryId(query);
+
 		PreparedStatement pstmt = conn.prepareStatement(query);
 		initParam(pstmt, params);
 		int cnt = pstmt.executeUpdate();

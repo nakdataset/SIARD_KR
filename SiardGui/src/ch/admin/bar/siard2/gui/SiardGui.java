@@ -37,8 +37,10 @@ import ch.admin.bar.siard2.gui.actions.OpenSaveAction;
 import ch.admin.bar.siard2.gui.actions.SearchAction;
 import ch.admin.bar.siard2.gui.actions.UploadDownloadAction;
 import ch.admin.bar.siard2.gui.dialogs.HelpDialog;
+import ch.admin.bar.siard2.gui.dialogs.HistoryDialog;
 import ch.admin.bar.siard2.gui.dialogs.InfoDialog;
 import ch.admin.bar.siard2.gui.dialogs.OptionDialog;
+import ch.config.db.CommonDAO;
 import ch.config.db.SQLiteConnection;
 import ch.enterag.utils.DU;
 import ch.enterag.utils.ProgramInfo;
@@ -291,6 +293,7 @@ public class SiardGui extends Application
    */
   private UserProperties loadProperties()
   {
+	LOG.info("");
     _il.enter();
     Rectangle2D rectScreen = FxSizes.getScreenBounds();
     UserProperties up = UserProperties.getUserProperties();
@@ -299,6 +302,10 @@ public class SiardGui extends Application
     // String sDefaultLanguage = Locale.getDefault().getLanguage();
     String sDefaultLanguage = System.getProperty("user.language");
     String sLanguage = up.getUiLanguage(sDefaultLanguage);
+
+    LOG.info("sDefaultLanguage " + sDefaultLanguage);
+    LOG.info("sLanguage " + sLanguage);
+
     sb.setLanguage(up.getUiLanguage(sLanguage));
     _stage.setFullScreen(false);
     _stage.setIconified(false);
@@ -306,15 +313,15 @@ public class SiardGui extends Application
     {
       _stage.setX(0.15*rectScreen.getWidth());
       _stage.setY(0.15*rectScreen.getHeight());
-//      _stage.setWidth(0.7 * rectScreen.getWidth());
-//      _stage.setHeight(0.7 * rectScreen.getHeight());
+      _stage.setWidth(0.7 * rectScreen.getWidth());
+      _stage.setHeight(0.7 * rectScreen.getHeight());
 	}
     else
     {
       _stage.setX(up.getStageX(0.15*rectScreen.getWidth()));
       _stage.setY(up.getStageY(0.15*rectScreen.getHeight()));
-//      _stage.setWidth(up.getStageWidth(0.7*rectScreen.getWidth()));
-//      _stage.setHeight(up.getStageHeight(0.7*rectScreen.getHeight()));
+      _stage.setWidth(up.getStageWidth(0.7*rectScreen.getWidth()));
+      _stage.setHeight(up.getStageHeight(0.7*rectScreen.getHeight()));
     }
     _stage.setWidth(1024);
     _stage.setHeight(768);
@@ -386,7 +393,10 @@ public class SiardGui extends Application
    */
   public void download(String sConnectionUrl, String sDbUser)
   {
+	LOG.info("sConnectionUrl " + sConnectionUrl);
+	LOG.info("sDbUser " + sDbUser);
     UploadDownloadAction.newUploadDownloadAction().download(sConnectionUrl, sDbUser);
+    LOG.info("_archive " + _archive);
     if (_archive != null)
     {
       setTitle();
@@ -417,6 +427,7 @@ public class SiardGui extends Application
    */
   public void upload()
   {
+	LOG.info("");
     upload(null,null);
   } /* upload */
 
@@ -425,6 +436,7 @@ public class SiardGui extends Application
    */
   public void openArchive(String sFile)
   {
+	LOG.info("");
     swOpen.start();
     OpenSaveAction.newOpenSaveAction().open(sFile);
     swOpen.stop();
@@ -683,6 +695,16 @@ public class SiardGui extends Application
     InfoDialog.showInfoDialog(getStage());
   } /* info */
 
+  // 최창근 추가 - 사용자 이벤트 내역 화면 호출
+  /*------------------------------------------------------------------*/
+  /** display info dialog
+   */
+  public void history()
+  {
+	  HistoryDialog.showHistoryDialog(getStage());
+  } /* info */
+
+
   /*------------------------------------------------------------------*/
   /** show object in the details pane.
    * @param oMetaData meta data or RecordExtract object.
@@ -690,6 +712,7 @@ public class SiardGui extends Application
    */
   public void showDetails(Object oMetaData, Class<?> clsTableData)
   {
+	LOG.info("showDetails");
     MainPane.getMainPane().showMetaData(oMetaData,clsTableData);
   } /* showDetails */
 
@@ -764,20 +787,29 @@ public class SiardGui extends Application
   public boolean checkInstall()
   {
     _il.enter();
+    LOG.info("");
     boolean bInstall = false;
     UserProperties up = UserProperties.getUserProperties();
     SiardBundle sb = SiardBundle.getSiardBundle();
     String sInstalledVersion = up.getInstalledVersion(null);
+
+    LOG.info("sInstalledVersion : " + sInstalledVersion);
+
     int iResult = 0; // proceed
     int iCompare = compareVersion(sInstalledVersion);
+    LOG.info("iCompare : " + iCompare);
+
+    LOG.info("iCompare > 0 : " + (iCompare > 0));
     if (iCompare > 0)
     {
+	  LOG.info("sInstalledVersion : " + sInstalledVersion);
       if (sInstalledVersion == null)
       {
         // display message that there is no version installed
         iResult = MB.show(getStage(), sb.getInstalledNoneTitle(),
           sb.getInstalledNoneMessage(up.getFile(), getVersion()),
           sb.getYes(), sb.getNo());
+        LOG.info("iResult : " + iResult);
       }
       else
       {
@@ -807,20 +839,28 @@ public class SiardGui extends Application
   @Override
   public void start(Stage stage) throws Exception
   {
+	LOG.info("stage : " + stage);
+
     _il.enter(stage);
     _stage = stage;
     // load the user properties and display an installation note, if appropriate
     UserProperties up = loadProperties();
     _stage.setOnCloseRequest(this);
     _bInitialInstall = checkInstall();
+
+    LOG.info("_bInitialInstall : " + _bInitialInstall);
+
     _stageSplash = new Stage(StageStyle.UNDECORATED);
     Scene scene = new Scene(SplashPane.newSplashPane());
     _stageSplash.setScene(scene);
     _stageSplash.toFront();
     _stageSplash.show();
+
     int iSplashMs = up.getSplashMs(1000);
+
     if (_bInitialInstall)
       iSplashMs = 0;
+
     SleeperTask.runSleeperTask(iSplashMs,new EventHandler<WorkerStateEvent>()
     {
       /*----------------------------------------------------------------*/
@@ -832,18 +872,24 @@ public class SiardGui extends Application
       {
         _il.enter(wse);
         _stageSplash.close();
+
         setTitle();
+
         if (_bInitialInstall)
           install();
+
         MainMenuBar.getMainMenuBar().restrict();
+
         _stage.initStyle(StageStyle.DECORATED);
         Scene scene = new Scene(MainPane.getMainPane());
         scene.setCursor(Cursor.DEFAULT);
         _stage.setScene(scene);
         _stage.toFront();
         _stage.show();
+
         if (_fileInitialOpen != null)
           openArchive(_fileInitialOpen.getAbsolutePath());
+
         _il.exit();
       }
     });
@@ -860,6 +906,7 @@ public class SiardGui extends Application
   {
     super.init();
 
+    LOG.info("init()");
     _il.enter();
     List<String> listParameters = getParameters().getRaw();
     if (listParameters.size() > 0)
@@ -955,15 +1002,23 @@ public class SiardGui extends Application
   private static void logSettingInit(){
 	try {
 		FileInputStream log4jRead = new FileInputStream("log4j.properties");
-			Properties log4jProperty = new Properties();
-			log4jProperty.load(log4jRead);
-			PropertyConfigurator.configure(log4jProperty);
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
+		Properties log4jProperty = new Properties();
+		log4jProperty.load(log4jRead);
+		PropertyConfigurator.configure(log4jProperty);
+	}catch(Exception e) {
+		e.printStackTrace();
 	}
-	// 최창근 추가 - SQLite 사용을 위한 설정 메소드
-	private static void sqliteSettingInit() {
-		Connection conn = SQLiteConnection.getConnection();
+  }
+
+  // 최창근 추가 - SQLite 사용을 위한 설정 메소드
+  private static void sqliteSettingInit() {
+	Connection conn = SQLiteConnection.getConnection();
+	CommonDAO dao = new CommonDAO();
+	try {
+		dao.insertHistory();
+	} catch (Exception e) {
+		e.printStackTrace();
 	}
+  }
+
 } /* class SiardGui */

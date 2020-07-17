@@ -87,6 +87,9 @@ public class SiardBundle extends FxBundle
   public String getMenuHelpHelp() { return getProperty("menu.help.help"); }
   public String getMenuHelpInfo() { return getProperty("menu.help.info"); }
 
+  // 최창근 추가 - 사용자 이벤트 내역 버튼 properties 추가
+  public String getMenuHelpHistory() { return getProperty("menu.help.history"); }
+
   public String getInfoTitle() { return getProperty("info.title"); }
   public String getInfoSubject() { return getProperty("info.subject"); }
   public String getInfoDescription() { return getProperty("info.description"); }

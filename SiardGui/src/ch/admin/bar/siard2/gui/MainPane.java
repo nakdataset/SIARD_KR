@@ -1,5 +1,5 @@
-/*====================================================================== 
-MainPanel implements the main panel of the SIARD GUI. 
+/*======================================================================
+MainPanel implements the main panel of the SIARD GUI.
 Application: SIARD 2
 Description: MainPanel implements the main panel of the SIARD GUI.
 Platform   : JAVA 1.7, JavaFX 2.2
@@ -9,16 +9,26 @@ Created    : 10.05.2017, Hartwig Thomas
 ======================================================================*/
 package ch.admin.bar.siard2.gui;
 
-import java.io.*;
-import javafx.geometry.*;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import ch.enterag.utils.fx.*;
-import ch.enterag.utils.fx.controls.*;
-import ch.enterag.utils.logging.*;
-import ch.admin.bar.siard2.api.*;
-import ch.admin.bar.siard2.gui.tv.*;
-import ch.admin.bar.siard2.gui.details.*;
+import java.io.IOException;
+
+import org.apache.log4j.Logger;
+
+import ch.admin.bar.siard2.api.MetaSearch;
+import ch.admin.bar.siard2.api.MetaTable;
+import ch.admin.bar.siard2.api.RecordExtract;
+import ch.admin.bar.siard2.api.Table;
+import ch.admin.bar.siard2.gui.details.DetailsScrollPane;
+import ch.admin.bar.siard2.gui.details.RecordExtractTableView;
+import ch.admin.bar.siard2.gui.tv.ArchiveTreeView;
+import ch.enterag.utils.fx.FxSizes;
+import ch.enterag.utils.fx.FxStyles;
+import ch.enterag.utils.fx.controls.ObjectListTableView;
+import ch.enterag.utils.logging.IndentLogger;
+import javafx.geometry.Insets;
+import javafx.scene.control.Label;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 
 /*====================================================================*/
 /** MainPanel implements the main panel of the SIARD GUI.
@@ -26,8 +36,12 @@ import ch.admin.bar.siard2.gui.details.*;
  */
 public class MainPane extends BorderPane
 {
-  /** logger */  
+  /** logger */
   private static IndentLogger _il = IndentLogger.getIndentLogger(MainPane.class.getName());
+
+  //최창근 추가 - 로그
+  private static final Logger LOG = Logger.getLogger(MainPane.class);
+
   /** padding inside main pane */
   private static final double dPADDING_EX = 0.0;
   /** margin inside main pane */
@@ -66,29 +80,45 @@ public class MainPane extends BorderPane
   private MainPane()
   {
     super();
+
+    LOG.info("");
     setPadding(new Insets(FxSizes.fromExes(dPADDING_EX)));
     setMinWidth(FxSizes.fromEms(dMIN_WIDTH_EM));
     setMinHeight(FxSizes.fromExes(dMIN_HEIGHT_EX));
+
     _mmb = MainMenuBar.getMainMenuBar();
+
     setTop(_mmb);
+
     _sp = new SplitPane();
     _atv = new ArchiveTreeView();
     _dsp = new DetailsScrollPane();
+
+    // 최창근 추가 - 트리메뉴 width를 고정시켜서 구분선 안움직이게
+    _atv.setMinWidth(250);
+    _atv.setMaxWidth(250);
+
     _sp.getItems().addAll(_atv,_dsp);
     _dsp.prefViewportWidthProperty().bind(widthProperty());
     _dsp.prefViewportHeightProperty().bind(heightProperty());
+
     setCenter(_sp);
+
     _sp.setDividerPosition(0,0.0);
+
     _lblStatus = new Label("");
     _lblStatus.prefWidthProperty().bind(widthProperty());
     _lblStatus.setStyle(FxStyles.sSTYLE_MESSAGE);
+
     setBottom(_lblStatus);
+
     setMargin(_mmb, new Insets(FxSizes.fromEms(dMARGIN_EM)));
     setMargin(_sp, new Insets(FxSizes.fromEms(dMARGIN_EM)));
     setMargin(_lblStatus, new Insets(FxSizes.fromEms(dMARGIN_EM)));
+
     setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
   } /* constructor MainPane */
-  
+
   /*------------------------------------------------------------------*/
   /** refreshLanguage redisplays the pane in the given language.
    */
@@ -97,10 +127,10 @@ public class MainPane extends BorderPane
     _mmb.refreshLanguage();
     _dsp.reset();
   } /* refreshLanguage */
-  
+
   /*------------------------------------------------------------------*/
   /** setModal displays status in status line and disables most controls.
-   * @param sStatus null, if modality is to be terminated. 
+   * @param sStatus null, if modality is to be terminated.
    */
   public void setModal(String sStatus)
   {
@@ -119,7 +149,7 @@ public class MainPane extends BorderPane
       _lblStatus.setText("");
     }
   } /* setStatus */
-  
+
   /*------------------------------------------------------------------*/
   /** show the meta data in the details pane.
    * @param oMetaData meta data or record extract.
@@ -127,12 +157,13 @@ public class MainPane extends BorderPane
    */
   public void showMetaData(Object oMetaData,Class<?>clsTableData)
   {
+	LOG.info("_dsp != null " + (_dsp != null));
     if (_dsp != null)
       _dsp.setMetaData(oMetaData,clsTableData);
   } /* showMetaData */
-  
+
   /*------------------------------------------------------------------*/
-  /** collapse currently selected record extract and its parents up to 
+  /** collapse currently selected record extract and its parents up to
    * the rows entry of the table tree item.
    */
   public void collapseToRows()
@@ -164,7 +195,7 @@ public class MainPane extends BorderPane
     }
     return table;
   } /* getSelectedTable */
-  
+
   /*------------------------------------------------------------------*/
   /** return the currently displayed table view in the details pane.
    * @return the currently displayed table view in the details pane.
@@ -173,21 +204,21 @@ public class MainPane extends BorderPane
   {
     return _dsp.getTableView();
   } /* getDisplayedTableView */
-  
+
   /*------------------------------------------------------------------*/
   /** are there any edited changes not yet applied to meta data?
-   * @return true, if meta data details were edited but not yet applied 
+   * @return true, if meta data details were edited but not yet applied
    * to meta data.
    */
   public boolean isChanged()
   {
     return _dsp.isChanged();
   } /* isChanged */
-  
+
   /*------------------------------------------------------------------*/
   /** return the currently selected row on the details pane.
-   * @return the currently selected row on the details pane 
-   *   or -1 if nothing is selected. 
+   * @return the currently selected row on the details pane
+   *   or -1 if nothing is selected.
    */
   public int getSelectedTableRow()
   {
@@ -197,7 +228,7 @@ public class MainPane extends BorderPane
       iSelectedRow = oltv.getSelectionModel().getSelectedIndex();
     return iSelectedRow;
   } /* getSelectedTableRow */
-  
+
   /*------------------------------------------------------------------*/
   /** select the meta data containing the search string.
    * @param ms MetaSearch meta data object.
@@ -209,14 +240,14 @@ public class MainPane extends BorderPane
     /* this should have displayed it on the details pane. */
     try
     {
-      _dsp.getMetaDataEditor().selectRange(ms.getFoundElement(), 
+      _dsp.getMetaDataEditor().selectRange(ms.getFoundElement(),
         ms.getFoundOffset(), ms.getFoundOffset()+ms.getFindString().length());
     }
     catch(IOException ie) { _il.exception(ie); }
   } /* selectFound */
-  
+
   /*------------------------------------------------------------------*/
-  /** select the cell in the primary data record set containing the 
+  /** select the cell in the primary data record set containing the
    * search string.
    * @param table selected table with search result.
    */

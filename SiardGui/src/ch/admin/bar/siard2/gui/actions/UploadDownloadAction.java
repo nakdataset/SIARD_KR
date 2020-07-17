@@ -19,6 +19,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import org.apache.log4j.Logger;
+
 import ch.admin.bar.siard2.api.Archive;
 import ch.admin.bar.siard2.api.primary.ArchiveImpl;
 import ch.admin.bar.siard2.cmd.MetaDataToDb;
@@ -51,6 +53,9 @@ public class UploadDownloadAction {
 	/** logger */
 	private static IndentLogger _il = IndentLogger.getIndentLogger(UploadDownloadAction.class.getName());
 
+	// 최창근 추가 - 로그
+	private static final Logger LOG = Logger.getLogger(UploadDownloadAction.class);
+
 	Stage _stageSplash = null;
 	Scene scene = null;
 	boolean process = true;
@@ -76,19 +81,34 @@ public class UploadDownloadAction {
 		_il.enter(sConnectionUrl, sDbUser);
 		SiardBundle sb = SiardBundle.getSiardBundle();
 		Stage stage = SiardGui.getSiardGui().getStage();
+
+		LOG.info("2 sConnectionUrl " + sConnectionUrl);
+		LOG.info("2 sDbUser " + sDbUser);
+
 		/* display connection dialog (at least for password) */
 		Connection conn = null;
-		DownloadConnectionDialog dcd = DownloadConnectionDialog.showDownloadConnectionDialog(
-			stage, sConnectionUrl, sDbUser);
+		DownloadConnectionDialog dcd = DownloadConnectionDialog.showDownloadConnectionDialog(stage, sConnectionUrl, sDbUser);
+
+		LOG.info("dcd.getResult() " + dcd.getResult());
+		LOG.info("DownloadConnectionDialog.iRESULT_SUCCESS " + DownloadConnectionDialog.iRESULT_SUCCESS);
+		LOG.info("conn " + conn);
+		LOG.info("while " + ((dcd.getResult() == DownloadConnectionDialog.iRESULT_SUCCESS) && (conn == null)));
 		while ((dcd.getResult() == DownloadConnectionDialog.iRESULT_SUCCESS) && (conn == null)) {
 			sConnectionUrl = dcd.getConnectionUrl();
 			sDbUser = dcd.getDbUser();
 			/* try and load appropriate driver */
+
+			LOG.info("dcd.getConnectionUrl() " + dcd.getConnectionUrl());
+			LOG.info("dcd.getDbUser() " + dcd.getDbUser());
+
 			String sError = SiardConnection.getSiardConnection().loadDriver(dcd.getConnectionUrl());
 			if (sError == null) {
 				_il.event("Driver for " + dcd.getConnectionUrl() + " loaded!");
+
 				/* test connection */
 				DriverManager.setLoginTimeout(UserProperties.getUserProperties().getLoginTimeoutSeconds());
+				LOG.info("UserProperties.getUserProperties().getLoginTimeoutSeconds() " + UserProperties.getUserProperties().getLoginTimeoutSeconds());
+
 				try {
 					conn = DriverManager.getConnection(dcd.getConnectionUrl(), dcd.getDbUser(), dcd.getDbPassword());
 					conn.setAutoCommit(false);
@@ -105,41 +125,66 @@ public class UploadDownloadAction {
 					sb.getConnectionErrorDriverMessage(sError),
 					sb.getOk(), null);
 			}
-			if (conn == null)
-				dcd = DownloadConnectionDialog.showDownloadConnectionDialog(
-					stage, sConnectionUrl, sDbUser);
+
+			if (conn == null) {
+				LOG.info("conn " + conn);
+				LOG.info("sConnectionUrl " + sConnectionUrl);
+				LOG.info("sDbUser " + sDbUser);
+				dcd = DownloadConnectionDialog.showDownloadConnectionDialog(stage, sConnectionUrl, sDbUser);
+			}
 		}
+
+		LOG.info("if " + (dcd.getResult() == DownloadConnectionDialog.iRESULT_SUCCESS));
 		if (dcd.getResult() == DownloadConnectionDialog.iRESULT_SUCCESS) {
 			_il.event("Connection established!");
 			/* update MRU */
 			MruConnection mc = MruConnection.getMruConnection(true);
 			mc.setMruConnection(dcd.getConnectionUrl(), dcd.getDbUser());
+
+			LOG.info("dcd.getConnectionUrl() " + dcd.getConnectionUrl());
+			LOG.info("dcd.getDbUser() " + dcd.getDbUser());
+
 			/* update menu bar */
 			MainMenuBar.getMainMenuBar().setConnectionMru(true);
+
 			/* get file */
 			File fileArchive = null;
+
 			try {
+				LOG.info("!dcd.isMetaDataOnly() " + !dcd.isMetaDataOnly());
 				if (!dcd.isMetaDataOnly()) {
 					fileArchive = SiardGui.getDefaultDataDirectory();
+					LOG.info("1 fileArchive " + fileArchive);
+
+					LOG.info("(MruFile.getMruFile().getMruFiles() > 0) " + (MruFile.getMruFile().getMruFiles() > 0));
 					if (MruFile.getMruFile().getMruFiles() > 0)
 						fileArchive = (new File(MruFile.getMruFile().getMruFile(0))).getParentFile();
+
 					fileArchive = new File(fileArchive.getAbsolutePath() + File.separator + "*." + Archive.sSIARD_DEFAULT_EXTENSION);
+					LOG.info("2 fileArchive " + fileArchive);
+
 					fileArchive = FS.chooseNewFile(stage,
 						sb.getArchiveFileTitle(), sb.getArchiveFileMessage(), sb,
 						fileArchive, Archive.sSIARD_DEFAULT_EXTENSION, true);
+					LOG.info("3 fileArchive " + fileArchive);
+
 				} else {
 					/* temporary meta data file */
 					fileArchive = File.createTempFile("mdo", ".siard");
+					LOG.info("1 fileArchive " + fileArchive);
 				}
 			} catch (IOException ie) {
 				_il.exception(ie);
 			}
+
+			LOG.info("fileArchive " + fileArchive);
 			if (fileArchive != null) {
 				_il.event("Archive file selected: " + fileArchive.getAbsolutePath());
 				if (fileArchive.exists())
 					fileArchive.delete();
-				SiardGui.getSiardGui().startAction(
-					sb.getDownloadingStatus(dcd.getConnectionUrl(), fileArchive));
+
+				SiardGui.getSiardGui().startAction(sb.getDownloadingStatus(dcd.getConnectionUrl(), fileArchive));
+
 				try {
 					Archive archive = ArchiveImpl.newInstance();
 
@@ -162,6 +207,7 @@ public class UploadDownloadAction {
 
 					archive.setTableCheckedList(dcd.getTableCheckedList()); // 체크된 테이블 목록
 					archive.create(fileArchive);
+
 					if (dcd.isMetaDataOnly())
 						fileArchive.deleteOnExit();
 					/* if there is a meta data only archive, use its meta data as a template */
@@ -173,12 +219,19 @@ public class UploadDownloadAction {
 						archive.importMetaDataTemplate(bais);
 						bais.close();
 					}
+
+					LOG.info("showDownloadDialog");
 					/* show download dialog */
-					DownloadDialog dd = DownloadDialog.showDownloadDialog(
-						stage, conn, archive, dcd.isMetaDataOnly(), dcd.isViewsAsTables());
+					DownloadDialog dd = DownloadDialog.showDownloadDialog(stage, conn, archive, dcd.isMetaDataOnly(), dcd.isViewsAsTables());
+
+					LOG.info("dd.wasSuccessful() " + dd.wasSuccessful());
+					LOG.info("dd.getArchive().isValid() " + dd.getArchive().isValid());
+					LOG.info("dcd.isMetaDataOnly() " + dcd.isMetaDataOnly());
+					LOG.info("(dd.wasSuccessful() && (dd.getArchive().isValid() || dcd.isMetaDataOnly())) " + (dd.wasSuccessful() && (dd.getArchive().isValid() || dcd.isMetaDataOnly())));
 					if (dd.wasSuccessful() && (dd.getArchive().isValid() || dcd.isMetaDataOnly())) {
 						// SIARD 파일 검증 진행 여부
 						boolean verify = dd.getVerify();
+						LOG.info("verify " + verify);
 
 						SiardGui owner = SiardGui.getSiardGui();
 
@@ -197,7 +250,7 @@ public class UploadDownloadAction {
 //									_stageSplash.setScene(scene);
 //									_stageSplash.setAlwaysOnTop(true);
 //									_stageSplash.show();
-//									
+//
 //									while(process)
 //									{
 //										try
@@ -216,16 +269,24 @@ public class UploadDownloadAction {
 //							};
 //						}
 
+						LOG.info("dd.getArchive().isValid() " + dd.getArchive().isValid());
 						if (dd.getArchive().isValid()) {
 							dd.getArchive().close();
 							dd.getArchive().open(fileArchive);
 						}
+
 						SiardGui.getSiardGui().setArchive(dd.getArchive());
+
+						LOG.info("!dcd.isMetaDataOnly() " + (!dcd.isMetaDataOnly()));
 						if (!dcd.isMetaDataOnly()) {
 							MruFile mf = MruFile.getMruFile();
 							mf.setMruFile(archive.getFile().getAbsolutePath());
+							LOG.info("archive.getFile().getAbsolutePath() " + archive.getFile().getAbsolutePath());
+
 							MainMenuBar.getMainMenuBar().setFileMru();
 						}
+
+						LOG.info("verify " + verify);
 						if(verify == true) {
 							process = false;
 
@@ -240,10 +301,12 @@ public class UploadDownloadAction {
 							dd.getArchive().close();
 						} catch (IOException ie) {
 						}
+
 						MB.show(stage,
 							sb.getDownloadErrorTitle(),
 							sb.getDownloadErrorInvalidMessage(fileArchive),
 							sb.getOk(), null);
+
 						if (!fileArchive.delete())
 							fileArchive.deleteOnExit();
 					}
@@ -260,6 +323,7 @@ public class UploadDownloadAction {
 						_il.exception(se);
 					}
 				}
+
 				SiardGui.getSiardGui().terminateAction();
 			} else
 				_il.event("No file selected!");
@@ -277,12 +341,19 @@ public class UploadDownloadAction {
 	 */
 	public void upload(String sConnectionUrl, String sDbUser, Archive archive) {
 		_il.enter(sConnectionUrl, sDbUser);
+		LOG.info("upload");
+
 		SiardBundle sb = SiardBundle.getSiardBundle();
 		Stage stage = SiardGui.getSiardGui().getStage();
+
 		/* display connection dialog (at least for password) */
 		Connection conn = null;
-		UploadConnectionDialog ucd = UploadConnectionDialog.showUploadConnectionDialog(
-			stage, sConnectionUrl, sDbUser, archive);
+		UploadConnectionDialog ucd = UploadConnectionDialog.showUploadConnectionDialog(stage, sConnectionUrl, sDbUser, archive);
+
+		LOG.info("dcd.getResult() " + ucd.getResult());
+		LOG.info("UploadConnectionDialog.iRESULT_SUCCESS " + UploadConnectionDialog.iRESULT_SUCCESS);
+		LOG.info("conn " + conn);
+		LOG.info("(ucd.getResult() == UploadConnectionDialog.iRESULT_SUCCESS) && (conn == null) " + ((ucd.getResult() == UploadConnectionDialog.iRESULT_SUCCESS) && (conn == null)));
 		while ((ucd.getResult() == UploadConnectionDialog.iRESULT_SUCCESS) && (conn == null)) {
 			sConnectionUrl = ucd.getConnectionUrl();
 			sDbUser = ucd.getDbUser();
@@ -310,6 +381,7 @@ public class UploadDownloadAction {
 				ucd = UploadConnectionDialog.showUploadConnectionDialog(
 					stage, sConnectionUrl, sDbUser, archive);
 		}
+
 		if (ucd.getResult() == UploadConnectionDialog.iRESULT_SUCCESS) {
 			/* update MRU */
 			MruConnection mc = MruConnection.getMruConnection(false);

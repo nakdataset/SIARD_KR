@@ -1,7 +1,7 @@
-/*====================================================================== 
-InstallUninstallHandler handles installing and uninstalling of SIARD Suite. 
+/*======================================================================
+InstallUninstallHandler handles installing and uninstalling of SIARD Suite.
 Application : SIARD GUI
-Description: InstallUninstallHandler handles installing and uninstalling of SIARD Suite. 
+Description: InstallUninstallHandler handles installing and uninstalling of SIARD Suite.
 Platform   : JAVA 1.7, JavaFX 2.2
 ------------------------------------------------------------------------
 Copyright  : Enter AG, Rüti ZH, Switzerland
@@ -9,15 +9,24 @@ Created    : 09.06.2017, Hartwig Thomas
 ======================================================================*/
 package ch.admin.bar.siard2.gui.actions;
 
-import java.io.*;
-import javafx.concurrent.*;
-import javafx.event.*;
-import javafx.stage.*;
-import ch.enterag.utils.fx.dialogs.*;
-import ch.enterag.utils.io.*;
-import ch.enterag.utils.logging.*;
-import ch.admin.bar.siard2.gui.*;
-import ch.admin.bar.siard2.gui.tasks.*;
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.log4j.Logger;
+
+import ch.admin.bar.siard2.gui.MainMenuBar;
+import ch.admin.bar.siard2.gui.SiardBundle;
+import ch.admin.bar.siard2.gui.SiardGui;
+import ch.admin.bar.siard2.gui.UserProperties;
+import ch.admin.bar.siard2.gui.tasks.InstallerTask;
+import ch.admin.bar.siard2.gui.tasks.UninstallerTask;
+import ch.enterag.utils.fx.dialogs.FS;
+import ch.enterag.utils.fx.dialogs.MB;
+import ch.enterag.utils.io.SpecialFolder;
+import ch.enterag.utils.logging.IndentLogger;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
+import javafx.stage.Stage;
 
 /*====================================================================*/
 /** InstallUninstallHandler handles installing and uninstalling of SIARD Suite.
@@ -27,8 +36,11 @@ public class InstallUninstallHandler
   implements EventHandler<WorkerStateEvent>
 {
   private static InstallUninstallHandler _si = null;
-  /** logger */  
+  /** logger */
   private static IndentLogger _il = IndentLogger.getIndentLogger(InstallUninstallHandler.class.getName());
+  //최창근 추가 - 로그
+  private static final Logger LOG = Logger.getLogger(InstallUninstallHandler.class);
+
   public static final String sDESKTOP_NAME = "SiardGui";
   /* problem: file system is not cleaned up immediately after uninstall */
   @SuppressWarnings("unused")
@@ -41,7 +53,7 @@ public class InstallUninstallHandler
   private InstallUninstallHandler()
   {
   } /* constructor InstallUninstallHandler */
-  
+
   /*------------------------------------------------------------------*/
   /** factory */
   public static InstallUninstallHandler getInstallUninstallHandler()
@@ -67,13 +79,13 @@ public class InstallUninstallHandler
       String sMessage = sb.getInstallationSuccessMessage(it.getInstallationFolder());
       if (it.getDesktopResult() != 0)
         MB.show(SiardGui.getSiardGui().getStage(),
-          sb.getInstallationErrorTitle(), 
-          sb.getInstallationErrorDesktopMessage(it.getDesktopError()), 
+          sb.getInstallationErrorTitle(),
+          sb.getInstallationErrorDesktopMessage(it.getDesktopError()),
           sb.getOk(), null);
       else
         sMessage = sb.getInstallationSuccessDesktopMessage(it.getInstallationFolder());
       MB.show(SiardGui.getSiardGui().getStage(),
-        sb.getInstallationSuccessTitle(), sMessage, 
+        sb.getInstallationSuccessTitle(), sMessage,
         sb.getOk(), null);
       _il.event("Setting installation folder to "+it.getInstallationFolder().getAbsolutePath()+" ...");
       up.setInstalledPath(it.getInstallationFolder());
@@ -89,12 +101,12 @@ public class InstallUninstallHandler
       _il.event("Installation failed!");
       MB.show(SiardGui.getSiardGui().getStage(),
         sb.getInstallationErrorTitle(),
-        sb.getInstallationErrorCopyMessage(it.getInstallationFolder()), 
+        sb.getInstallationErrorCopyMessage(it.getInstallationFolder()),
         sb.getOk(), null);
     }
     _il.exit();
   } /* handleInstallerResult */
-  
+
   /*------------------------------------------------------------------*/
   /** handle the result of the uninstaller task.
    * @param ut uninstaller task.
@@ -119,7 +131,7 @@ public class InstallUninstallHandler
         if (ut.areFilesRemoved()) // settings and files removed
           sMessage = sb.getUninstallationSuccessFilesMessage(up.getInstalledPath(null), up.getFile());
         MB.show(SiardGui.getSiardGui().getStage(),
-          sb.getUninstallationSuccessTitle(), sMessage, 
+          sb.getUninstallationSuccessTitle(), sMessage,
           sb.getOk(), null);
       }
       up.setInstalledVersion(null);
@@ -134,12 +146,12 @@ public class InstallUninstallHandler
     {
       MB.show(SiardGui.getSiardGui().getStage(),
         sb.getUninstallationErrorTitle(),
-        sb.getUninstallationErrorSettingsMessage(up.getFile()), 
+        sb.getUninstallationErrorSettingsMessage(up.getFile()),
         sb.getOk(), null);
     }
     _il.exit();
   } /* handleUninstallerResult */
-  
+
   /*------------------------------------------------------------------*/
   /** handle the result of the InstallerTask or UninstallerTask.
    * @param wse event from ExecuteTask.
@@ -155,18 +167,20 @@ public class InstallUninstallHandler
       handleUninstallerResult((UninstallerTask)wse.getSource());
     _il.exit();
   } /* handle */
-  
+
   /*------------------------------------------------------------------*/
   /** install the currently executing instance
    */
   public void install()
   {
+	LOG.info("install");
+
     _il.enter(String.valueOf(_bContinueInstall));
     _bContinueInstall = false;
     UserProperties up = UserProperties.getUserProperties();
     SiardBundle sb = SiardBundle.getSiardBundle();
     Stage stage = SiardGui.getSiardGui().getStage();
-    /* folder of running instance */ 
+    /* folder of running instance */
     File folderSource = SpecialFolder.getMainJar();
     if (folderSource.isFile())
       folderSource = folderSource.getParentFile().getParentFile();
@@ -185,18 +199,18 @@ public class InstallUninstallHandler
       }
       _il.event("Initial installation folder: "+folderInstallation.getAbsolutePath());
       /* now select folder where SIARD Suite is to be installed. */
-      try 
+      try
       {
         /* do not use native directory chooser here */
         boolean bNative = Boolean.valueOf(System.getProperty(FS.sUSE_NATIVE_PROPERTY));
         System.setProperty(FS.sUSE_NATIVE_PROPERTY, String.valueOf(false));
         do
         {
-          folderInstallation = FS.chooseNewFolder(stage, 
-              sb.getInstallationSelectorTitle(), sb.getInstallationSelectorMessage(), 
+          folderInstallation = FS.chooseNewFolder(stage,
+              sb.getInstallationSelectorTitle(), sb.getInstallationSelectorMessage(),
               sb, folderInstallation);
-        } while ((folderInstallation != null) && 
-          folderInstallation.exists() && 
+        } while ((folderInstallation != null) &&
+          folderInstallation.exists() &&
           (folderInstallation.listFiles().length > 0) &&
           (MB.show(stage,
             sb.getInstallationNotemptyTitle(),
@@ -225,10 +239,10 @@ public class InstallUninstallHandler
     }
     _il.exit();
   } /* install */
-  
+
   /*------------------------------------------------------------------*/
   /** uninstall the currently installed version of SIARD Suite.
-   * @param bQuiet true, if questions are to be asked and no success is 
+   * @param bQuiet true, if questions are to be asked and no success is
    *   to be displayed.
    */
   public void uninstall(boolean bQuiet)
@@ -240,7 +254,7 @@ public class InstallUninstallHandler
     if (!bQuiet)
     {
       bRemoveSettings = (MB.show(SiardGui.getSiardGui().getStage(),
-        sb.getUninstallationTitle(), sb.getUninstallationCompleteQuery(), 
+        sb.getUninstallationTitle(), sb.getUninstallationCompleteQuery(),
         sb.getYes(), sb.getNo()) == 1);
     }
     File folderInstallation = UserProperties.getUserProperties().getInstalledPath(null);

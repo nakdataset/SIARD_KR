@@ -1,7 +1,7 @@
 /*======================================================================
-The details scroll pane contains the meta data editor and the meta data table.  
+The details scroll pane contains the meta data editor and the meta data table.
 Application: SIARD GUI
-Description: The details scroll pane contains the meta data editor and the meta data table. 
+Description: The details scroll pane contains the meta data editor and the meta data table.
 Platform   : JAVA 1.7, JavaFX 2.2
 ------------------------------------------------------------------------
 Copyright  : Swiss Federal Archives, Berne, Switzerland, 2017
@@ -9,23 +9,43 @@ Created    : 10.08.2017, Hartwig Thomas, Enter AG, Rüti ZH
 ======================================================================*/
 package ch.admin.bar.siard2.gui.details;
 
-import java.io.*;
-import javafx.event.*;
-import javafx.geometry.*;
-import javafx.scene.layout.*;
-import ch.admin.bar.siard2.api.*;
-import ch.admin.bar.siard2.gui.*;
-import ch.enterag.utils.fx.*;
-import ch.enterag.utils.fx.controls.*;
+import java.io.IOException;
+
+import org.apache.log4j.Logger;
+
+import ch.admin.bar.siard2.api.MetaColumn;
+import ch.admin.bar.siard2.api.MetaData;
+import ch.admin.bar.siard2.api.MetaField;
+import ch.admin.bar.siard2.api.MetaForeignKey;
+import ch.admin.bar.siard2.api.MetaPrivilege;
+import ch.admin.bar.siard2.api.MetaRole;
+import ch.admin.bar.siard2.api.MetaRoutine;
+import ch.admin.bar.siard2.api.MetaSchema;
+import ch.admin.bar.siard2.api.MetaTable;
+import ch.admin.bar.siard2.api.MetaType;
+import ch.admin.bar.siard2.api.MetaUniqueKey;
+import ch.admin.bar.siard2.api.MetaUser;
+import ch.admin.bar.siard2.api.MetaView;
+import ch.admin.bar.siard2.api.RecordExtract;
+import ch.admin.bar.siard2.gui.SiardGui;
+import ch.enterag.utils.fx.FxStyles;
+import ch.enterag.utils.fx.controls.ObjectListTableView;
+import ch.enterag.utils.fx.controls.ScrollPane;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
 /*====================================================================*/
 /** The details scroll pane contains the meta data editor and the meta data table.
  * @author Hartwig
  */
-public class DetailsScrollPane
-  extends ScrollPane
-  implements EventHandler<ActionEvent>
-{
+public class DetailsScrollPane extends ScrollPane implements EventHandler<ActionEvent>{
+
+  // 최창근 추가 - 로그
+  private static final Logger LOG = Logger.getLogger(DetailsScrollPane.class);
+
   private VBox _vbox = null;
   private Object _oMetaData = null;
   private Class<?> _clsTableData = null;
@@ -37,7 +57,7 @@ public class DetailsScrollPane
   private static final double dINNER_PADDING = 10.0;
   // vertical spacing of elements
   private static final double dVSPACING = 10.0;
-  
+
   /*------------------------------------------------------------------*/
   /** set new meta data to display in the details scroll pane.
    * @param oMetaData new meta data.
@@ -53,8 +73,12 @@ public class DetailsScrollPane
   /*------------------------------------------------------------------*/
   /** redisplay the current meta data in the current language.
    */
-  public void reset() 
+  public void reset()
   {
+	LOG.info("reset()");
+	LOG.info("_oMetaData " + _oMetaData);
+	LOG.info("_oMetaData.getClass() " + _oMetaData.getClass());
+
     _vbox.getChildren().remove(_oltv);
     _vbox.minHeightProperty().unbind();
     _oltv = null;
@@ -147,6 +171,8 @@ public class DetailsScrollPane
     setFocused(true);
     double dMinWidth = 2*dINNER_PADDING;
     double dMinHeight = 2*dINNER_PADDING;
+
+
     if (_mde != null)
     {
       if (!_vbox.getChildren().contains(_mde))
@@ -199,10 +225,10 @@ public class DetailsScrollPane
   {
     SiardGui.getSiardGui().setTitle();
   } /* handle */
-  
+
   /*------------------------------------------------------------------*/
   /** are there any edited changes not yet applied to meta data?
-   * @return true, if meta data details were edited but not yet applied 
+   * @return true, if meta data details were edited but not yet applied
    * to meta data.
    */
   public boolean isChanged()

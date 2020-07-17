@@ -13,6 +13,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Optional;
 
+import org.apache.log4j.Logger;
+
 import ch.admin.bar.siard2.api.Archive;
 import ch.admin.bar.siard2.gui.SiardBundle;
 import ch.admin.bar.siard2.gui.tasks.DownloadTask;
@@ -39,6 +41,10 @@ public class DownloadDialog
 {
   /** logger */
   private static IndentLogger _il = IndentLogger.getIndentLogger(DownloadDialog.class.getName());
+
+  //최창근 추가 - 로그
+  private static final Logger LOG = Logger.getLogger(DownloadDialog.class);
+
   // download task
   private DownloadTask _dt = null;
 
@@ -57,10 +63,16 @@ public class DownloadDialog
     @Override
     public void handle(WorkerStateEvent wse)
     {
+      LOG.info("");
       _btnCancel.setDisable(true);
       DownloadTask dt = (DownloadTask)wse.getSource();
       SiardBundle sb = SiardBundle.getSiardBundle();
       String sMessage = null;
+
+      LOG.info("wse.getEventType() " + wse.getEventType());
+      LOG.info("WorkerStateEvent.WORKER_STATE_SUCCEEDED " + WorkerStateEvent.WORKER_STATE_SUCCEEDED);
+      LOG.info("(wse.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED) " + (wse.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED));
+
       if (wse.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED)
       {
         sMessage = sb.getDownloadSuccessMessage();
@@ -73,6 +85,8 @@ public class DownloadDialog
         sMessage = sb.getDownloadFailureMessage(dt.getException());
         System.err.println(sMessage);
       }
+
+      LOG.info("sMessage " + sMessage);
       _tfMessage.setText(sMessage);
       _btnDefault.setDisable(false);
     }
@@ -87,6 +101,7 @@ public class DownloadDialog
     @Override
     public void handle(ActionEvent ae)
     {
+      LOG.info("ae.getSource() " + ae.getSource());
       if (ae.getSource() == _btnCancel)
       {
         _dt.cancel();
@@ -95,13 +110,12 @@ public class DownloadDialog
       else if (ae.getSource() == _btnDefault)
       {
 		Alert alert = new Alert(AlertType.CONFIRMATION);
-
 		alert.setTitle("검증");
 		alert.setHeaderText("SIARD 파일 검증");
 		alert.setContentText("다운로드한 SIARD 파일을 검증하시겠습니까?");
-
 		Optional<ButtonType> result = alert.showAndWait();
 
+		LOG.info("result.get() " + result.get());
 		if (result.get() == ButtonType.OK)
 		{
 			verify_process = true;
@@ -211,10 +225,11 @@ public class DownloadDialog
   private DownloadDialog(Stage stageOwner, Connection conn, Archive archive,
     boolean bMetaDataOnly, boolean bViewsAsTables)
   {
-    super(stageOwner,conn,archive,bMetaDataOnly,bViewsAsTables,
-      SiardBundle.getSiardBundle().getDownloadTitle());
-    _dt = DownloadTask.startDownloadTask(conn, archive,
-      bMetaDataOnly, bViewsAsTables, _pb.progressProperty(), _wseh);
+    super(stageOwner,conn,archive,bMetaDataOnly,bViewsAsTables,SiardBundle.getSiardBundle().getDownloadTitle());
+
+    LOG.info("startDownloadTask");
+
+    _dt = DownloadTask.startDownloadTask(conn, archive, bMetaDataOnly, bViewsAsTables, _pb.progressProperty(), _wseh);
   } /* constructor DownloadDialog */
 
   /*------------------------------------------------------------------*/
@@ -232,8 +247,11 @@ public class DownloadDialog
   {
     _il.enter(conn, archive,String.valueOf(bMetaDataOnly));
     DownloadDialog dd = null;
+    LOG.info("1 showDownloadDialog");
     dd = new DownloadDialog(stageOwner, conn, archive, bMetaDataOnly, bViewsAsTables);
+    LOG.info("2 showDownloadDialog");
     dd.showAndWait();
+    LOG.info("3 showDownloadDialog");
     System.setOut(dd._psOut);
     System.setErr(dd._psErr);
     _il.exit(dd);

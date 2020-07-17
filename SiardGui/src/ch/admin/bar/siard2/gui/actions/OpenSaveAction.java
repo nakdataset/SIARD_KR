@@ -1,6 +1,6 @@
-/*====================================================================== 
+/*======================================================================
 Application : SIARD GUI
-Description: OpenSaveAction handles open and save of a SIARD archive. 
+Description: OpenSaveAction handles open and save of a SIARD archive.
 Platform   : JAVA 1.7, JavaFX 2.2
 ------------------------------------------------------------------------
 Copyright  : Swiss Federal Archives, Berne, Switzerland, 2017
@@ -8,13 +8,23 @@ Created    : 30.06.2017, Hartwig Thomas, Enter AG, Rüti ZH
 ======================================================================*/
 package ch.admin.bar.siard2.gui.actions;
 
-import java.io.*;
-import javafx.stage.*;
-import ch.enterag.utils.fx.dialogs.*;
-import ch.enterag.utils.logging.*;
-import ch.admin.bar.siard2.api.*;
-import ch.admin.bar.siard2.api.primary.*;
-import ch.admin.bar.siard2.gui.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import org.apache.log4j.Logger;
+
+import ch.admin.bar.siard2.api.Archive;
+import ch.admin.bar.siard2.api.primary.ArchiveImpl;
+import ch.admin.bar.siard2.gui.MainMenuBar;
+import ch.admin.bar.siard2.gui.MainPane;
+import ch.admin.bar.siard2.gui.MruFile;
+import ch.admin.bar.siard2.gui.SiardBundle;
+import ch.admin.bar.siard2.gui.SiardGui;
+import ch.enterag.utils.fx.dialogs.FS;
+import ch.enterag.utils.fx.dialogs.MB;
+import ch.enterag.utils.logging.IndentLogger;
+import javafx.stage.Stage;
 
 /*====================================================================*/
 /** OpenSaveAction handles open and save of a SIARD archive.
@@ -22,22 +32,25 @@ import ch.admin.bar.siard2.gui.*;
  */
 public class OpenSaveAction
 {
-  /** logger */  
+  /** logger */
   private static IndentLogger _il = IndentLogger.getIndentLogger(OpenSaveAction.class.getName());
+
+  //최창근 추가 - 로그
+  private static final Logger LOG = Logger.getLogger(OpenSaveAction.class);
 
   /*------------------------------------------------------------------*/
   /** constructor */
   private OpenSaveAction()
   {
   } /* constructor OpenSaveAction */
-  
+
   /*------------------------------------------------------------------*/
   /** factory */
   public static OpenSaveAction newOpenSaveAction()
   {
     return new OpenSaveAction();
   } /* newOpenSaveAction */
-  
+
   /*------------------------------------------------------------------*/
   /** if sFile is null or does not exist, display file selector,
    * otherwise open the file.
@@ -45,16 +58,22 @@ public class OpenSaveAction
    */
   public void open(String sFile)
   {
+	LOG.info("");
     _il.enter(sFile);
     SiardBundle sb = SiardBundle.getSiardBundle();
     Stage stage = SiardGui.getSiardGui().getStage();
     File fileArchive = null;
+
+    LOG.info("sFile " + sFile);
     if (sFile != null)
     {
       fileArchive = new File(sFile);
       if (!fileArchive.exists())
         fileArchive = null;
     }
+
+    LOG.info("fileArchive " + fileArchive);
+
     if (fileArchive == null)
     {
       fileArchive = new File(SiardGui.getDefaultDataDirectory().getAbsolutePath()+File.separator+"*."+Archive.sSIARD_DEFAULT_EXTENSION);
@@ -63,11 +82,12 @@ public class OpenSaveAction
       try
       {
         fileArchive = FS.chooseExistingFile(stage,
-            sb.getOpenArchiveTitle(), sb.getOpenArchiveMessage(), sb, 
+            sb.getOpenArchiveTitle(), sb.getOpenArchiveMessage(), sb,
             fileArchive, Archive.sSIARD_DEFAULT_EXTENSION);
       }
       catch(FileNotFoundException fnfe) { _il.exception(fnfe); }
     }
+
     if (fileArchive != null)
     {
       SiardGui.getSiardGui().startAction(sb.getOpeningStatus(fileArchive));
@@ -75,17 +95,22 @@ public class OpenSaveAction
       try
       {
         archive.open(fileArchive);
+        LOG.info("fileArchive " + fileArchive);
+
+        LOG.info("archive.isValid() " + archive.isValid());
         if (archive.isValid())
         {
           MruFile mf = MruFile.getMruFile();
           mf.setMruFile(archive.getFile().getAbsolutePath());
+          LOG.info("archive.getFile().getAbsolutePath() " + archive.getFile().getAbsolutePath());
+
           MainMenuBar.getMainMenuBar().setFileMru();
           SiardGui.getSiardGui().setArchive(archive);
         }
         else
         {
-          MB.show(stage, 
-            sb.getOpenErrorTitle(), 
+          MB.show(stage,
+            sb.getOpenErrorTitle(),
             sb.getOpenErrorInvalidMessage(fileArchive),
             sb.getOk(),null);
         }
@@ -113,7 +138,7 @@ public class OpenSaveAction
     // force apply/reset on unsaved changes to meta data
     MainPane.getMainPane().refreshLanguage();
     SiardGui.getSiardGui().startAction(sb.getSavingStatus(archive.getFile()));
-    try 
+    try
     { archive.saveMetaData(); }
     catch(IOException ie)
     {
