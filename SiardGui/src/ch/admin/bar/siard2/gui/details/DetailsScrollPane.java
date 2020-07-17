@@ -82,6 +82,8 @@ public class DetailsScrollPane extends ScrollPane implements EventHandler<Action
     _vbox.getChildren().remove(_oltv);
     _vbox.minHeightProperty().unbind();
     _oltv = null;
+
+    LOG.info("_clsTableData " + _clsTableData);
     if (_oMetaData instanceof MetaData)
     {
       MetaData md = (MetaData)_oMetaData;
@@ -168,10 +170,11 @@ public class DetailsScrollPane extends ScrollPane implements EventHandler<Action
     }
     else
       _mde.setMetaData(_oMetaData);
+
     setFocused(true);
+
     double dMinWidth = 2*dINNER_PADDING;
     double dMinHeight = 2*dINNER_PADDING;
-
 
     if (_mde != null)
     {
@@ -179,11 +182,13 @@ public class DetailsScrollPane extends ScrollPane implements EventHandler<Action
         _vbox.getChildren().add(_mde);
       dMinWidth += _mde.getMinWidth();
       dMinHeight += _mde.getMinHeight();
+
       if (_oltv == null)
         VBox.setVgrow(_mde, Priority.ALWAYS);
       else
         VBox.setVgrow(_mde, Priority.NEVER);
     }
+
     if (_oltv != null)
     {
       _vbox.getChildren().add(_oltv);

@@ -1,7 +1,7 @@
 /*======================================================================
-The editor portion of the details pane for meta data.  
+The editor portion of the details pane for meta data.
 Application: SIARD GUI
-Description: The editor portion of the details pane for meta data. 
+Description: The editor portion of the details pane for meta data.
 Platform   : JAVA 1.7, JavaFX 2.2
 ------------------------------------------------------------------------
 Copyright  : Swiss Federal Archives, Berne, Switzerland, 2017
@@ -9,25 +9,51 @@ Created    : 25.07.2017, Hartwig Thomas, Enter AG, Rüti ZH
 ======================================================================*/
 package ch.admin.bar.siard2.gui.details;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.net.*;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URI;
 import java.sql.Types;
-import java.util.*;
+import java.util.GregorianCalendar;
+import java.util.Iterator;
+import java.util.Set;
 
-import javafx.beans.value.*;
-import javafx.event.*;
-import javafx.geometry.*;
-import javafx.scene.*;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import org.apache.log4j.Logger;
 
-import ch.enterag.utils.*;
-import ch.enterag.utils.fx.*;
-import ch.enterag.utils.fx.dialogs.*;
-import ch.enterag.utils.logging.*;
-import ch.admin.bar.siard2.api.*;
-import ch.admin.bar.siard2.gui.*;
+import ch.admin.bar.siard2.api.MetaAttribute;
+import ch.admin.bar.siard2.api.MetaColumn;
+import ch.admin.bar.siard2.api.MetaData;
+import ch.admin.bar.siard2.api.MetaField;
+import ch.admin.bar.siard2.api.MetaForeignKey;
+import ch.admin.bar.siard2.api.MetaParameter;
+import ch.admin.bar.siard2.api.MetaPrivilege;
+import ch.admin.bar.siard2.api.MetaRole;
+import ch.admin.bar.siard2.api.MetaRoutine;
+import ch.admin.bar.siard2.api.MetaSchema;
+import ch.admin.bar.siard2.api.MetaTable;
+import ch.admin.bar.siard2.api.MetaType;
+import ch.admin.bar.siard2.api.MetaUniqueKey;
+import ch.admin.bar.siard2.api.MetaUser;
+import ch.admin.bar.siard2.api.MetaView;
+import ch.admin.bar.siard2.api.RecordExtract;
+import ch.admin.bar.siard2.gui.MainMenuBar;
+import ch.admin.bar.siard2.gui.SiardBundle;
+import ch.admin.bar.siard2.gui.SiardGui;
+import ch.enterag.utils.DU;
+import ch.enterag.utils.fx.FxSizes;
+import ch.enterag.utils.fx.FxStyles;
+import ch.enterag.utils.fx.dialogs.MB;
+import ch.enterag.utils.logging.IndentLogger;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 /*====================================================================*/
 /** The editor portion of the details pane for meta data.
@@ -45,8 +71,12 @@ public class MetaDataEditor
   private static final double dVSPACING = 0.0;
   // horizontal spacing of elements
   private static final double dHSPACING = 10.0;
-  /** logger */  
+  /** logger */
   private static IndentLogger _il = IndentLogger.getIndentLogger(MetaDataEditor.class.getName());
+
+  //최창근 추가 - 로그
+  private static final Logger LOG = Logger.getLogger(MetaDataEditor.class);
+
   private SiardBundle _sb = SiardBundle.getSiardBundle();
   private DU _du = DU.getInstance(_sb.getLanguage(), _sb.getDateFormat());
   private Object _oMetaData = null;
@@ -57,7 +87,7 @@ public class MetaDataEditor
   private String _sLabelLanguage = null;
   private Button _btnApply = null;
   private Button _btnReset = null;
-  
+
   /*------------------------------------------------------------------*/
   /** change event from text input control.
    * @param ov observable value.
@@ -88,7 +118,7 @@ public class MetaDataEditor
         String sKey = iterProperty.next();
         if (sKey.startsWith("label."))
         {
-          String sValue = (String)sb.getProperty(sKey);
+          String sValue = sb.getProperty(sKey);
           if (dLabelWidth < FxSizes.getTextWidth(sValue))
             dLabelWidth = FxSizes.getTextWidth(sValue);
         }
@@ -98,7 +128,7 @@ public class MetaDataEditor
     }
     return _dLabelWidth;
   } /* getLabelWidth */
-  
+
   /*------------------------------------------------------------------*/
   /** set the value of the named property of the current meta data object.
    * @param sProperty property name.
@@ -116,7 +146,7 @@ public class MetaDataEditor
         methodSet = _oMetaData.getClass().getDeclaredMethod(sMethodName, String.class);
         methodSet.invoke(_oMetaData, sValue);
       }
-      else 
+      else
       {
         URI uriValue = null;
         if (sValue != null)
@@ -220,7 +250,7 @@ public class MetaDataEditor
       if (SiardGui.getSiardGui().getArchive().isValid())
       {
         RecordExtract re = (RecordExtract)_oMetaData;
-        RecordExtract reLastChild = null; 
+        RecordExtract reLastChild = null;
         try { reLastChild = re.getRecordExtract(re.getRecordExtracts()-1); }
         catch(IOException ie) { _il.exception(ie); }
         sValue = String.valueOf(re.getOffset());
@@ -238,7 +268,7 @@ public class MetaDataEditor
       String sMethodName = "get"+sProperty;
       try
       {
-        Method methodGet = _oMetaData.getClass().getDeclaredMethod(sMethodName); 
+        Method methodGet = _oMetaData.getClass().getDeclaredMethod(sMethodName);
         Object oValue = methodGet.invoke(_oMetaData);
         if (oValue != null)
           sValue = oValue.toString();
@@ -249,7 +279,7 @@ public class MetaDataEditor
     }
     return sValue;
   } /* getProperty */
-  
+
   /*------------------------------------------------------------------*/
   /** handle button events.
    */
@@ -270,7 +300,7 @@ public class MetaDataEditor
    * @param bMultiline true, if property is multi-line.
    * @param bMandatory true, if property must not be empty.
    */
-  private PropertyHBox displayProperty(Class<?> clsMetaData, String sProperty, 
+  private PropertyHBox displayProperty(Class<?> clsMetaData, String sProperty,
     boolean bEditable, boolean bMultiline, boolean bMandatory)
   {
     String sLabelKey = ("label."+clsMetaData.getSimpleName()+"."+sProperty).toLowerCase();
@@ -291,10 +321,11 @@ public class MetaDataEditor
    */
   private HBox displayButtons(double dPropertyWidth)
   {
+    LOG.info("displayButtons");
     HBox hbox = new HBox();
     hbox.setPadding(new Insets(dINNER_PADDING));
     hbox.setSpacing(dHSPACING);
-    
+
     _btnReset = new Button(_sb.getEditMetaDataReset());
     _btnReset.setOnAction(this);
     _btnReset.setDisable(true);
@@ -305,17 +336,22 @@ public class MetaDataEditor
     _btnApply.setOnAction(this);
     _btnApply.setDisable(true);
     hbox.getChildren().add(_btnApply);
-    
+
     HBox.setMargin(_btnApply, new Insets(dOUTER_PADDING));
     HBox.setMargin(_btnReset, new Insets(dOUTER_PADDING));
-    if (dPropertyWidth < FxSizes.getNodeWidth(hbox))
-      dPropertyWidth = FxSizes.getNodeWidth(hbox);
-    hbox.setMaxWidth(dPropertyWidth);
+
+    if (dPropertyWidth < FxSizes.getNodeWidth(hbox)) {
+    	dPropertyWidth = FxSizes.getNodeWidth(hbox);
+    }
+
+    // 최창근 수정 - 버튼 우측 정렬을 위해 width set 해제
+//    hbox.setMaxWidth(dPropertyWidth);
     hbox.setAlignment(Pos.TOP_RIGHT);
+
     getChildren().add(hbox);
     return hbox;
   } /* displayButtons */
-  
+
   /*------------------------------------------------------------------*/
   /** apply edited changes to meta data.
    */
@@ -334,7 +370,7 @@ public class MetaDataEditor
         }
       }
       ActionEvent ae = new ActionEvent(_oMetaData,this);
-      fireEvent(ae); // this notifies listeners for changes in meta data 
+      fireEvent(ae); // this notifies listeners for changes in meta data
       _bChanged = false;
       MainMenuBar.getMainMenuBar().restrict();
     }
@@ -453,7 +489,7 @@ public class MetaDataEditor
         if (bInvalid)
         {
           int iPreType = mc.getPreType();
-          boolean bLob = 
+          boolean bLob =
              (iPreType == Types.BINARY) ||
              (iPreType == Types.VARBINARY) ||
              (iPreType == Types.BLOB) ||
@@ -522,7 +558,7 @@ public class MetaDataEditor
         if (bInvalid)
         {
           int iPreType = mf.getPreType();
-          boolean bLob = 
+          boolean bLob =
              (iPreType == Types.BINARY) ||
              (iPreType == Types.VARBINARY) ||
              (iPreType == Types.BLOB) ||
@@ -552,6 +588,7 @@ public class MetaDataEditor
       displayProperty(RecordExtract.class,"Table",false,false,false);
       displayProperty(RecordExtract.class,"Data",false,false,false);
     }
+
     double dPropertyWidth = 0.0;
     for (Iterator<Node> iterProperty = getChildren().iterator(); iterProperty.hasNext(); )
     {
@@ -559,8 +596,11 @@ public class MetaDataEditor
       if (dPropertyWidth < phbox.getMinWidth())
         dPropertyWidth = phbox.getMinWidth();
     }
+
+    LOG.info("_bEditable " + _bEditable);
     if (_bEditable)
     {
+      LOG.info("dPropertyWidth " + dPropertyWidth);
       displayButtons(dPropertyWidth);
       _bChanged = false;
       MainMenuBar.getMainMenuBar().restrict();
@@ -590,23 +630,27 @@ public class MetaDataEditor
       }
     }
   } /* selectRange */
-  
+
   /*------------------------------------------------------------------*/
   /** change meta data editor to edit a new meta data object.
    * @param oMetaData new meta data object.
    */
   public void setMetaData(Object oMetaData)
   {
+	LOG.info("(_oMetaData != null) && _bChanged " + ((_oMetaData != null) && _bChanged));
     if ((_oMetaData != null) && _bChanged)
     {
-      if (MB.show(SiardGui.getSiardGui().getStage(), 
-          _sb.getEditMetaDataTitle(), 
-          _sb.getEditMetaDataQuery(), 
-          _sb.getYes(), 
-          _sb.getNo()) == 1)
-        apply();
+      if (MB.show(SiardGui.getSiardGui().getStage(),
+          _sb.getEditMetaDataTitle(),
+          _sb.getEditMetaDataQuery(),
+          _sb.getYes(),
+          _sb.getNo()) == 1) {
+    	  LOG.info("true");
+    	  apply();
+      }
     }
     _oMetaData = oMetaData;
+    LOG.info("oMetaData " + oMetaData);
     reset();
   } /* setMetaData */
 
@@ -619,13 +663,14 @@ public class MetaDataEditor
   {
     addEventHandler(ActionEvent.ACTION, ehavMetaDataChange);
   } /* setOnMetaDataChangeAction */
-  
+
   /*------------------------------------------------------------------*/
   /** constructor for a few general visual aspects.
    */
   public MetaDataEditor()
   {
     super();
+    LOG.info("MetaDataEditor");
     setPadding(new Insets(dOUTER_PADDING));
     setSpacing(dVSPACING);
     setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
