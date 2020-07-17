@@ -1071,7 +1071,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
 		    @Override
 		    public void handle(ActionEvent event)
 		    {
-		    	getTableNames();
+				getTableNames();
 		    }
 		});
 
@@ -1252,6 +1252,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
 		String driverNameMysql 		= "com.mysql.jdbc.Driver";
 		String driverNameMssql 		= "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 		String driverNameMsAccess 	= "sun.jdbc.odbc.JdbcOdbcDriver";
+		String driverNamePostgresql = "org.postgresql.Driver";
 
 		String sqlOracle 			= "";
 		String sqlMysql 			= "SHOW FULL TABLES WHERE TABLE_TYPE = 'BASE TABLE'";
@@ -1315,6 +1316,18 @@ public abstract class ConnectionDialog extends ScrollableDialog
 			url 		= _tfConnectionUrl.getText();
 			user 		= _tfUser.getText();
 			password 	= _pfTable.getText();
+		}
+		/*2020.07.17 - PostgreSQL 드라이버 추가*/
+		else if(dbsystem.equals("PostgreSQL"))
+		{
+			driverName 	= driverNamePostgresql;
+
+			url 		= _tfConnectionUrl.getText();
+			user 		= _tfUser.getText();
+			password 	= _pfTable.getText();
+
+			sqlCubrid 	= "SELECT TABLENAME FROM PG_TABLES WHERE TABLEOWNER = '" + user.toLowerCase().trim() + "'";
+			sql 		= sqlCubrid;
 		}
 
 		try
