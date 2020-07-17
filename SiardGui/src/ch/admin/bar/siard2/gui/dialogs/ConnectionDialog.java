@@ -77,7 +77,7 @@ import javafx.stage.Stage;
 /*====================================================================*/
 /** ConnectionDialog for entering data to connect to a database.
  * Abstract base class for DownloadConnectionDialog and UploadConnectionDialog.
- * @author Hartwig Thomas
+ * @author Hartwig Thomas test
  */
 public abstract class ConnectionDialog extends ScrollableDialog
 {
