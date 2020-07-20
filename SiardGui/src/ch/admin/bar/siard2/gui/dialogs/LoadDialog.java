@@ -12,6 +12,8 @@ package ch.admin.bar.siard2.gui.dialogs;
 import java.io.PrintStream;
 import java.sql.Connection;
 
+import org.apache.log4j.Logger;
+
 import ch.admin.bar.siard2.api.Archive;
 import ch.admin.bar.siard2.gui.SiardBundle;
 import ch.enterag.utils.fx.FxSizes;
@@ -40,10 +42,11 @@ import javafx.stage.WindowEvent;
  * Abstract base class for DownloadDialog and UploadDialog.
  @author Hartwig Thomas
  */
-public abstract class LoadDialog
-  extends ScrollableDialog
-  implements EventHandler<WindowEvent>
-{
+public abstract class LoadDialog extends ScrollableDialog implements EventHandler<WindowEvent>{
+
+  // 최창근 추가 - 로그
+  private static final Logger LOG = Logger.getLogger(LoadDialog.class);
+
   // archive
   private Archive _archive = null;
   public Archive getArchive() { return _archive; }
@@ -195,6 +198,7 @@ public abstract class LoadDialog
     boolean bMetaDataOnly, boolean bViewsAsTables)
   {
     /* VBox for title area, text area, progress bar, message, separator and OK and Cancel buttons */
+	LOG.info("createVBoxDialog");
     VBox vbox = new VBox();
     vbox.setPadding(new Insets(dOUTER_PADDING));
     vbox.setSpacing(dVSPACING);

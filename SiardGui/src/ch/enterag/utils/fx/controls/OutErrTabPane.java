@@ -1,8 +1,8 @@
 /*======================================================================
-OutErrTabPane is a tab pane with two console tabs for stdout and stderr. 
+OutErrTabPane is a tab pane with two console tabs for stdout and stderr.
 Application : Siard2
-Description : OutErrTabPane is a tab pane with two console tabs for stdout and stderr. 
-Platform    : Java 7, JavaFX 2.2   
+Description : OutErrTabPane is a tab pane with two console tabs for stdout and stderr.
+Platform    : Java 7, JavaFX 2.2
 ------------------------------------------------------------------------
 Copyright  : Swiss Federal Archives, Berne, Switzerland, 2017
 Created    : 28.06.2017, Hartwig Thomas, Enter AG, Rüti ZH
@@ -31,9 +31,9 @@ public class OutErrTabPane extends TabPane
   /** preferred number of rows of the console */
   private static final int iPREF_ROWS = 25;
   /** stdout tab */
-  Tab _tabOut = null; 
+  Tab _tabOut = null;
   /** stderr tab */
-  Tab _tabErr = null; 
+  Tab _tabErr = null;
 
   /*==================================================================*/
   /** a change of the text content of the stdout console selects its
@@ -49,7 +49,7 @@ public class OutErrTabPane extends TabPane
     }
   }
   OutChangeListener ocl = new OutChangeListener();
-  
+
   /*==================================================================*/
   /** a change of the text content of the stderr console selects its
    * tab.
@@ -64,7 +64,7 @@ public class OutErrTabPane extends TabPane
     }
   }
   ErrChangeListener ecl = new ErrChangeListener();
-  
+
   /*------------------------------------------------------------------*/
   /** create a tab for the tab pane containing a scrollable console
    * text area.
@@ -78,22 +78,22 @@ public class OutErrTabPane extends TabPane
     taConsole.setWrapText(false);
     taConsole.setPrefColumnCount(iPREF_COLUMNS);
     taConsole.setPrefRowCount(iPREF_ROWS);
-    
+
     ScrollPane sp = new ScrollPane();
     sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-    sp.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);    
+    sp.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
     sp.setContent(taConsole);
     sp.setPrefViewportWidth(taConsole.getPrefColumnCount()*FxSizes.getEm());
     sp.setPrefViewportHeight(taConsole.getPrefRowCount()*FxSizes.getEx());
     sp.setFitToWidth(true);
     sp.setFitToHeight(true);
-    
+
     Tab tab = new Tab();
     tab.setText(sTitle);
     tab.setContent(sp);
     return tab;
   } /* createTab */
-  
+
   /*------------------------------------------------------------------*/
   /** constructor
    * creates a tab pane containing two console tabs for the output and the
@@ -114,13 +114,13 @@ public class OutErrTabPane extends TabPane
     taErr.setStyle(FxStyles.sSTYLE_ERROR);
     ConsolePrintStream cpsErr = ConsolePrintStream.newConsolePrintStream(taErr);
     _tabOut = createTab("Out",taOut);
-    ScrollPane spOut = (ScrollPane)_tabOut.getContent(); 
+    ScrollPane spOut = (ScrollPane)_tabOut.getContent();
     if (dMinWidth < spOut.getPrefViewportWidth())
       dMinWidth = spOut.getPrefViewportWidth();
     if (dMinHeight < spOut.getPrefViewportHeight())
       dMinHeight = spOut.getPrefViewportHeight();
     _tabErr = createTab("Err",taErr);
-    ScrollPane spErr = (ScrollPane)_tabErr.getContent(); 
+    ScrollPane spErr = (ScrollPane)_tabErr.getContent();
     if (dMinWidth < spErr.getMinWidth())
       dMinWidth = spErr.getMinWidth();
     if (dMinHeight < spErr.getMinHeight())
@@ -130,11 +130,12 @@ public class OutErrTabPane extends TabPane
     setMinWidth(dMinWidth);
     setMinHeight(dMinHeight);
     System.setOut(cpsOut);
-    
+
     /* S: err탭에 로그 출력 */
-    System.setOut(cpsErr);
+    // 최창근 수정 - 파일다운로드 내역이 err창에 출력되서 주석처리
+    //System.setOut(cpsErr);
     /* E: err탭에 로그 출력 */
-    
+
     System.setErr(cpsErr);
     getSelectionModel().select(_tabOut);
   } /* constructor */
