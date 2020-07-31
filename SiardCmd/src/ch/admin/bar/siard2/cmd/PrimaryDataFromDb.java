@@ -323,6 +323,11 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
         case Types.STRUCT:
           oValue = rs.getObject(iPosition);
           break;
+        //데이터타입이 null(0) 인 경우 처리 로직 추가.
+        case Types.NULL:
+          //2020.07.28 - Types에 정의되어 있지 않은 타입(json 등)의 경우  null(0)로 들어옴.이 경우 varchar로 전환되도록 함.
+          oValue = rs.getString(iPosition);
+          break;
         default:
           throw new SQLException("Invalid data type "+
             String.valueOf(iDataType)+" ("+

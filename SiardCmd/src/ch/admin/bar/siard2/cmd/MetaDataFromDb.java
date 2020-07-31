@@ -779,10 +779,19 @@ public class MetaDataFromDb
   private void getColumnData(ResultSet rs, MetaColumn mc)
     throws IOException, SQLException
   {
-    int iDataType = rs.getInt("DATA_TYPE");
-    String sTypeName = rs.getString("TYPE_NAME");
-    long lColumnSize = rs.getLong("COLUMN_SIZE");
-    int iDecimalDigits = rs.getInt("DECIMAL_DIGITS");
+  	String sTypeName = rs.getString("TYPE_NAME");
+
+  	//2020.07.29 - json 타입에 대한 처리 (json => varchar)
+  	//Types에 정의되어 있지 않은 타입(json 등)은 아래 데이터가 null이므로, 디폴트 값을 지정함.
+  	int iDataType = Types.VARCHAR;
+  	long lColumnSize = 255;
+  	int iDecimalDigits = 0;
+  	if(!"json".equals(sTypeName)) {
+  		iDataType = rs.getInt("DATA_TYPE");
+  		lColumnSize = rs.getLong("COLUMN_SIZE");
+  		iDecimalDigits = rs.getInt("DECIMAL_DIGITS");
+  	}
+
     MetaSchema ms = null;
     QualifiedId qiParent = null;
     if (mc.getParentMetaTable() != null)
@@ -837,6 +846,13 @@ public class MetaDataFromDb
       }
       else
         throw new SQLException("Invalid ARRAY constructor for column "+mc.getName()+" of table "+qiParent.format()+"!");
+    }
+    //데이터타입이 null(0) 인 경우 처리 로직 추가.
+    else if (iDataType == Types.NULL)
+    {
+    	//2020.07.28 - Types에 정의되어 있지 않은 타입(json 등)의 경우 null(0)으로 들어옴. varchar로 전환되도록 함.
+		iDataType = Types.VARCHAR;
+		mc.setPreType(iDataType, lColumnSize, iDecimalDigits);
     }
     else
     {
@@ -1287,7 +1303,7 @@ public class MetaDataFromDb
         throw new IOException("Invalid table name for column found!");
       String sColumnName = rs.getString("COLUMN_NAME");
       MetaColumn mc = mt.createMetaColumn(sColumnName);
-      getColumnData(rs,mc);
+    	getColumnData(rs,mc);
     }
     if (mt.getMetaColumns() == 0)
       throw new SQLException("Table "+mt.getName() + " has no columns!");
@@ -1388,7 +1404,8 @@ public class MetaDataFromDb
    * @throws IOException if an I/O error occurred.
    * @throws SQLException in a database error occurred.
    */
-  private void getTables()
+  @SuppressWarnings("unchecked")
+	private void getTables()
     throws IOException, SQLException
   {
     /* first count the tables for progress */
@@ -1403,12 +1420,18 @@ public class MetaDataFromDb
     _iTablesPercent = (_iTables+99)/100;
     _iTablesAnalyzed = 0;
     rs = _dmd.getTables(null, "%", "%", asTypes);
-		ArrayList<String> list = _archive.getTableCheckedList();
-		boolean is_table_select = false; // 테이블 목록을 가져와서 선택한 경우
-		if(list != null && list.size() > 0)
-		{
-			is_table_select = true;
-		}
+    /**
+     * 2020.07.28 - siardCmd 단독 실행 시 archive 가 널일 수 있음(테이블 목록 입력 안할경우)
+     */
+    ArrayList<String> list = null;
+    if(_archive != null) {
+    	list = _archive.getTableCheckedList();
+    }
+	boolean is_table_select = false; // 테이블 목록을 가져와서 선택한 경우
+	if(list != null && list.size() > 0)
+	{
+		is_table_select = true;
+	}
     while ((rs.next()) && (!cancelRequested()))
     {
       String sTableSchema = rs.getString("TABLE_SCHEM");

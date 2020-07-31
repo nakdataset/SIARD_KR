@@ -9,16 +9,30 @@ Created    : 29.08.2016, Hartwig Thomas, Enter AG, Rüti ZH
 
 package ch.admin.bar.siard2.cmd;
 
-import java.io.*;
-import java.net.*;
-import java.sql.*;
-import java.util.*;
-import ch.enterag.utils.*;
-import ch.enterag.utils.cli.*;
-import ch.enterag.utils.configuration.*;
-import ch.enterag.utils.logging.*;
-import ch.admin.bar.siard2.api.*;
-import ch.admin.bar.siard2.api.primary.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.StringTokenizer;
+
+import ch.admin.bar.siard2.api.Archive;
+import ch.admin.bar.siard2.api.MetaColumn;
+import ch.admin.bar.siard2.api.MetaSchema;
+import ch.admin.bar.siard2.api.MetaTable;
+import ch.admin.bar.siard2.api.primary.ArchiveImpl;
+import ch.enterag.utils.EU;
+import ch.enterag.utils.ProgramInfo;
+import ch.enterag.utils.cli.Arguments;
+import ch.enterag.utils.configuration.ManifestAttributes;
+import ch.enterag.utils.logging.IndentLogger;
 
 /*====================================================================*/
 /** Stores database content in a SIARD file.
@@ -37,10 +51,10 @@ public class SiardFromDb
   /*====================================================================
   (private) data members
   ====================================================================*/
-  /** logger */  
+  /** logger */
   private static IndentLogger _il = IndentLogger.getIndentLogger(SiardFromDb.class.getName());
   /** manifest */
-  private static final ManifestAttributes MF = ManifestAttributes.getInstance(SiardFromDb.class); 
+  private static final ManifestAttributes MF = ManifestAttributes.getInstance(SiardFromDb.class);
   /** info */
   private static ProgramInfo _pi = ProgramInfo.getProgramInfo(
   		"SIARD Suite",MF.getSpecificationVersion(),
@@ -74,13 +88,15 @@ public class SiardFromDb
   private String _sDatabasePassword = null;
   private File _fileSiard = null;
   private File _fileExportXml = null;
+  //2020.07.28 - siardCmd 테이블 목록 변수
+  private ArrayList<String> _tableList = new ArrayList<>();
 
   private Archive _archive = null;
   private Connection _conn = null;
-  
+
 	private int _iReturn = iRETURN_WARNING;
 	int getReturn() { return _iReturn; }
-  
+
   /*====================================================================
   methods
   ====================================================================*/
@@ -91,7 +107,7 @@ public class SiardFromDb
 		_il.info(s);
 		System.out.println(s);
 	} /* logPrint */
-	
+
 	/*------------------------------------------------------------------*/
   /** prints usage information */
   private void printUsage()
@@ -100,17 +116,17 @@ public class SiardFromDb
   	System.out.println("java -cp <siardpath>/lib/siardcmd.jar ch.admin.bar.siard2.cmd.SiardFromDb [-h]");
     System.out.println("  [-o][-v][-l=<login timeout>][-q=<query timeout>][-i=<import xml>] [-x=<external lob folder>] [-m=<mime type>]");
   	System.out.println("  -j=<JDBC URL> -u=<database user> -p=<database password> (-s=<siard file> | -e=<export xml>)");
-    System.out.println("where");  	
-    System.out.println("  <siardpath>          installation path of SiardCmd");  	
-    System.out.println("  -h (help)            prints this usage information");  	
+    System.out.println("where");
+    System.out.println("  <siardpath>          installation path of SiardCmd");
+    System.out.println("  -h (help)            prints this usage information");
     System.out.println("  -o (overwrite)       overwrite existing siard file");
     System.out.println("  -v (views as tables) archive views as tables");
-    System.out.println("  <login timeout>      login timeout in seconds (default: "+String.valueOf(_iLoginTimeoutSeconds)+"), 0 for unlimited");    
-    System.out.println("  <query timeout>      query timeout in seconds (default: "+String.valueOf(_iQueryTimeoutSeconds)+"), 0 for unlimited");    
+    System.out.println("  <login timeout>      login timeout in seconds (default: "+String.valueOf(_iLoginTimeoutSeconds)+"), 0 for unlimited");
+    System.out.println("  <query timeout>      query timeout in seconds (default: "+String.valueOf(_iQueryTimeoutSeconds)+"), 0 for unlimited");
     System.out.println("  <import xml>         name of meta data XML file to be used as a template");
-    System.out.println("  <lob folder>         folder for storing largest LOB column of database externally");   
-    System.out.println("                       (contents will be deleted if they exist!)");   
-    System.out.println("  <mime type>          MIME type of data in the largest LOB column of database");   
+    System.out.println("  <lob folder>         folder for storing largest LOB column of database externally");
+    System.out.println("                       (contents will be deleted if they exist!)");
+    System.out.println("  <mime type>          MIME type of data in the largest LOB column of database");
     System.out.println("  <JDBC URL>           JDBC URL of database to be downloaded");
     System.out.print("                       e.g. ");
     SiardConnection sc = SiardConnection.getSiardConnection();
@@ -122,12 +138,12 @@ public class SiardFromDb
       String sScheme = asSchemes[i];
       System.out.println("for "+sc.getTitle(sScheme)+": "+sc.getSampleUrl(sScheme,"dbserver.enterag.ch","D:\\dbfolder","testdb"));
     }
-    System.out.println("  <database user>      database user");  	
-    System.out.println("  <database password>  database password");  	
-    System.out.println("  <siard file>         name of .siard file to be written");  	
+    System.out.println("  <database user>      database user");
+    System.out.println("  <database password>  database password");
+    System.out.println("  <siard file>         name of .siard file to be written");
     System.out.println("  <export xml>         name of meta data XML file to be exported");
   } /* printUsage */
-  
+
 	/*------------------------------------------------------------------*/
 	/** reads the parameters from the command line or from the config file.
 	*/
@@ -164,14 +180,33 @@ public class SiardFromDb
     _sDatabasePassword = args.getOption("p");
     /* siard file */
     String sSiardFile = args.getOption("s");
+    /* siard Table List (2020.07.28 - 신규 추가)*/
+    String sTableList = args.getOption("t");
+
     /* analyze the parameters */
     if (_iReturn == iRETURN_OK)
     {
+      //2020.07.28 - siardCmd 파라미터로 받은 테이블 목록 세팅하기
+      if (sTableList != null) {
+      	_tableList = new ArrayList<>();
+
+      	if(sTableList.indexOf(",") > -1) {
+      		StringTokenizer st = new StringTokenizer(sTableList, ",");
+
+      		while (st.hasMoreElements())
+      		{
+      			String tableName = (String) st.nextElement();
+      			_tableList.add(tableName.trim().toLowerCase());
+      		}
+      	} else {
+      		_tableList.add(sTableList.trim());
+      	}
+      }
       if (sSiardFile != null)
-        _fileSiard = new File(sSiardFile);
+      	_fileSiard = new File(sSiardFile);
       if (sExportXml != null)
         _fileExportXml = new File(sExportXml);
-      
+
       if ((sSiardFile == null) && (sExportXml == null))
       {
         System.out.println("SIARD file and/or export meta data XML must be given!");
@@ -180,8 +215,8 @@ public class SiardFromDb
       if (sLoginTimeoutSeconds != null)
       {
         try { _iLoginTimeoutSeconds = Integer.parseInt(sLoginTimeoutSeconds); }
-        catch(NumberFormatException nfe) 
-        { 
+        catch(NumberFormatException nfe)
+        {
           System.out.println("Invalid login timeout: "+sLoginTimeoutSeconds+"!");
           _iReturn = iRETURN_ERROR;
         }
@@ -189,8 +224,8 @@ public class SiardFromDb
       if (sQueryTimeoutSeconds != null)
       {
         try { _iQueryTimeoutSeconds = Integer.parseInt(sQueryTimeoutSeconds); }
-        catch(NumberFormatException nfe) 
-        { 
+        catch(NumberFormatException nfe)
+        {
           System.out.println("Invalid query timeout: "+sQueryTimeoutSeconds+"!");
           _iReturn = iRETURN_ERROR;
         }
@@ -218,13 +253,13 @@ public class SiardFromDb
           File fileRelative = _fileSiard.getParentFile().getAbsoluteFile().toPath().relativize(_fileExternalLobFolder.getAbsoluteFile().toPath()).toFile();
           /* prepend a ../ for exiting the SIARD file and append a / to indicate that it is a folder */
           try { _uriExternalLobFolder =  new URI("../"+fileRelative.toString()+"/"); }
-          catch (URISyntaxException use) 
+          catch (URISyntaxException use)
           {
             System.out.println("External LOB folder  "+_fileExternalLobFolder.getAbsolutePath() + " could not be relativized!");
             _iReturn = iRETURN_ERROR;
           }
         }
-        
+
       }
       String sError = SiardConnection.getSiardConnection().loadDriver(_sJdbcUrl);
       if (sError != null)
@@ -302,7 +337,7 @@ public class SiardFromDb
 	          _fileExportXml.delete();
 	      }
 	    }
-	    if (((_fileSiard == null) || !_fileSiard.exists()) && 
+	    if (((_fileSiard == null) || !_fileSiard.exists()) &&
 	        ((_fileExportXml == null) || !_fileExportXml.exists()))
 	    {
 	      /* open connection */
@@ -330,8 +365,26 @@ public class SiardFromDb
 	            _archive.importMetaDataTemplate(fis);
 	            fis.close();
 	          }
-	          /* get meta data from DB */
-	          MetaDataFromDb mdfd = MetaDataFromDb.newInstance(_conn.getMetaData(), _archive.getMetaData());
+
+	          MetaDataFromDb mdfd;
+	          //2020.07.28 - archive 파라미터 추가
+	          //archive에 파라미터로 받은 테이블 목록 세팅.
+	          if(_tableList.size() > 0) {
+	          	System.out.println("_tableList is not null");
+	          	_archive.setOriginalDir(""); // 파일 원래 경로
+		          _archive.setFileDown("SFTP");
+		          _archive.setSchema(""); //TODO : 추후 스키마데이터 입력 받게되면 추가해야함.
+		          _archive.setTargetDir(fileSiard.getParent());
+		          _archive.setFilePath("");
+	          	_archive.setTableCheckedList(_tableList);
+	          	mdfd = MetaDataFromDb.newInstance(_conn.getMetaData(), _archive.getMetaData(), _archive);
+	          } else {
+	          	System.out.println("_tableList is null");
+	          	//기존 소스
+	          	/* get meta data from DB */
+	          	mdfd = MetaDataFromDb.newInstance(_conn.getMetaData(), _archive.getMetaData());
+	          }
+
 						mdfd._cubrid = _conn.getMetaData().getDatabaseProductName().equals("CUBRID");
 	          mdfd.setQueryTimeout(_iQueryTimeoutSeconds);
 	          mdfd.download(_bViewsAsTables, (_uriExternalLobFolder != null), null);
@@ -363,7 +416,7 @@ public class SiardFromDb
 	          /* export meta data XML from DB */
 	          if (_fileExportXml != null)
 	          {
-	            OutputStream osXml = new FileOutputStream(_fileExportXml); 
+	            OutputStream osXml = new FileOutputStream(_fileExportXml);
 	            _archive.exportMetaData(osXml);
 	            osXml.close();
 	          }
@@ -378,7 +431,7 @@ public class SiardFromDb
               fileSiard.deleteOnExit();
 	          /* close SIARD archive */
 	          /***
-	          FileOutputStream fosXml = new FileOutputStream("D:\\Projekte\\SIARD2\\SiardCmd\\tmp\\export.xml"); 
+	          FileOutputStream fosXml = new FileOutputStream("D:\\Projekte\\SIARD2\\SiardCmd\\tmp\\export.xml");
 	          _archive.exportMetaData(fosXml);
 	          fosXml.close();
 	          ***/
