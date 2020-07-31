@@ -1,6 +1,10 @@
 package ch.admin.bar.siard2.mysql;
 
 /**
+ * 2020.07.28 - JSON타입 추가
+ */
+
+/**
  * Contains all built-in MySql Types
  * @author Simon Jutz
  */
@@ -52,10 +56,11 @@ public enum MySqlType {
 	MULTIPOINT("multipoint"),
 	MULTILINESTRING("multilinestring"),
 	MULTIPOLYGON("multipolygon"),
-	GEOMETRYCOLLECTION("geometrycollection");
-	
+	GEOMETRYCOLLECTION("geometrycollection"),
+	JSON("json");
+
 	private String sTypeName = null;
-	
+
 	/**
 	 * constructor
 	 * @param _sTypeName the system name of the type
@@ -63,7 +68,7 @@ public enum MySqlType {
 	MySqlType(String _sTypeName) {
 		sTypeName = _sTypeName;
 	} /* constructor */
-	
+
 	/**
 	 * Gets the enum constant with a given type name
 	 * @param _sTypeName the type name
@@ -80,7 +85,7 @@ public enum MySqlType {
 		}
 		return result;
 	} /* getByTypeName */
-	
+
 	/**
 	 * Gets the type name
 	 * @return the type name
@@ -88,5 +93,5 @@ public enum MySqlType {
 	public String getTypeName() {
 		return sTypeName;
 	}
-		
+
 } /* enum MySqlType */

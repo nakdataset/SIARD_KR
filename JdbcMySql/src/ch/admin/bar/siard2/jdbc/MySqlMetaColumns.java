@@ -3,28 +3,32 @@ Implements the type translation between MySql and ISO SQL
 Version     : $Id: $
 Application : SIARD2
 Description : Implements the type translation between MySql and ISO SQL
-Platform    : Java 7   
+Platform    : Java 7
 ------------------------------------------------------------------------
 Copyright  : 2016, Enter AG, Rüti ZH, Switzerland
 Created    : 31.10.2016, Simon Jutz
 ======================================================================*/
 package ch.admin.bar.siard2.jdbc;
 
-import java.sql.*;
-import java.util.*;
-import ch.admin.bar.siard2.mysql.*;
-import ch.enterag.sqlparser.datatype.enums.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.HashMap;
+import java.util.Map;
+
+import ch.admin.bar.siard2.mysql.MySqlType;
+import ch.enterag.sqlparser.datatype.enums.PreType;
 
 /* =============================================================================== */
 /**
  * Implements the type translation between MySql and ISO SQL
  * @author Simon Jutz
  */
-public class MySqlMetaColumns extends MySqlResultSet 
+public class MySqlMetaColumns extends MySqlResultSet
 {
 	private static Map<MySqlType,PreType> mapNAME_MYSQL_TO_ISO = new HashMap<MySqlType,PreType>();
 
-	static 
+	static
 	{
 		mapNAME_MYSQL_TO_ISO.put(MySqlType.BIGINT, PreType.BIGINT);
 		mapNAME_MYSQL_TO_ISO.put(MySqlType.BIGINTU, PreType.BIGINT);
@@ -74,9 +78,11 @@ public class MySqlMetaColumns extends MySqlResultSet
 		mapNAME_MYSQL_TO_ISO.put(MySqlType.MULTILINESTRING, PreType.CLOB);
 		mapNAME_MYSQL_TO_ISO.put(MySqlType.MULTIPOLYGON, PreType.CLOB);
 		mapNAME_MYSQL_TO_ISO.put(MySqlType.GEOMETRYCOLLECTION, PreType.CLOB);
+		//2020.07.28 - json타입 추가
+		mapNAME_MYSQL_TO_ISO.put(MySqlType.JSON, PreType.VARCHAR);
 	}
 
-	private static final int iMAX_VARCHAR_LENGTH = 21845; 
+	private static final int iMAX_VARCHAR_LENGTH = 21845;
 	private int _iDataType = -1;
 	private int _iTypeName = -1;
 	private int _iPrecision = -1;
@@ -129,13 +135,13 @@ public class MySqlMetaColumns extends MySqlResultSet
 		}
 		return lColumnSize;
 	} /* getColumnSize */
-	
+
 	/* ------------------------------------------------------------------------ */
 	@Override
-	public int getInt(int columnIndex) throws SQLException 
+	public int getInt(int columnIndex) throws SQLException
 	{
 		int iResult = -1;
-		if(columnIndex == _iDataType) 
+		if(columnIndex == _iDataType)
 			iResult = getDataType(_rsUnwrapped.getString(_iTypeName));
 		else if ((columnIndex == _iPrecision) ||
 				(columnIndex == _iLength))
@@ -155,8 +161,8 @@ public class MySqlMetaColumns extends MySqlResultSet
 	/*------------------------------------------------------------------*/
 	/** {@inheritDoc}
 	 * Mapped java.sql.Types type is returned in DATA_TYPE.
-	 * Original java.sql.Types type can be retrieved by using unwrap. 
-	 * Column size is adjusted to CHARS rather than BYTES.  
+	 * Original java.sql.Types type can be retrieved by using unwrap.
+	 * Column size is adjusted to CHARS rather than BYTES.
 	 */
 	@Override
 	public long getLong(int columnIndex) throws SQLException
@@ -181,11 +187,11 @@ public class MySqlMetaColumns extends MySqlResultSet
 
 	/* ------------------------------------------------------------------------ */
 	@Override
-	public Object getObject(int columnIndex) throws SQLException 
+	public Object getObject(int columnIndex) throws SQLException
 	{
 		Object oResult = _rsUnwrapped.getObject(columnIndex);
 
-		
+
 		if (oResult instanceof Integer)
 			oResult = Integer.valueOf(getInt(columnIndex));
 		else if (oResult instanceof Long)
@@ -195,7 +201,7 @@ public class MySqlMetaColumns extends MySqlResultSet
 
 		if(columnIndex == _iLength)
 			oResult = Long.valueOf(getLong(columnIndex));
-			
+
 		return oResult;
 	} /* getObject */
 
