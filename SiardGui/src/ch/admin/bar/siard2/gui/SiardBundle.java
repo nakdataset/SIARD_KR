@@ -87,8 +87,10 @@ public class SiardBundle extends FxBundle
   public String getMenuHelpHelp() { return getProperty("menu.help.help"); }
   public String getMenuHelpInfo() { return getProperty("menu.help.info"); }
 
-  // 최창근 추가 - 사용자 이벤트 내역 버튼 properties 추가
-  public String getMenuHelpHistory() { return getProperty("menu.help.history"); }
+  // 최창근 추가 - 내역, 다운로드, 업로드, 처분 버튼 properties 추가
+  public String getMenuHistory() { return getProperty("menu.history"); }
+  public String getMenuHistoryDownload() { return getProperty("menu.history.download"); }
+  public String getMenuHistoryUpload() { return getProperty("menu.history.upload"); }
 
   public String getInfoTitle() { return getProperty("info.title"); }
   public String getInfoSubject() { return getProperty("info.subject"); }
@@ -505,5 +507,10 @@ public class SiardBundle extends FxBundle
   public String getTargetDirLabel()
   {
 	return getProperty("filecopy.target.label");
+  }
+
+  // 최창근 추가 - 테이블 컬럼명을 properties에 관리 => 다국어 지원
+  public String getTableColumnName(String value) {
+	  return getProperty("history.column." + value);
   }
 } /* SiardBundle */

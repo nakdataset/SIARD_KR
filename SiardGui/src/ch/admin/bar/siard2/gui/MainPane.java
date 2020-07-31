@@ -95,8 +95,8 @@ public class MainPane extends BorderPane
     _dsp = new DetailsScrollPane();
 
     // 최창근 추가 - 트리메뉴 width를 고정시켜서 구분선 안움직이게
-    _atv.setMinWidth(250);
-    _atv.setMaxWidth(250);
+    _atv.setMinWidth(300);
+    _atv.setMaxWidth(300);
 
     _sp.getItems().addAll(_atv,_dsp);
     _dsp.prefViewportWidthProperty().bind(widthProperty());

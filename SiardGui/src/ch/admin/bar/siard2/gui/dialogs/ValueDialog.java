@@ -1,45 +1,69 @@
 /*======================================================================
 ValueDialog displays cell values.
 Application : Siard2
-Description : ValueDialog displays cell values.  
-Platform    : Java 7, JavaFX 2.2   
+Description : ValueDialog displays cell values.
+Platform    : Java 7, JavaFX 2.2
 ------------------------------------------------------------------------
 Copyright  : 2017, Enter AG, Rüti ZH, Switzerland
 Created    : 14.08.2017, Hartwig Thomas
 ======================================================================*/
 package ch.admin.bar.siard2.gui.dialogs;
 
-import java.io.*;
-import java.sql.*;
-import java.text.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.sql.Types;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
-import javafx.application.*;
-import javafx.event.*;
-import javafx.geometry.*;
-import javafx.scene.*;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.stage.*;
-import ch.enterag.utils.*;
-import ch.enterag.utils.fx.*;
-import ch.enterag.utils.fx.dialogs.*;
-import ch.enterag.utils.lang.*;
-import ch.enterag.sqlparser.*;
-import ch.admin.bar.siard2.api.*;
+import org.apache.log4j.Logger;
+
 import ch.admin.bar.siard2.api.Cell;
-import ch.admin.bar.siard2.api.generated.*;
-import ch.admin.bar.siard2.gui.*;
-import ch.admin.bar.siard2.gui.details.*;
+import ch.admin.bar.siard2.api.MetaType;
+import ch.admin.bar.siard2.api.MetaValue;
+import ch.admin.bar.siard2.api.Value;
+import ch.admin.bar.siard2.api.generated.CategoryType;
+import ch.admin.bar.siard2.gui.SiardBundle;
+import ch.admin.bar.siard2.gui.SiardGui;
+import ch.admin.bar.siard2.gui.UserProperties;
+import ch.admin.bar.siard2.gui.details.ValueTreeView;
+import ch.enterag.sqlparser.Interval;
+import ch.enterag.sqlparser.SqlLiterals;
+import ch.enterag.utils.BU;
+import ch.enterag.utils.DU;
+import ch.enterag.utils.EU;
+import ch.enterag.utils.fx.FxSizes;
+import ch.enterag.utils.fx.FxStyles;
+import ch.enterag.utils.fx.ScrollableDialog;
+import ch.enterag.utils.fx.dialogs.MB;
+import ch.enterag.utils.lang.Execute;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 /*====================================================================*/
 /** ValueDialog displays cell values.
  * @author Hartwig Thomas
  */
 public class ValueDialog
-  extends ScrollableDialog 
+  extends ScrollableDialog
   implements EventHandler<ActionEvent>
 {
+
+  // 최창근 추가 - 로그
+  private static final Logger LOG = Logger.getLogger(ValueDialog.class);
+
   // padding inside
   private static final double dINNER_PADDING = 10.0;
   // vertical spacing of elements
@@ -55,7 +79,7 @@ public class ValueDialog
   private Value _value = null;
   private int _iMaxInlineSize = -1;
   private String _sLocation = null;
-  
+
   /*------------------------------------------------------------------*/
   /** display value in tree view cell.
    * @param vtc tree view cell.
@@ -67,7 +91,7 @@ public class ValueDialog
     displayValue(this,vtc.getLocation(),vtc.getDataValue(),vtc.getMaxInlineSize());
     vtc.deselect();
   } /* displayCell */
-  
+
   /*------------------------------------------------------------------*/
   /** handle close button.
    * @param action event indicating close button has been pressed.
@@ -78,7 +102,7 @@ public class ValueDialog
     if (ae.getTarget() instanceof ValueTreeView.ValueTreeCell)
     {
       ValueTreeView.ValueTreeCell vtc = (ValueTreeView.ValueTreeCell)ae.getTarget();
-      Platform.runLater(new Runnable() 
+      Platform.runLater(new Runnable()
       {
         private ValueTreeView.ValueTreeCell _vtc = null;
         /* stores argument and returns this */
@@ -88,7 +112,7 @@ public class ValueDialog
           return this;
         } /* init */
         /* uses argument */
-        @Override 
+        @Override
         public void run()
         {
           try { displayCell(_vtc); }
@@ -97,7 +121,7 @@ public class ValueDialog
       }.init(vtc));
 
     }
-    else // from button  
+    else // from button
       close();
   } /* handle */
 
@@ -116,8 +140,8 @@ public class ValueDialog
     try
     {
       MetaValue mv = _value.getMetaValue();
-      MetaType mt = mv.getMetaType(); 
-      if (((mt != null) && (mt.getCategoryType() == CategoryType.UDT)) || 
+      MetaType mt = mv.getMetaType();
+      if (((mt != null) && (mt.getCategoryType() == CategoryType.UDT)) ||
         (mv.getCardinality() > 0))
       {
         ValueTreeView vtv = new ValueTreeView(_sLocation, (Cell)_value, _iMaxInlineSize);
@@ -166,18 +190,23 @@ public class ValueDialog
     Button btnClose = new Button(SiardBundle.getSiardBundle().getValueDialogClose());
     btnClose.setDefaultButton(true);
     btnClose.setOnAction(this);
+
     if (dMinWidth < FxSizes.getNodeWidth(btnClose))
       dMinWidth = FxSizes.getNodeWidth(btnClose);
-    dMinHeight += dVSPACING + FxSizes.getNodeHeight(btnClose); 
+
+    dMinHeight += dVSPACING + FxSizes.getNodeHeight(btnClose);
+
     vbox.getChildren().add(btnClose);
-    
+
     dMinWidth += vbox.getPadding().getLeft()+vbox.getPadding().getRight();
     dMinHeight += vbox.getPadding().getTop()+vbox.getPadding().getBottom();
+
     vbox.setMinWidth(dMinWidth);
     vbox.setMinHeight(dMinHeight);
+
     return vbox;
   } /* createVBoxDialog */
-  
+
   /*------------------------------------------------------------------*/
   /** create a dialog that displays the value data.
    * @param stageOwner
@@ -191,6 +220,7 @@ public class ValueDialog
     _value = value;
     _iMaxInlineSize = iMaxInlineSize;
     _sLocation = sLocation;
+    LOG.info("ValueDialog");
     _vbox = createVBoxDialog();
     /* scene */
     double dWidth = _vbox.getMinWidth()+10.0;
@@ -202,7 +232,7 @@ public class ValueDialog
     Scene scene = new Scene(_vbox,dWidth,dHeight);
     setScene(scene);
   } /* constructor */
-  
+
   /*------------------------------------------------------------------*/
   /** get text to be displayed from value.
    * @param value value.
@@ -261,7 +291,7 @@ public class ValueDialog
       sText = ""; // null value returns empty string
     return sText;
   } /* getText */
-  
+
   /*------------------------------------------------------------------*/
   /** display the characters in the text editor.
    * @param stageOwner
@@ -287,15 +317,15 @@ public class ValueDialog
     if (ex.getResult() != 0)
     {
       SiardBundle sb = SiardBundle.getSiardBundle();
-      MB.show(stageOwner, 
-        sb.getValueDisplayErrorTitle(), 
+      MB.show(stageOwner,
+        sb.getValueDisplayErrorTitle(),
         sb.getValueDisplayErrorMessage(fileTextEditor.getPath(),ex.getResult(),
           ex.getStdOut(),ex.getStdErr()),
         sb.getOk(), null);
     }
     fiTemp.deleteOnExit();
   } /* displayText */
-  
+
   /*------------------------------------------------------------------*/
   /** display the bytes in the bin editor.
    * @param stageOwner
@@ -316,18 +346,18 @@ public class ValueDialog
     File fileBinEditor = UserProperties.getUserProperties().getBinEditor();
     String[] asCommand = new String[] {fileBinEditor.getPath(),fiTemp.getAbsolutePath()};
     Execute ex = Execute.execute(asCommand);
-    if (ex.getResult() != 0) 
+    if (ex.getResult() != 0)
     {
       SiardBundle sb = SiardBundle.getSiardBundle();
-      MB.show(stageOwner, 
-        sb.getValueDisplayErrorTitle(), 
+      MB.show(stageOwner,
+        sb.getValueDisplayErrorTitle(),
         sb.getValueDisplayErrorMessage(fileBinEditor.getPath(),ex.getResult(),
           ex.getStdOut(),ex.getStdErr()),
         sb.getOk(), null);
     }
     fiTemp.deleteOnExit();
   } /* displayBinary */
-  
+
   /*------------------------------------------------------------------*/
   /** factory creates the value dialog and shows it.
    * @param stageOwner
@@ -336,10 +366,12 @@ public class ValueDialog
    * @param iMaxInlineSize maximum number of characters to be displayed inline.
    * @throws IOException if an I/O error occurred.
    */
-  private static void displayValue(Stage stageOwner, String sLocation, 
+  private static void displayValue(Stage stageOwner, String sLocation,
     Value value, int iMaxInlineSize)
     throws IOException
   {
+	LOG.info("(value.getCharLength() > iMaxInlineSize) " + (value.getCharLength() > iMaxInlineSize));
+	LOG.info("(value.getByteLength() > iMaxInlineSize/2) " + (value.getByteLength() > iMaxInlineSize/2));
     if (value.getCharLength() > iMaxInlineSize)
       displayText(stageOwner, value.getReader());
     else if (value.getByteLength() > iMaxInlineSize/2)

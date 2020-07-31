@@ -93,6 +93,7 @@ public class UploadDownloadAction {
 		LOG.info("DownloadConnectionDialog.iRESULT_SUCCESS " + DownloadConnectionDialog.iRESULT_SUCCESS);
 		LOG.info("conn " + conn);
 		LOG.info("while " + ((dcd.getResult() == DownloadConnectionDialog.iRESULT_SUCCESS) && (conn == null)));
+
 		while ((dcd.getResult() == DownloadConnectionDialog.iRESULT_SUCCESS) && (conn == null)) {
 			sConnectionUrl = dcd.getConnectionUrl();
 			sDbUser = dcd.getDbUser();
@@ -186,26 +187,27 @@ public class UploadDownloadAction {
 				SiardGui.getSiardGui().startAction(sb.getDownloadingStatus(dcd.getConnectionUrl(), fileArchive));
 
 				try {
+
 					Archive archive = ArchiveImpl.newInstance();
 
-					archive.setOriginalDir(dcd.getOriginalDir()); // 파일 원래 경로
-					archive.setFileDown(dcd.getFileDown());
-					archive.setSchema(dcd.getSchemaName());
-
-					// siard 저장되면 파일 저장 경로
-					// DB 첨부파일 루트 저장경로
-					if(dcd.getTargetDir() == null || dcd.getTargetDir().trim().equals("")) {
-						archive.setTargetDir(fileArchive.getParent());
-					} else {
-						archive.setTargetDir(dcd.getTargetDir());
-					}
-
-					// 파일저장 경로 필드명
-					if(dcd.getFilePath() != null && dcd.getFilePath().trim().length() > 0) {
-						archive.setFilePath(dcd.getFilePath());
-					}
-
-					archive.setTableCheckedList(dcd.getTableCheckedList()); // 체크된 테이블 목록
+//					archive.setOriginalDir(dcd.getOriginalDir()); // 파일 원래 경로
+//					archive.setFileDown(dcd.getFileDown());
+//					archive.setSchema(dcd.getSchemaName());
+//
+//					// siard 저장되면 파일 저장 경로
+//					// DB 첨부파일 루트 저장경로
+//					if(dcd.getTargetDir() == null || dcd.getTargetDir().trim().equals("")) {
+//						archive.setTargetDir(fileArchive.getParent());
+//					} else {
+//						archive.setTargetDir(dcd.getTargetDir());
+//					}
+//
+//					// 파일저장 경로 필드명
+//					if(dcd.getFilePath() != null && dcd.getFilePath().trim().length() > 0) {
+//						archive.setFilePath(dcd.getFilePath());
+//					}
+//
+//					archive.setTableCheckedList(dcd.getTableCheckedList()); // 체크된 테이블 목록
 					archive.create(fileArchive);
 
 					if (dcd.isMetaDataOnly())

@@ -11,6 +11,8 @@ package ch.admin.bar.siard2.gui.dialogs;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.log4j.Logger;
@@ -18,6 +20,7 @@ import org.apache.log4j.Logger;
 import ch.admin.bar.siard2.api.Archive;
 import ch.admin.bar.siard2.gui.SiardBundle;
 import ch.admin.bar.siard2.gui.tasks.DownloadTask;
+import ch.config.db.HistoryDAO;
 import ch.enterag.utils.fx.FxSizes;
 import ch.enterag.utils.logging.IndentLogger;
 import javafx.concurrent.WorkerStateEvent;
@@ -63,27 +66,58 @@ public class DownloadDialog
     @Override
     public void handle(WorkerStateEvent wse)
     {
-      LOG.info("");
+      LOG.info("DownloadTask.call.callback");
+
       _btnCancel.setDisable(true);
       DownloadTask dt = (DownloadTask)wse.getSource();
       SiardBundle sb = SiardBundle.getSiardBundle();
       String sMessage = null;
 
       LOG.info("wse.getEventType() " + wse.getEventType());
-      LOG.info("WorkerStateEvent.WORKER_STATE_SUCCEEDED " + WorkerStateEvent.WORKER_STATE_SUCCEEDED);
-      LOG.info("(wse.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED) " + (wse.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED));
-
-      if (wse.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED)
-      {
+      //TODO 최창근 추가 - 추출 결과
+      String execute_result = "";
+      if (wse.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED){
         sMessage = sb.getDownloadSuccessMessage();
         _bSuccess = true;
-      }
-      else if (wse.getEventType() == WorkerStateEvent.WORKER_STATE_CANCELLED)
-        sMessage = sb.getDownloadCanceledMessage();
-      else if (wse.getEventType() == WorkerStateEvent.WORKER_STATE_FAILED)
-      {
+        execute_result = "1";
+
+      }else if (wse.getEventType() == WorkerStateEvent.WORKER_STATE_CANCELLED) {
+    	sMessage = sb.getDownloadCanceledMessage();
+    	execute_result = "0";
+
+      }else if (wse.getEventType() == WorkerStateEvent.WORKER_STATE_FAILED){
         sMessage = sb.getDownloadFailureMessage(dt.getException());
         System.err.println(sMessage);
+        execute_result = "0";
+      }
+
+      try {
+    	  HistoryDAO dao = new HistoryDAO();
+    	  String history_idx = "";
+    	  Map<String, String> params = null;
+    	  for(int i=0, schemaSize=dt.getArchive().getMetaData().getMetaSchemas(); i<schemaSize; i++) {
+    		  params = new LinkedHashMap<String, String>();
+    		  history_idx = dao.selectMaxHistoryIdx();
+    		  params.put("history_idx", history_idx);
+    		  params.put("div", "0001");
+    		  params.put("db_name", dt.getArchive().getMetaData().getDatabaseProduct());
+    		  params.put("db_con_url", dt.getArchive().getMetaData().getConnection());
+    		  params.put("schema_name", dt.getArchive().getMetaData().getMetaSchema(i) + "");
+    		  params.put("table_count", dt.getArchive().getMetaData().getMetaSchema(i).getMetaTables() + "");
+    		  params.put("execute_result", execute_result);
+    		  dao.insertHistory(params);
+
+    		  for(int j=0, tableSize=dt.getArchive().getMetaData().getMetaSchema(i).getMetaTables(); j<tableSize; j++) {
+    			  params = new LinkedHashMap<String, String>();
+    			  params.put("history_idx", history_idx);
+    	          params.put("table_name", dt.getArchive().getMetaData().getMetaSchema(i).getMetaTable(j) + "");
+    	          params.put("table_column_count", dt.getArchive().getMetaData().getMetaSchema(i).getMetaTable(j).getMetaColumns() + "");
+    	          params.put("table_record_count", dt.getArchive().getMetaData().getMetaSchema(i).getMetaTable(j).getRows() + "");
+    	          dao.insertHistoryDetail(params);
+    		  }
+    	  }
+      }catch(Exception e) {
+    	  e.printStackTrace();
       }
 
       LOG.info("sMessage " + sMessage);

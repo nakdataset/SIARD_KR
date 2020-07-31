@@ -12,13 +12,7 @@ package ch.admin.bar.siard2.gui.dialogs;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -28,15 +22,11 @@ import org.apache.log4j.Logger;
 import ch.admin.bar.siard2.cmd.SiardConnection;
 import ch.admin.bar.siard2.gui.SiardBundle;
 import ch.admin.bar.siard2.gui.UserProperties;
-import ch.config.db.CommonDAO;
 import ch.enterag.utils.fx.FxSizes;
 import ch.enterag.utils.fx.FxStyles;
 import ch.enterag.utils.fx.ScrollableDialog;
 import ch.enterag.utils.fx.dialogs.FS;
 import ch.enterag.utils.logging.IndentLogger;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -55,14 +45,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
-import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -77,15 +63,16 @@ import javafx.stage.Stage;
 /*====================================================================*/
 /** ConnectionDialog for entering data to connect to a database.
  * Abstract base class for DownloadConnectionDialog and UploadConnectionDialog.
- * @author Hartwig Thomas test
+ * @author Hartwig Thomas
  */
-public abstract class ConnectionDialog extends ScrollableDialog
-{
+public abstract class ConnectionDialog extends ScrollableDialog{
+
   /** logger */
   private static IndentLogger _il = IndentLogger.getIndentLogger(ConnectionDialog.class.getName());
 
-  // 최창근 추가 - 로그
-  private static final Logger LOG = Logger.getLogger(ConnectionDialog.class);
+  //최창근 추가 - 로그
+  private static final Logger LOG = Logger.getLogger(ConnectionDialog_original.class);
+  private Stage _stageOwner;
 
   // width of JDBC URL input box
   protected static final double dWIDTH_URL = FxSizes.getScreenBounds().getWidth()/2.0;
@@ -127,90 +114,6 @@ public abstract class ConnectionDialog extends ScrollableDialog
   protected Map<String,String> _mapSchemes = new HashMap<String,String>();
   /** text field for connection URL */
   protected TextField _tfConnectionUrl = null;
-
-	protected TextField				_tfOriginalDir		= new TextField();
-	protected TextField				_tfTargetDir		= new TextField();
-	protected TextField				_tfFilePath			= new TextField(); 	//파일 저장 경로
-	protected TextField				_tfSchema			= new TextField(); 	//스키마명
-
-	protected Button				_btnTableName		= new Button("목록 가져오기");				// _tvSelectTable 행 삭제
-	protected Button				_btnChecked			= new Button("Check Table Names");				// _tvSelectTable 행 삭제
-	protected CheckBox 				_cbkAll				= new CheckBox("전체선택");
-
-	protected Label					_lblUser			= new Label("계정");
-	protected TextField				_tfUser				= new TextField();
-	protected Label					_lblPassword		= new Label("암호");
-	protected PasswordField         _pfTable  			= new PasswordField();
-
-	protected Button				_btnAdd				= new Button("+");				// _tvSelectTable 행 추가
-	protected Button				_btnDelete			= new Button("-");				// _tvSelectTable 행 삭제
-
-	protected RadioButton			_radioSftp 			= new RadioButton("네트워크");
-	protected RadioButton			_radioCopy 			= new RadioButton("폴더 복사");
-	protected ToggleGroup 			_groupFile 			= new ToggleGroup();
-	protected HBox 					_hboxRadio 			= new HBox();
-	protected HBox 					_hboxSchema 		= new HBox();
-
-	protected TableView<TableName>	_tvSelectTable		= new TableView<TableName>();
-	ObservableList<TableName> rowdata = FXCollections.observableArrayList();
-
-	public String getSchemaName()
-	{
-		return _tfSchema.getText();
-	}
-
-	public String getFileDown()
-	{
-		if(_radioSftp.isSelected() == true)
-		{
-			return "SFTP";
-		}
-		else
-		{
-			return "COPY";
-		}
-	}
-
-	public String getOriginalDir()
-	{
-		return _tfOriginalDir.getText();
-	}
-
-	public String getTargetDir()
-	{
-		return _tfTargetDir.getText();
-	}
-
-	public String getFilePath()
-	{
-		return _tfFilePath.getText();
-	}
-
-	public ArrayList getTableCheckedList()
-	{
-		ObservableList<TableName> rowdata_checked =  _tvSelectTable.getItems();
-
-    	ArrayList<String> list = new ArrayList();
-
-    	for(int ix = 0; ix < rowdata_checked.size(); ix++)
-    	{
-    		TableName tablename_check = rowdata_checked.get(ix);
-
-    		String str_checked = "";
-
-    		Hashtable<String, String> hash = new Hashtable();
-
-    		if(tablename_check.getCheck().get() == true)
-    		{
-    			str_checked = "CHECK!!!!!!!!!!!!";
-    			list.add(tablename_check.getTableName());
-
-    		}
-    	}
-
-    	return list;
-	}
-
   public String getConnectionUrl() { return _iResult == 1? _tfConnectionUrl.getText(): null; }
   /** text field for DbUser */
   protected TextField _tfDbUser = null;
@@ -273,14 +176,15 @@ public abstract class ConnectionDialog extends ScrollableDialog
     up.setDatabaseScheme(sDbScheme);
 
     String sDbHost = _tfDbHost.getText();
-    if ((sDbHost != null) && (sDbHost.length() > 0))
-      up.setDatabaseHost(sDbHost);
+    if ((sDbHost != null) && (sDbHost.length() > 0)) {
+    	up.setDatabaseHost(sDbHost);
+    }
 
     String sDbName = _tfDbName.getText();
     up.setDatabaseName(sDbName);
-
-    if (sc.getOptions(sDbScheme) > 1)
-      up.setDatabaseOption(getSelectedOption());
+    if (sc.getOptions(sDbScheme) > 1) {
+    	up.setDatabaseOption(getSelectedOption());
+    }
 
     _sDbUser = _tfDbUser.getText();
 
@@ -309,30 +213,35 @@ public abstract class ConnectionDialog extends ScrollableDialog
   /*====================================================================*/
   /** ActionEventHandler handles all action events.
    */
-  private class ActionEventHandler
-    implements EventHandler<ActionEvent>
-  {
+  private class ActionEventHandler implements EventHandler<ActionEvent>{
     /*------------------------------------------------------------------*/
     /** handle the clicking of the default or cancel button.
      */
     @Override
     public void handle(ActionEvent ae)
     {
-      if (ae.getSource() == _btnCancel)
-        close();
-      else if (ae.getSource() == _btnDefault)
-      {
+      if (ae.getSource() == _btnCancel) {
+    	  close();
+      }else if (ae.getSource() == _btnDefault){
         String sError = validate();
-        if (sError == null)
-        {
-          LOG.info("sError " + sError);
-          persist();
-          _iResult = iRESULT_SUCCESS;
-          LOG.info("_iResult " + _iResult);
-          close();
+
+        LOG.info("sError " + sError);
+        if (sError == null){
+        	persist();
+        	_iResult = iRESULT_SUCCESS;
+        	LOG.info("1 _iResult " + _iResult);
+
+        	//TODO 최창근 추가 - 테이블 선택 dialog를 띄워야함
+        	ChooseTableDialog ctd = ChooseTableDialog.showChooseTableDialog(_stageOwner);
+        	_iResult = ctd.getResult();
+        	LOG.info("2 _iResult " + _iResult);
+
+        	close();
+
+        }else {
+        	_tfError.setText(sError);
         }
-        else
-          _tfError.setText(sError);
+
       }
       else if (ae.getSource() == _btnDbFolder)
       {
@@ -360,9 +269,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
   /*====================================================================*/
   /** StringChangeListener handles all change events.
    */
-  private class StringChangeListener
-    implements ChangeListener<String>
-  {
+  private class StringChangeListener implements ChangeListener<String>{
     boolean _bInListener = false;
     /*------------------------------------------------------------------*/
     /** if the scheme choice changed, redisplay Host/Folder and JDBC URL.
@@ -442,9 +349,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
   /*====================================================================*/
   /** ToggleChangeListener handles change events of database name option.
    */
-  private class ToggleChangeListener
-    implements ChangeListener<Toggle>
-  {
+  private class ToggleChangeListener implements ChangeListener<Toggle>{
     /*------------------------------------------------------------------*/
     /** if the scheme choice changed, redisplay Host/Folder and JDBC URL.
      * @param ovs observable value.
@@ -468,9 +373,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
   /** PastingTextField implements non-editable field which can receive
    * paste events and serve as a drop target.
    */
-  private class PastingTextField
-    extends TextField
-  {
+  private class PastingTextField extends TextField{
     private boolean bChangeable = false;
     PastingTextField(String s)
     {
@@ -690,20 +593,12 @@ public abstract class ConnectionDialog extends ScrollableDialog
     hbox.getChildren().add(node);
     double dWidth = 0.0;
 
-    /**
-     * AS-IS
-    if (node instanceof TextField)// PasswordField is a TextField
+    // TODO 최창근 추가 - 동적 크기조절을 위한 설정
+    HBox.setHgrow(node, Priority.ALWAYS);
+    if (node instanceof TextField) // PasswordField is a TextField
       dWidth = ((TextField)node).getPrefWidth();
     else if (node instanceof CheckBox)
       dWidth = ((CheckBox)node).getWidth();
-    */
-
-    // TODO 최창근 수정 - 동적 크기조절을 위한 설정
-    HBox.setHgrow(node, Priority.ALWAYS);
-    if (node instanceof TextField) // PasswordField is a TextField
-    	dWidth = ((TextField)node).getPrefWidth();
-    else if (node instanceof CheckBox)
-    	dWidth = ((CheckBox)node).getWidth();
     hbox.setMinWidth(lbl.getPrefWidth() + dHSPACING + dWidth);
     return hbox;
   } /* createHBox */
@@ -938,16 +833,13 @@ public abstract class ConnectionDialog extends ScrollableDialog
       _tfDbUser.setText(up.getDatabaseUser());
     _tfDbUser.setTooltip(new Tooltip(sb.getConnectionDbUserTooltip()));
     _tfDbUser.textProperty().addListener(_scl);
-
     Label lblDbUser = createLabel(sb.getConnectionDbUserLabel()+":",_tfDbUser);
     _pfDbPassword = new PasswordField();
     _pfDbPassword.setTooltip(new Tooltip(sb.getConnectionDbPasswordTooltip()));
-
     Label lblDbPassword = createLabel(sb.getConnectionDbPasswordLabel()+":",_pfDbPassword);
     _cbMetaDataOnly = new CheckBox();
     _cbMetaDataOnly.setTooltip(new Tooltip(sLoadMetaDataOnlyTooltip));
     _cbMetaDataOnly.setAllowIndeterminate(false);
-
     Label lblMetaDataOnly = createLabel(sLoadMetaDataOnlyLabel+":",_cbMetaDataOnly);
     Label lblOverwrite = null;
     if (sLoadOverwriteLabel != null)
@@ -966,22 +858,11 @@ public abstract class ConnectionDialog extends ScrollableDialog
       lblViewsAsTables  = createLabel(sLoadViewsAsTablesLabel+":",_cbViewsAsTables);
     }
 
-		Label lblFileDown 		= createLabel("파일 다운로드 방식 :", _hboxRadio);
-		Label lblOriginalDir 	= createLabel("파일 위치 :", _tfOriginalDir);
-		Label lblTargetDir 		= createLabel("저장 위치 :", _tfTargetDir);
-		Label lblFilePath 		= createLabel("저장경로 필드명 :", _tfFilePath);
-		Label lblSchema  		= createLabel("스키마명 :", _hboxSchema);
-		Label lblSelectCheck 	= createLabel("테이블 목록 :", _tvSelectTable);
-
-    double dLabelWidth = this.getMaxLabelPrefWidth(lblDbUser,lblDbPassword,lblMetaDataOnly,lblOverwrite,
-		        lblViewsAsTables, lblOriginalDir, lblTargetDir, lblFilePath, lblSchema, lblSelectCheck, lblFileDown);
+    double dLabelWidth = this.getMaxLabelPrefWidth(lblDbUser,lblDbPassword,lblMetaDataOnly,lblOverwrite,lblViewsAsTables);
 
     double dTextWidth = dWIDTH_URL - dLabelWidth - dHSPACING;
     _tfDbUser.setPrefWidth(dTextWidth);
     _pfDbPassword.setPrefWidth(dTextWidth);
-		_tfOriginalDir.setPrefWidth(dTextWidth);
-		_tfTargetDir.setPrefWidth(dTextWidth);
-		_tvSelectTable.setPrefWidth(dTextWidth);
 
     VBox vbox = new VBox();
     vbox.setPadding(new Insets(dINNER_PADDING));
@@ -996,124 +877,6 @@ public abstract class ConnectionDialog extends ScrollableDialog
 
     HBox hboxMetaDataOnly = createHBox(lblMetaDataOnly,_cbMetaDataOnly);
     vbox.getChildren().add(hboxMetaDataOnly);
-
-		_radioSftp.setToggleGroup(_groupFile);
-		_radioCopy.setToggleGroup(_groupFile);
-
-		_radioSftp.setSelected(true);
-		_radioCopy.setSelected(false);
-
-		_hboxRadio.getChildren().add(_radioSftp);
-		_hboxRadio.setSpacing(3);
-		_hboxRadio.getChildren().add(_radioCopy);
-
-		HBox hboxFileDown = createHBox(lblFileDown, _hboxRadio);		//파일다운로드 선택 라디오버튼
-		vbox.getChildren().add(hboxFileDown);
-
-		HBox hboxOriginalDir = createHBox(lblOriginalDir, _tfOriginalDir);
-		vbox.getChildren().add(hboxOriginalDir);
-
-		HBox hboxTargetDir = createHBox(lblTargetDir, _tfTargetDir);
-		vbox.getChildren().add(hboxTargetDir);
-
-		HBox hboxFilePath = createHBox(lblFilePath, _tfFilePath);
-		vbox.getChildren().add(hboxFilePath);
-
-		_hboxSchema.getChildren().add(_tfSchema);
-		_hboxSchema.setSpacing(3);
-		_hboxSchema.getChildren().add(new Label("(메타데이터 다운로드 속도 개선)"));
-
-		HBox hboxSchema = createHBox(lblSchema, _hboxSchema);
-		vbox.getChildren().add(hboxSchema);
-
-		// 테이블 목록 보여주기
-		// colname1.setCellValueFactory(new PropertyValueFactory<>("tableName"));
-		// colname2.setCellValueFactory(new PropertyValueFactory<>("check"));
-
-		TableColumn<TableName, String> c1 = new TableColumn<TableName, String>("테이블명");
-		c1.setCellValueFactory(new PropertyValueFactory<TableName, String>("TableName"));
-
-		TableColumn<TableName, Boolean> c2 = new TableColumn<TableName, Boolean>("선택");
-
-		c2.setCellValueFactory(new PropertyValueFactory<TableName, Boolean>("check"));
-
-		c2.setCellFactory(CheckBoxTableCell.forTableColumn(c2));
-
-		//c2.setEditable(true);
-
-		c1.prefWidthProperty().bind(_tvSelectTable.widthProperty().multiply(0.75));
-		c2.prefWidthProperty().bind(_tvSelectTable.widthProperty().multiply(0.2));
-
-		_tvSelectTable.getColumns().add(c1);
-		_tvSelectTable.getColumns().add(c2);
-		_tvSelectTable.setEditable(true);
-
-//		rowdata.add(new TableName("ABCD", true));
-//		_tvSelectTable.setItems(rowdata);
-
-		HBox hboxBtn = new HBox();
-
-		hboxBtn.getChildren().add(_lblUser);
-		hboxBtn.setSpacing(3);
-		hboxBtn.getChildren().add(_tfUser);
-		hboxBtn.setSpacing(10);
-		hboxBtn.getChildren().add(_lblPassword);
-		hboxBtn.setSpacing(3);
-		hboxBtn.getChildren().add(_pfTable);
-		hboxBtn.setSpacing(10);
-		hboxBtn.getChildren().add(_btnTableName);
-		hboxBtn.setSpacing(10);
-		hboxBtn.getChildren().add(_cbkAll);
-
-		//버튼을 누르면 테이블명을 가져온다.
-		//오라클만 가능
-		_btnTableName.setOnAction(new EventHandler<ActionEvent>() {
-		    @Override
-		    public void handle(ActionEvent event)
-		    {
-				getTableNames();
-		    }
-		});
-
-		//버튼을 누르면 테이블명을 가져온다.
-		//오라클만 가능
-		_btnChecked.setOnAction(new EventHandler<ActionEvent>() {
-		    @Override
-		    public void handle(ActionEvent event)
-		    {
-		    	ObservableList<TableName> rowdata_checked =  _tvSelectTable.getItems();
-
-		    	for(int ix = 0; ix < rowdata_checked.size(); ix++)
-		    	{
-		    		TableName tablename_check = rowdata_checked.get(ix);
-
-		    		String str_checked = "";
-		    		if(tablename_check.getCheck().get() == true)
-		    		{
-		    			str_checked = "CHECK!!!!!!!!!!!!";
-		    		}
-		    	}
-		    }
-		});
-
-		//버튼을 누르면 테이블명을 가져온다.
-		//오라클만 가능
-		_cbkAll.setOnAction(new EventHandler<ActionEvent>() {
-		    @Override
-		    public void handle(ActionEvent event)
-		    {
-		    	setTableNamesChecked(_cbkAll.isSelected());
-		    	_tvSelectTable.refresh();
-		    }
-		});
-
-		VBox vboxSelectTable = new VBox();
-		vboxSelectTable.setSpacing(5);
-		vboxSelectTable.getChildren().add(hboxBtn);
-		vboxSelectTable.getChildren().add(_tvSelectTable);
-
-		HBox hboxSelectTable = createHBox(lblSelectCheck, vboxSelectTable);
-		vbox.getChildren().add(hboxSelectTable);
 
     HBox hboxOverwrite = null;
     if (sLoadOverwriteLabel != null)
@@ -1195,19 +958,11 @@ public abstract class ConnectionDialog extends ScrollableDialog
     String sLoadOverwriteLabel, String sLoadOverwriteTooltip,
     String sLoadViewsAsTablesLabel, String sLoadViewsAsTablesTooltip)
   {
-    super(stageOwner,sTitle);
+    super(stageOwner, sTitle);
 
-    LOG.info("");
+    LOG.info("sTitle " + sTitle);
 
-    //TODO 최창근 추가 - SQLite insert 테스트 후 삭제
-	CommonDAO dao = new CommonDAO();
-	try {
-		dao.insertHistory();
-	} catch (Exception e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-
+    _stageOwner = stageOwner;
     _sConnectionUrl = sConnectionUrl;
     _sDbUser = sDbUser;
     double dMinWidth = FxSizes.getTextWidth(sTitle)+FxSizes.getCloseWidth()+dHSPACING;
@@ -1225,226 +980,12 @@ public abstract class ConnectionDialog extends ScrollableDialog
     Scene scene = new Scene(vboxDialog);
     setScene(scene);
 
-    // TODO 최창근 추가 - 테스트 후 삭제
+    //TODO 최창근 추가 - 테스트 후 삭제
     testInit();
+
   } /* constructor DownloadConnectionDialog */
 
-	// 테이블명을 가져온다.
-	private void getTableNames()
-	{
-		this._cbkAll.setSelected(true);
-		_tvSelectTable.getItems().clear();
-
-		String dbsystem 			= "";
-		String url 					= "";
-		String user 				= "";
-		String password 			= "";
-
-		String driverName 			= "";
-		String sql 					= "";
-
-		Connection connection 		= null;
-		Statement statement			= null;
-		ResultSet resultset			= null;
-
-		String driverNameOracle 	= "oracle.jdbc.driver.OracleDriver";
-		String driverNameCubrid 	= "cubrid.jdbc.driver.CUBRIDDriver";
-		String driverNameMysql 		= "com.mysql.jdbc.Driver";
-		String driverNameMssql 		= "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-		String driverNameMsAccess 	= "sun.jdbc.odbc.JdbcOdbcDriver";
-		String driverNamePostgresql = "org.postgresql.Driver";
-
-		String sqlOracle 			= "";
-		String sqlMysql 			= "SHOW FULL TABLES WHERE TABLE_TYPE = 'BASE TABLE'";
-		String sqlMssql 			= "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES";
-		String sqlMsAccess			= "SELECT MsysObjects.Name FROM MSysObjects WHERE Type = 1";
-		String sqlCubrid 			= "";
-
-		dbsystem = _cbDbScheme.getSelectionModel().getSelectedItem().toString();
-
-		if(dbsystem.equals("Oracle"))
-		{
-			driverName 	= driverNameOracle;
-
-			url 		= _tfConnectionUrl.getText();
-			user 		= _tfDbUser.getText();
-			password 	= _pfDbPassword.getText();
-
-			String owner = _tfUser.getText();
-//			sqlOracle   = "SELECT OBJECT_NAME FROM DBA_OBJECTS WHERE OBJECT_TYPE = 'TABLE' AND OWNER = '" + owner.toUpperCase() + "' ORDER BY OBJECT_NAME";
-			sqlOracle   = "SELECT TABLE_NAME FROM ALL_TABLES WHERE OWNER = '" + owner.toUpperCase() + "' ORDER BY TABLE_NAME";
-			sql 		= sqlOracle;
-		}
-		else if(dbsystem.equals("MySQL"))
-		{
-			driverName 	= driverNameMysql;
-
-			sql 		= sqlMysql;
-			url 		= _tfConnectionUrl.getText();
-			user 		= _tfUser.getText();
-			password 	= _pfTable.getText();
-		}
-		else if(dbsystem.equals("Microsoft Access"))
-		{
-			driverName 	= driverNameMsAccess;
-
-			sql 		= sqlMsAccess;
-			url 		= _tfConnectionUrl.getText();
-			user 		= _tfUser.getText();
-			password 	= _pfTable.getText();
-		}
-		else if(dbsystem.equals("CUBRID"))
-		{
-			driverName 	= driverNameCubrid;
-
-			url 		= _tfConnectionUrl.getText();
-			user 		= _tfUser.getText();
-			password 	= _pfTable.getText();
-
-			/* S: Cubrid 테이블 목록조회 쿼리 오류 수정 */
-			String owner = _tfUser.getText();
-			sqlCubrid	 = "SELECT CLASS_NAME FROM DB_CLASS WHERE OWNER_NAME = '" + owner.toUpperCase() + "'" + " AND CLASS_TYPE = 'CLASS' AND IS_SYSTEM_CLASS = 'NO'";
-			sql 		 = sqlCubrid;
-			/* E: Cubrid 테이블 목록조회 쿼리 오류 수정 */
-		}
-		/*2020.07.14 - MsSQL(SQL Server) 드라이버 추가*/
-		else if(dbsystem.equals("SQL Server"))
-		{
-			driverName 	= driverNameMssql;
-
-			sql 		= sqlMssql;
-			url 		= _tfConnectionUrl.getText();
-			user 		= _tfUser.getText();
-			password 	= _pfTable.getText();
-		}
-		/*2020.07.17 - PostgreSQL 드라이버 추가*/
-		else if(dbsystem.equals("PostgreSQL"))
-		{
-			driverName 	= driverNamePostgresql;
-
-			url 		= _tfConnectionUrl.getText();
-			user 		= _tfUser.getText();
-			password 	= _pfTable.getText();
-
-			sqlCubrid 	= "SELECT TABLENAME FROM PG_TABLES WHERE TABLEOWNER = '" + user.toLowerCase().trim() + "'";
-			sql 		= sqlCubrid;
-		}
-
-		try
-		{
-			Class.forName(driverName);
-
-//			System.out.println("url:" + url);
-//			System.out.println("user:" + user);
-//			System.out.println("password:" + password);
-//			System.out.println("sql:" + sql);
-
-			connection = DriverManager.getConnection(url, user, password);
-			statement = connection.createStatement();
-			resultset = statement.executeQuery(sql);
-
-			while (resultset.next())
-			{
-				String tablename = resultset.getString(1);
-
-				TableName tablenames = new TableName(tablename, true);
-				rowdata.add(tablenames);
-				//_tvSelectTable.getItems().add(rowdata);
-			}
-
-			_tvSelectTable.setItems(rowdata);
-
-			if(resultset != null)
-			{
-				resultset.close();
-				resultset = null;
-			}
-
-			if(statement != null)
-			{
-				statement.close();
-				statement = null;
-			}
-
-			if(connection != null)
-			{
-				connection.close();
-				connection = null;
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	public void setCheckedTableList()
-	{
-		ObservableList<TableName> rowdata_checked =  _tvSelectTable.getItems();
-
-		ArrayList<String> list = new ArrayList<String>();
-
-    	for(int ix = 0; ix < rowdata_checked.size(); ix++)
-    	{
-    		TableName tablename_check = rowdata_checked.get(ix);
-
-    		if(tablename_check.getCheck().get() == true)
-    		{
-    			list.add(tablename_check.getTableName());
-    		}
-    	}
-	}
-
-	public class TableName
-	{
-		public SimpleStringProperty	tableName;
-		public BooleanProperty check;
-
-		public TableName(String str, boolean c)
-		{
-			this.tableName = new SimpleStringProperty(str);
-			this.check = new SimpleBooleanProperty(c);
-		}
-
-		public String getTableName()
-		{
-			return this.tableName.get();
-		}
-
-		public void setTableName(SimpleStringProperty str)
-		{
-			this.tableName = str;
-		}
-
-		public BooleanProperty getCheck()
-		{
-			return this.check;
-		}
-
-		public BooleanProperty checkProperty()
-		{
-			return check;
-		}
-
-		public void setCheck(Boolean check)
-		{
-			this.check = new SimpleBooleanProperty(check);
-		}
-	}
-
-	public void setTableNamesChecked(boolean b)
-	{
-		ObservableList<TableName> rowdata_checked =  _tvSelectTable.getItems();
-
-    	for(int ix = 0; ix < rowdata_checked.size(); ix++)
-    	{
-    		TableName tablename_check = rowdata_checked.get(ix);
-
-    		tablename_check.setCheck(b);
-    	}
-	}
-
-	/* 최창근 추가 - 테스트를 위한 LocalDB 정보로 Set */
+  /* 최창근 추가 - 테스트를 위한 LocalDB 정보로 Set */
 	void testInit() {
 
 		_cbDbScheme.getSelectionModel().select("MySQL");
@@ -1453,14 +994,11 @@ public abstract class ConnectionDialog extends ScrollableDialog
 
 		_tfDbName.setText("MYSQL");
 
-		_tfConnectionUrl.setText("jdbc:mysql://192.168.1.152:3306/Mysql?serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8");
+		_tfConnectionUrl.setText("jdbc:mysql://192.168.1.152:3306/Mysql?serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull");
 
 		_tfDbUser.setText("root");
 
 		_pfDbPassword.setText("root");
-
-		_tfUser.setText("root");
-
-		_pfTable.setText("root");
 	}
+
 } /* class ConnectionDialog */

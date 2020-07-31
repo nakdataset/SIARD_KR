@@ -1,8 +1,8 @@
 /*======================================================================
 The record extract table view displays the primary dara of the record extract.
 Application: SIARD GUI
-Description: The record extract table view displays the primary dara of 
-             the record extract. 
+Description: The record extract table view displays the primary dara of
+             the record extract.
              It catches and executes sort requests.
              It catches and executes display requests.
 Platform   : JAVA 1.7, JavaFX 2.2
@@ -12,30 +12,45 @@ Created    : 11.08.2017, Hartwig Thomas, Enter AG, Rüti ZH
 ======================================================================*/
 package ch.admin.bar.siard2.gui.details;
 
-import java.io.*;
-import java.sql.*;
-import java.util.*;
+import java.io.IOException;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import javafx.application.Platform;
-import javafx.beans.value.*;
-import javafx.concurrent.*;
-import javafx.event.*;
-import javafx.scene.control.*;
-import javafx.scene.control.TableColumn.*;
-import ch.enterag.utils.*;
-import ch.enterag.utils.database.*;
-import ch.enterag.utils.fx.*;
-import ch.enterag.utils.fx.controls.*;
-import ch.enterag.sqlparser.identifier.*;
-import ch.admin.bar.siard2.api.*;
+import org.apache.log4j.Logger;
+
+import ch.admin.bar.siard2.api.Archive;
 import ch.admin.bar.siard2.api.Cell;
-import ch.admin.bar.siard2.api.generated.*;
-import ch.admin.bar.siard2.gui.*;
-import ch.admin.bar.siard2.gui.dialogs.*;
+import ch.admin.bar.siard2.api.MetaColumn;
+import ch.admin.bar.siard2.api.MetaTable;
+import ch.admin.bar.siard2.api.Record;
+import ch.admin.bar.siard2.api.RecordExtract;
+import ch.admin.bar.siard2.api.generated.CategoryType;
+import ch.admin.bar.siard2.gui.MainMenuBar;
+import ch.admin.bar.siard2.gui.SiardBundle;
+import ch.admin.bar.siard2.gui.SiardGui;
+import ch.admin.bar.siard2.gui.UserProperties;
+import ch.admin.bar.siard2.gui.dialogs.ValueDialog;
 import ch.admin.bar.siard2.gui.tasks.SortTask;
+import ch.enterag.sqlparser.identifier.QualifiedId;
+import ch.enterag.utils.EU;
+import ch.enterag.utils.database.SqlTypes;
+import ch.enterag.utils.fx.FxSizes;
+import ch.enterag.utils.fx.controls.ObjectListTableView;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.SortEvent;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.SortType;
+import javafx.scene.control.TableView;
 
 /*====================================================================*/
-/** The record extract table view displays the primary data of the record 
+/** The record extract table view displays the primary data of the record
  * extract.
  * It catches and executes sort requests.
  * It catches and executes display requests.
@@ -45,6 +60,10 @@ public class RecordExtractTableView
   extends ObjectListTableView
   implements EventHandler<ActionEvent>
 {
+
+  // 최창근 추가 - 로그
+  private static final Logger LOG = Logger.getLogger(RecordExtractTableView.class);
+
   private RecordExtract _re = null;
   public RecordExtract getRecordExtract() { return _re; }
   private static final String sROW_HEADER = "Row";
@@ -60,12 +79,14 @@ public class RecordExtractTableView
     throws IOException
   {
     int iMaxInlineSize = _re.getTable().getParentSchema().getParentArchive().getMaxInlineSize();
-    RecordExtract reRecord = _re.getRecordExtract(iRow); 
+    RecordExtract reRecord = _re.getRecordExtract(iRow);
     Record re = reRecord.getRecord();
     Cell cell = re.getCell(iColumn);
+    LOG.info("iRow " + iRow);
+    LOG.info("iColumn " + iColumn);
     ValueDialog.displayValue(SiardGui.getSiardGui().getStage(), cell, iMaxInlineSize);
   } /* displayCell */
-  
+
   /*------------------------------------------------------------------*/
   /** handle show cell event.
    */
@@ -74,8 +95,9 @@ public class RecordExtractTableView
   {
     if (ae.getTarget() instanceof ObjectListTableView.ObjectTableCell)
     {
+      LOG.info("ae.getTarget() " + ae.getTarget());
       ObjectListTableView.ObjectTableCell otc = (ObjectListTableView.ObjectTableCell)ae.getTarget();
-      Platform.runLater(new Runnable() 
+      Platform.runLater(new Runnable()
       {
         private ObjectListTableView.ObjectTableCell _otc = null;
         public Runnable init(ObjectListTableView.ObjectTableCell otc)
@@ -83,16 +105,21 @@ public class RecordExtractTableView
           _otc = otc;
           return this;
         }
-        @Override 
+        @Override
         public void run()
         {
-          try { displayCell(_otc.getRow(),_otc.getColumn()-1); }
-          catch(IOException ie) { System.err.println(EU.getExceptionMessage(ie)); }
+          try {
+        	  LOG.info("_otc.getRow() " + _otc.getRow());
+        	  LOG.info("_otc.getColumn()-1 " + (_otc.getColumn()-1));
+        	  displayCell(_otc.getRow(), _otc.getColumn()-1);
+          }catch(IOException ie) {
+        	  System.err.println(EU.getExceptionMessage(ie));
+          }
         }
       }.init(otc));
     }
   } /* handle */
-  
+
   /*------------------------------------------------------------------*/
   /** retrieve the column headers for the record extract.
    * @param re record extract.
@@ -215,13 +242,13 @@ public class RecordExtractTableView
     for (Iterator<TableColumn<List<Object>,?>> iterColumn = getColumns().iterator(); iterColumn.hasNext(); )
     {
       ObjectListTableColumn oltc = (ObjectListTableColumn)iterColumn.next();
-      double dPreferredColumnWidth = (double)UserProperties.getUserProperties().getColumnWidth();
+      double dPreferredColumnWidth = UserProperties.getUserProperties().getColumnWidth();
       oltc.setMinWidth(FxSizes.fromEms(sMIN_COLUMN_WIDTH));
       oltc.setPrefWidth(FxSizes.fromEms(dPreferredColumnWidth));
       oltc.setMaxWidth(FxSizes.fromEms(dPreferredColumnWidth*dPreferredColumnWidth/sMIN_COLUMN_WIDTH));
     }
     setOnShowCellAction(this);
-    setOnSort(new EventHandler<SortEvent<TableView<List<Object>>>>() 
+    setOnSort(new EventHandler<SortEvent<TableView<List<Object>>>>()
     {
       @Override
       public void handle(SortEvent<TableView<List<Object>>> se)
@@ -235,7 +262,7 @@ public class RecordExtractTableView
           sg.startAction(sb.getTableSorting(_re.getTable().getMetaTable().getName()));
           int iSortColumn = retv.getColumns().indexOf(oltc)-1;
           SortTask.sortTask(_re.getTable(), (oltc.getSortType() == SortType.ASCENDING),
-            iSortColumn, new EventHandler<WorkerStateEvent>() 
+            iSortColumn, new EventHandler<WorkerStateEvent>()
           {
             @Override
             public void handle(WorkerStateEvent arg0)
@@ -249,7 +276,7 @@ public class RecordExtractTableView
       }
     });
     getSelectionModel().setCellSelectionEnabled(true);
-    getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() 
+    getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>()
     {
       /*------------------------------------------------------------------*/
       /** handle changes in selection: refresh menu.

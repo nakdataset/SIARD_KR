@@ -84,7 +84,6 @@ public class DownloadTask
     LOG.info("SiardCmd->MetaDataFromDb call");
 	MetaDataFromDb mdfd	= MetaDataFromDb.newInstance(_conn.getMetaData(), _archive.getMetaData(), _archive);
 
-
     mdfd.setQueryTimeout(up.getQueryTimeoutSeconds());
     LOG.info("up.getQueryTimeoutSeconds() " + up.getQueryTimeoutSeconds());
 

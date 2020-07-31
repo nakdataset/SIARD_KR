@@ -21,6 +21,8 @@ public class AbstractDAO {
 
 	private Connection conn = SQLiteConnection.getConnection();
 
+	private List<String> fields = new ArrayList<String>();
+
 	protected void printQueryId(String queryId) {
 //		if(log.isDebugEnabled()){
 			log.info("Query \t: " + queryId);
@@ -62,10 +64,11 @@ public class AbstractDAO {
 		List resultList = new ArrayList();
 		Map<String, String> resultMap = new HashMap<String, String>();
 
+		query = initQueryDataBinding(query);
 		PreparedStatement pstmt = conn.prepareStatement(query);
 		initParam(pstmt, params);
 
-		ResultSet rs = pstmt.executeQuery(query);
+		ResultSet rs = pstmt.executeQuery();
 		ResultSetMetaData rsmd = rs.getMetaData();
 
 		int cols = rsmd.getColumnCount();
@@ -149,6 +152,7 @@ public class AbstractDAO {
 	public Object insert(String query, Map<String, String> params) throws Exception {
 		printQueryId(query);
 
+		query = initQueryDataBinding(query);
 		PreparedStatement pstmt = conn.prepareStatement(query);
 		initParam(pstmt, params);
 		int cnt = pstmt.executeUpdate();
@@ -196,14 +200,32 @@ public class AbstractDAO {
 	}
 
 	void initParam(PreparedStatement pstmt, Map<String, String> params) throws Exception{
-		int setIndex = 1;
-		Iterator<String> iter = params.keySet().iterator();
 
+		Iterator<String> iter = params.keySet().iterator();
 		while (iter.hasNext()) {
 			String key = iter.next();
 			String value = params.get(key);
-			pstmt.setString(setIndex++, value);
+
+			if(fields.indexOf(key)+1 > 0) {
+				pstmt.setString(fields.indexOf(key)+1, value);
+			}
 		}
+	}
+
+	String initQueryDataBinding(String query) {
+		fields = new ArrayList<String>();
+		int pos;
+        while((pos = query.indexOf("#{")) != -1) {
+            int end = query.substring(pos).indexOf("}");
+            if (end == -1) {
+            	end = query.length();
+            }else {
+            	end += pos;
+            }
+            fields.add(query.substring(pos+2,end));
+            query = query.substring(0, pos) + "?" + query.substring(end+1);
+        }
+        return query;
 	}
 
 	//TODO 테스트
@@ -212,12 +234,39 @@ public class AbstractDAO {
 		try {
             Statement stmt = conn.createStatement();
 
-			String sql = "CREATE TABLE IF NOT EXISTS history (\n"
-                + "	idx integer PRIMARY KEY,\n"
-                + "	date text\n"
-                + ");";
+//			String sql = "CREATE TABLE IF NOT EXISTS history (\n"
+//                + "	idx integer PRIMARY KEY AUTOINCREMENT,\n"
+//                + "	date text\n"
+//                + ");";
 
-			stmt.execute(sql);
+            String dropTableHistorySQL = "drop table HISTORY";
+            stmt.execute(dropTableHistorySQL);
+            String dropTableHISTORYDETAILSQL = "drop table HISTORY_DETAIL";
+            stmt.execute(dropTableHISTORYDETAILSQL);
+
+            String createTableHistory = "";
+            createTableHistory += "CREATE TABLE IF NOT EXISTS HISTORY(";
+    		createTableHistory += "   HISTORY_IDX integer PRIMARY KEY AUTOINCREMENT,";
+    		createTableHistory += "   DIV text,";
+    		createTableHistory += "   DB_NAME text,";
+    		createTableHistory += "   DB_CON_URL text,";
+    		createTableHistory += "   SCHEMA_NAME text,";
+    		createTableHistory += "   TABLE_COUNT text,";
+    		createTableHistory += "   EXECUTE_RESULT text,";
+    		createTableHistory += "   EXECUTE_DATE text";
+    		createTableHistory += ")";
+			stmt.execute(createTableHistory);
+
+			String createTableHistoryDetail = "";
+			createTableHistoryDetail += "CREATE TABLE IF NOT EXISTS HISTORY_DETAIL(";
+			createTableHistoryDetail += "	HISTORY_DETAIL_IDX integer PRIMARY KEY AUTOINCREMENT,";
+			createTableHistoryDetail += "	HISTORY_IDX integer,";
+			createTableHistoryDetail += "	TABLE_NAME text,";
+			createTableHistoryDetail += "	TABLE_COLUMN_COUNT integer,";
+			createTableHistoryDetail += "	TABLE_RECORD_COUNT integer,";
+			createTableHistoryDetail += "	PERFORM_TIME integer";
+			createTableHistoryDetail += ")";
+			stmt.execute(createTableHistoryDetail);
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -248,20 +297,12 @@ public class AbstractDAO {
 			//SelectList
 			String selectListSQL = "SELECT idx, date FROM history ";
 			List<Map> resultList = dao.selectList(selectListSQL);
-			System.out.println(resultList.toString());
-			/*
-			for(int i=0, size=resultList.size(); i<size; i++) {
-				System.out.println(resultList.get(i).get("idx") + " / " + resultList.get(i).get("date"));
-			}
-			*/
 
 			//Select
 			String selectSQL = "SELECT idx, date FROM history WHERE idx = ? ";
 			Map<String, String> selectParams = new LinkedHashMap<String, String>();
 			selectParams.put("idx", "2");
 			Map<String, String> resultMap = (Map<String, String>) dao.selectByOne(selectSQL, selectParams);
-			System.out.println(resultMap.toString());
-			// System.out.println(resultMap.get("idx") + " / " + resultMap.get("date"));
 
 		}catch(Exception e) {
 			e.printStackTrace();

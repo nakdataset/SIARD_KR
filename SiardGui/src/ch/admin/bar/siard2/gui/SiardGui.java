@@ -16,6 +16,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -40,7 +41,6 @@ import ch.admin.bar.siard2.gui.dialogs.HelpDialog;
 import ch.admin.bar.siard2.gui.dialogs.HistoryDialog;
 import ch.admin.bar.siard2.gui.dialogs.InfoDialog;
 import ch.admin.bar.siard2.gui.dialogs.OptionDialog;
-import ch.config.db.CommonDAO;
 import ch.config.db.SQLiteConnection;
 import ch.enterag.utils.DU;
 import ch.enterag.utils.ProgramInfo;
@@ -702,12 +702,12 @@ public class SiardGui extends Application
 
   // 최창근 추가 - 사용자 이벤트 내역 화면 호출
   /*------------------------------------------------------------------*/
-  /** display info dialog
+  /** display history dialog
    */
-  public void history()
+  public void history(String div)
   {
-	  HistoryDialog.showHistoryDialog(getStage());
-  } /* info */
+	  HistoryDialog.showHistoryDialog(getStage(), div);
+  } /* history */
 
 
   /*------------------------------------------------------------------*/
@@ -942,8 +942,8 @@ public class SiardGui extends Application
   public static void main(String[] args)
   {
 	// 최창근 추가 - 로그, SQLite Set
-    logSettingInit();
-	sqliteSettingInit();
+	initLogSetting();
+	initSQLiteSettingInit();
 
 	LOG.info("main");
 
@@ -1004,7 +1004,7 @@ public class SiardGui extends Application
 
 
   // 최창근 추가 - log4j 사용을 properties 위한 설정 메소드
-  private static void logSettingInit(){
+  private static void initLogSetting(){
 	try {
 		FileInputStream log4jRead = new FileInputStream("log4j.properties");
 		Properties log4jProperty = new Properties();
@@ -1016,12 +1016,48 @@ public class SiardGui extends Application
   }
 
   // 최창근 추가 - SQLite 사용을 위한 설정 메소드
-  private static void sqliteSettingInit() {
+  private static void initSQLiteSettingInit() {
 	Connection conn = SQLiteConnection.getConnection();
-	CommonDAO dao = new CommonDAO();
+	// 테이블 생성
 	try {
-		dao.insertHistory();
-	} catch (Exception e) {
+		//TODO 테스트 후 삭제
+        Statement stmt = conn.createStatement();
+
+//				String sql = "CREATE TABLE IF NOT EXISTS history (\n"
+//	                + "	idx integer PRIMARY KEY AUTOINCREMENT,\n"
+//	                + "	date text\n"
+//	                + ");";
+
+//        String dropTableHistorySQL = "drop table History";
+//        stmt.execute(dropTableHistorySQL);
+//        System.out.println("history 테이블 삭제 완료");
+
+        String createTableHistory = "";
+        createTableHistory += "CREATE TABLE IF NOT EXISTS HISTORY(";
+		createTableHistory += "   HISTORY_IDX integer PRIMARY KEY AUTOINCREMENT,";
+		createTableHistory += "   DIV text,";
+		createTableHistory += "   DB_NAME text,";
+		createTableHistory += "   DB_CON_URL text,";
+		createTableHistory += "   SCHEMA_NAME text,";
+		createTableHistory += "   TABLE_COUNT integer,";
+		createTableHistory += "   EXECUTE_RESULT integer,";
+		createTableHistory += "   EXECUTE_DATE text";
+		createTableHistory += ")";
+		stmt.execute(createTableHistory);
+		LOG.info("history 생성 완료");
+
+		String createTableHistoryDetail = "";
+		createTableHistoryDetail += "CREATE TABLE IF NOT EXISTS HISTORY_DETAIL(";
+		createTableHistoryDetail += "	HISTORY_DETAIL_IDX integer PRIMARY KEY AUTOINCREMENT,";
+		createTableHistoryDetail += "	HISTORY_IDX integer,";
+		createTableHistoryDetail += "	TABLE_NAME text,";
+		createTableHistoryDetail += "	TABLE_COLUMN_COUNT integer,";
+		createTableHistoryDetail += "	TABLE_RECORD_COUNT integer";
+		createTableHistoryDetail += ")";
+		stmt.execute(createTableHistoryDetail);
+		LOG.info("historyDetail 생성 완료");
+
+	}catch(Exception e) {
 		e.printStackTrace();
 	}
   }

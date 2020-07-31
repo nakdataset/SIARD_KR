@@ -1,23 +1,35 @@
 /*======================================================================
-UploadConnectionDialog for entering data to connect to a database. 
+UploadConnectionDialog for entering data to connect to a database.
 Application : Siard2
-Description : UploadConnectionDialog for entering data to connect to a 
-              database for upload. 
-Platform    : Java 7, JavaFX 2.2   
+Description : UploadConnectionDialog for entering data to connect to a
+              database for upload.
+Platform    : Java 7, JavaFX 2.2
 ------------------------------------------------------------------------
 Copyright  : Swiss Federal Archives, Berne, Switzerland, 2017
 Created    : 29.06.2017, Hartwig Thomas, Enter AG, Rüti ZH
 ======================================================================*/
 package ch.admin.bar.siard2.gui.dialogs;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
-import javafx.geometry.*;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.stage.*;
-import ch.admin.bar.siard2.api.*;
-import ch.admin.bar.siard2.gui.*;
+import org.apache.log4j.Logger;
+
+import ch.admin.bar.siard2.api.Archive;
+import ch.admin.bar.siard2.api.MetaData;
+import ch.admin.bar.siard2.gui.SchemaMapping;
+import ch.admin.bar.siard2.gui.SiardBundle;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 /*====================================================================*/
 /** UploadConnectionDialog for entering data to connect to a database
@@ -27,6 +39,10 @@ import ch.admin.bar.siard2.gui.*;
 public class UploadConnectionDialog
   extends ConnectionDialog
 {
+
+  //최창근 추가 - 로그
+  private static final Logger LOG = Logger.getLogger(UploadConnectionDialog.class);
+
   private static SiardBundle _sb = SiardBundle.getSiardBundle();
   private Archive _archive = null;
   /** schema mappings */
@@ -44,7 +60,7 @@ public class UploadConnectionDialog
     }
     return mapSchemas;
   } /* getSchemasMap */
-  
+
   @Override
   protected void persist()
   {
@@ -58,7 +74,7 @@ public class UploadConnectionDialog
     }
     SchemaMapping.getInstance().setSchemaMapping(mapSchemas);
   }
-  
+
   @Override
   protected String validate()
   {
@@ -76,10 +92,10 @@ public class UploadConnectionDialog
     }
     return sError;
   }
-  
+
   /*------------------------------------------------------------------*/
   /** create a VBox for the schema mapping.
-   * @return VBox for the schema mapping. 
+   * @return VBox for the schema mapping.
    */
   private VBox createVBoxSchemas()
   {
@@ -96,7 +112,7 @@ public class UploadConnectionDialog
     vbox.getChildren().add(lblTitle);
     double dLabelWidth = 0;
     Set<String> setSchemas = new HashSet<String>();
-    MetaData md = _archive.getMetaData(); 
+    MetaData md = _archive.getMetaData();
     for (int iSchema = 0; iSchema < md.getMetaSchemas(); iSchema++)
     {
       String sSchema = md.getMetaSchema(iSchema).getName();
@@ -129,7 +145,7 @@ public class UploadConnectionDialog
     vbox.setMinWidth(dMinWidth);
     return vbox;
   } /* createVBoxSchemas */
-  
+
   /*------------------------------------------------------------------*/
   /** display the upload connection dialog.
    * @param stageOwner owner window.
@@ -147,19 +163,33 @@ public class UploadConnectionDialog
         _sb.getConnectionUploadOverwriteLabel(),
         _sb.getConnectionUploadOverwriteTooltip(),
         null,null);
+
+    LOG.info("sConnectionUrl " + sConnectionUrl);
+    LOG.info("sDbUser " + sDbUser);
+    LOG.info("_sb.getConnectionDownloadTitle() " + _sb.getConnectionUploadTitle());
+    LOG.info("_sb.getConnectionUploadMetaDataOnlyLabel() " + _sb.getConnectionUploadMetaDataOnlyLabel());
+    LOG.info("_sb.getConnectionUploadMetaDataOnlyTooltip() " + _sb.getConnectionUploadMetaDataOnlyTooltip());
+    LOG.info("_sb.getConnectionUploadOverwriteLabel() " + _sb.getConnectionUploadOverwriteLabel());
+    LOG.info("_sb.getConnectionUploadOverwriteTooltip() " + _sb.getConnectionUploadOverwriteTooltip());
+
     _archive = archive;
+
+    LOG.info("UploadConnectionDialog");
+
     /* add the schemas from the meta data to the dialog */
     VBox vboxDialog = (VBox)getScene().getRoot();
     double dMinWidth = vboxDialog.getMinWidth();
     VBox vboxSchemas = createVBoxSchemas();
+
     if (dMinWidth < vboxSchemas.getMinWidth())
       dMinWidth = vboxSchemas.getMinWidth();
+
     /* add schemas before buttons */
     vboxDialog.getChildren().add(vboxDialog.getChildren().size()-1,vboxSchemas);
     vboxDialog.getChildren().add(vboxDialog.getChildren().size()-1,new Separator());
     vboxDialog.setMinWidth(dMinWidth);
   } /* constructor UpConnectionDialog */
-  
+
   /*------------------------------------------------------------------*/
   /** show upload connection dialog and save entered values.
    * @param stageOwner owner window.
@@ -167,15 +197,14 @@ public class UploadConnectionDialog
    * @param sDbUser initial value for user of database or null.
    * @param archive SIARD archive to be uploaded.
    * @return UpConnectionDialog instance with results.
-   *   if getResult() is 1 then getConnectionUrl(), getDbUser(), 
+   *   if getResult() is 1 then getConnectionUrl(), getDbUser(),
    *   getDbPassword(), isMetaDataOnly(), isOverwrite(), and getSchemasMap()
    *   have the values entered.
    */
   public static UploadConnectionDialog showUploadConnectionDialog(
     Stage stageOwner, String sConnectionUrl, String sDbUser, Archive archive)
   {
-    UploadConnectionDialog ucd = new UploadConnectionDialog(
-      stageOwner, sConnectionUrl, sDbUser, archive);
+    UploadConnectionDialog ucd = new UploadConnectionDialog(stageOwner, sConnectionUrl, sDbUser, archive);
     ucd.showAndWait();
     return ucd;
   } /* showUploadConnectionDialog */

@@ -77,8 +77,10 @@ public class MainMenuBar
   private MenuItem _miHelp = null;
   private MenuItem _miInfo = null;
 
-  // 최창근 추가 - 사용자 이벤트 내역 버튼
-  private MenuItem _miHistory = null;
+  // 최창근 추가 - 내역 버튼 추가
+  private Menu _menuHistory = null;
+  private MenuItem _miDownloadHistory = null;
+  private MenuItem _miUploadHistory = null;
 
   /*==================================================================*/
   private class ToggleChangeListener
@@ -195,8 +197,11 @@ public class MainMenuBar
       sg.info(); // display Info dialog
 
     // 최창근 추가 - 사용자 이벤트 내역 버튼 이벤트처리
-    else if (mi == _miHistory) {
-      sg.history();
+    else if (mi == _miDownloadHistory) {
+      sg.history("0001");
+    }
+    else if (mi == _miUploadHistory) {
+      sg.history("0002");
     }
 
   } /* handle */
@@ -298,8 +303,10 @@ public class MainMenuBar
     _miHelp.setText(sb.getMenuHelpHelp());
     _miInfo.setText(sb.getMenuHelpInfo());
 
-    // 최창근 추가 - 사용자 이벤트 내역 버튼명
-    _miHistory.setText(sb.getMenuHelpHistory());
+    // 최창근 추가 - 내역메뉴명, 다운르도, 업로드, 버튼명
+    _menuHistory.setText(sb.getMenuHistory());
+    _miDownloadHistory.setText(sb.getMenuHistoryDownload());
+    _miUploadHistory.setText(sb.getMenuHistoryUpload());
   } /* refreshLanguage */
 
   /*------------------------------------------------------------------*/
@@ -450,6 +457,19 @@ public class MainMenuBar
 
     getMenus().add(_menuEdit);
 
+
+
+    // 최창근 추가 - 내역 메뉴, 다운로드 버튼 추가
+    _menuHistory = new Menu();
+    _miDownloadHistory = createMenuItem();
+    _menuHistory.getItems().add(_miDownloadHistory);
+
+    _miUploadHistory = createMenuItem();
+    _menuHistory.getItems().add(_miUploadHistory);
+    getMenus().add(_menuHistory);
+
+
+
     _menuTools = new Menu();
 
     _miInstall = createMenuItem();
@@ -493,10 +513,6 @@ public class MainMenuBar
 
     _miHelp = createMenuItem();
     _menuHelp.getItems().add(_miHelp);
-
-    // 최창근 추가 - 사용자 이벤트 내역 버튼
-    _miHistory = createMenuItem();
-    _menuHelp.getItems().add(_miHistory);
 
     _menuHelp.getItems().add(new SeparatorMenuItem());
 

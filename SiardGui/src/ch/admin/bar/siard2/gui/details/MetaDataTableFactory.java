@@ -1,7 +1,7 @@
 /*======================================================================
 Creates the table views for SIARD meta data.
 Application: SIARD GUI
-Description: Creates the table views for SIARD meta data. 
+Description: Creates the table views for SIARD meta data.
 Platform   : JAVA 1.7, JavaFX 2.2
 ------------------------------------------------------------------------
 Copyright  : Swiss Federal Archives, Berne, Switzerland, 2017
@@ -9,13 +9,30 @@ Created    : 25.07.2017, Hartwig Thomas, Enter AG, Rüti ZH
 ======================================================================*/
 package ch.admin.bar.siard2.gui.details;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
+import org.apache.log4j.Logger;
+
+import ch.admin.bar.siard2.api.MetaAttribute;
+import ch.admin.bar.siard2.api.MetaColumn;
+import ch.admin.bar.siard2.api.MetaData;
+import ch.admin.bar.siard2.api.MetaField;
+import ch.admin.bar.siard2.api.MetaForeignKey;
+import ch.admin.bar.siard2.api.MetaParameter;
+import ch.admin.bar.siard2.api.MetaPrivilege;
+import ch.admin.bar.siard2.api.MetaRole;
+import ch.admin.bar.siard2.api.MetaRoutine;
+import ch.admin.bar.siard2.api.MetaSchema;
+import ch.admin.bar.siard2.api.MetaTable;
+import ch.admin.bar.siard2.api.MetaType;
+import ch.admin.bar.siard2.api.MetaUniqueKey;
+import ch.admin.bar.siard2.api.MetaUser;
+import ch.admin.bar.siard2.api.MetaView;
+import ch.admin.bar.siard2.gui.SiardBundle;
+import ch.enterag.sqlparser.identifier.QualifiedId;
 import ch.enterag.utils.fx.controls.ObjectListTableView;
-import ch.enterag.sqlparser.identifier.*;
-import ch.admin.bar.siard2.api.*;
-import ch.admin.bar.siard2.gui.*;
 
 /*====================================================================*/
 /** Creates the table views for SIARD meta data.
@@ -23,6 +40,10 @@ import ch.admin.bar.siard2.gui.*;
  */
 public abstract class MetaDataTableFactory
 {
+
+  // 최창근 추가 - 로그
+  private static final Logger LOG = Logger.getLogger(MetaDataTableFactory.class);
+
   /*------------------------------------------------------------------*/
   /** create the table view for the schemas of the SIARD archive.
    * @param md meta data of SIARD archive.
@@ -40,8 +61,11 @@ public abstract class MetaDataTableFactory
     for (int iSchema = 0; iSchema < md.getMetaSchemas(); iSchema++)
     {
       MetaSchema ms = md.getMetaSchema(iSchema);
-      List<Object> listRow = Arrays.asList((Object)iSchema, 
+      List<Object> listRow = Arrays.asList((Object)iSchema,
         ms.getName(), ms.getMetaTables());
+      LOG.info("(Object)iSchema " + (Object)iSchema);
+      LOG.info("ms.getName() " + ms.getName());
+      LOG.info("ms.getMetaTables() " + ms.getMetaTables());
       oltv.getItems().add(listRow);
     }
     return oltv;
@@ -63,13 +87,13 @@ public abstract class MetaDataTableFactory
     for (int iUser = 0; iUser < md.getMetaUsers(); iUser++)
     {
       MetaUser mu = md.getMetaUser(iUser);
-      List<Object> listRow = Arrays.asList((Object)iUser, 
+      List<Object> listRow = Arrays.asList((Object)iUser,
         mu.getName());
       oltv.getItems().add(listRow);
     }
     return oltv;
   } /* newMetaUsersTableView */
-  
+
   /*------------------------------------------------------------------*/
   /** create the table view for the roles of the SIARD archive.
    * @param md meta data of SIARD archive.
@@ -87,13 +111,13 @@ public abstract class MetaDataTableFactory
     for (int iRole = 0; iRole < md.getMetaRoles(); iRole++)
     {
       MetaRole mr = md.getMetaRole(iRole);
-      List<Object> listRow = Arrays.asList((Object)iRole, 
+      List<Object> listRow = Arrays.asList((Object)iRole,
         mr.getName(),mr.getAdmin());
       oltv.getItems().add(listRow);
     }
     return oltv;
   } /* newMetaRolesTableView */
-  
+
   /*------------------------------------------------------------------*/
   /** create the table view for the privileges of the SIARD archive.
    * @param md meta data of SIARD archive.
@@ -119,7 +143,7 @@ public abstract class MetaDataTableFactory
     }
     return oltv;
   } /* newMetaPrivilegesTableView */
-  
+
   /*------------------------------------------------------------------*/
   /** create the table view for the types of a schema.
    * @param ms schema meta data.
@@ -355,7 +379,7 @@ public abstract class MetaDataTableFactory
     }
     return oltv;
   } /* newMetaCandidateKeysTableView */
-  
+
   /*------------------------------------------------------------------*/
   /** create the table view for the foreign keys of a table.
    * @param mt table meta data.
@@ -394,7 +418,7 @@ public abstract class MetaDataTableFactory
     }
     return oltv;
   } /* newMetaForeignKeysTableView */
-  
+
   /*------------------------------------------------------------------*/
   /** create the table view for the parameters of a routine.
    * @param mr routine meta data.
@@ -414,7 +438,7 @@ public abstract class MetaDataTableFactory
     for (int iParameter = 0; iParameter < mr.getMetaParameters(); iParameter++)
     {
       MetaParameter mp = mr.getMetaParameter(iParameter);
-      String sType = mp.getType(); 
+      String sType = mp.getType();
       if (sType == null)
       {
         QualifiedId qiType = new QualifiedId(null,mp.getTypeSchema(),mp.getTypeName());
