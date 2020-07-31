@@ -31,6 +31,7 @@ import ch.admin.bar.siard2.gui.MruFile;
 import ch.admin.bar.siard2.gui.SiardBundle;
 import ch.admin.bar.siard2.gui.SiardGui;
 import ch.admin.bar.siard2.gui.UserProperties;
+import ch.admin.bar.siard2.gui.dialogs.ChooseTableDialog;
 import ch.admin.bar.siard2.gui.dialogs.DownloadConnectionDialog;
 import ch.admin.bar.siard2.gui.dialogs.DownloadDialog;
 import ch.admin.bar.siard2.gui.dialogs.UploadConnectionDialog;
@@ -88,6 +89,10 @@ public class UploadDownloadAction {
 		/* display connection dialog (at least for password) */
 		Connection conn = null;
 		DownloadConnectionDialog dcd = DownloadConnectionDialog.showDownloadConnectionDialog(stage, sConnectionUrl, sDbUser);
+
+		if(dcd.getResult() == DownloadConnectionDialog.iRESULT_SUCCESS)
+			ChooseTableDialog.showChooseTableDialog(stage, dcd);
+//		dcd._iResult = ctd.getResult();
 
 		LOG.info("dcd.getResult() " + dcd.getResult());
 		LOG.info("DownloadConnectionDialog.iRESULT_SUCCESS " + DownloadConnectionDialog.iRESULT_SUCCESS);

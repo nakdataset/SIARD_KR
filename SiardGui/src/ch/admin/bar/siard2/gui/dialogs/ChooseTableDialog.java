@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 
 import org.apache.log4j.Logger;
 
+import ch.admin.bar.siard2.cmd.SiardConnection;
 import ch.admin.bar.siard2.gui.SiardBundle;
 import ch.enterag.utils.fx.FxSizes;
 import ch.enterag.utils.fx.FxStyles;
@@ -46,8 +47,13 @@ public class ChooseTableDialog extends ScrollableDialog implements EventHandler<
 	/** cancel button (= Escape) */
 	protected Button _btnCancel = null;
 
-	private ChooseTableDialog(Stage stageOwner) {
+	// properties
+	protected DownloadConnectionDialog dcd;
+
+	private ChooseTableDialog(Stage stageOwner, DownloadConnectionDialog dcd) {
 		super(stageOwner, "테이블 선택 테스트");
+
+		this.dcd = dcd;
 
 		//TODO getChooseTableTitle 로 변경해야함
 		double dMinWidth = FxSizes.getTextWidth(SiardBundle.getSiardBundle().getInfoTitle()) + FxSizes.getCloseWidth() + dHSPACING;
@@ -63,6 +69,8 @@ public class ChooseTableDialog extends ScrollableDialog implements EventHandler<
 		/* scene */
 		Scene scene = new Scene(vboxDialog);
 		setScene(scene);
+
+		dcd._iResult = iRESULT_CANCELED;
 	}
 
 	@Override
@@ -71,7 +79,7 @@ public class ChooseTableDialog extends ScrollableDialog implements EventHandler<
 		LOG.info("handle");
 
 		if (event.getSource() == _btnDefault) {
-			_iResult = iRESULT_SUCCESS;
+			dcd._iResult = iRESULT_SUCCESS;
 		}
 //		if (event.getSource() == _btnCancel) {
 //			_iResult = iRESULT_CANCELED;
@@ -143,25 +151,31 @@ public class ChooseTableDialog extends ScrollableDialog implements EventHandler<
 		//TODO 최창근 추가 - 테스트 후 삭제->테스트 데이터 삽입
 //		ObservableList<TableListModel> rowdata = FXCollections.observableArrayList();
 
-
 		try {
 			Connection _conn = null;
-			DriverManager.setLoginTimeout(5000);
-			_conn = DriverManager.getConnection("jdbc:mysql://192.168.1.152:3306/Mysql?serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull", "root", "root");
+
+			//TODO 최창근 추가 - 전 화면에서 가져와야함
+			SiardConnection.getSiardConnection().loadDriver(dcd.getConnectionUrl());
+
+			DriverManager.setLoginTimeout(0);
+
+			//TODO 최창근 추가 - 전 화면에서 가져와야함
+			_conn = DriverManager.getConnection(dcd.getConnectionUrl(), dcd.getDbUser(),  dcd.getDbPassword());
 			_conn.setAutoCommit(false);
+
 			ResultSet rs = _conn.getMetaData().getTables(null, "%", "%", new String[]{"TABLE"});
+
 			while (rs.next()) {
 			  String sTableSchema = rs.getString("TABLE_SCHEM");
 		      String sTableName = rs.getString("TABLE_NAME");
 		      String sTableType = rs.getString("TABLE_TYPE");
-		      System.out.println(sTableSchema + " / " + sTableName + " / " + sTableType);
+
 		      chooseTableListTabieView.getItems().add(new TableListModel(sTableSchema, sTableName, false));
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 
 		// 최창근 추가 - 테이블 크기별로 리사이징
 		autoResizeColumns(chooseTableListTabieView);
@@ -233,9 +247,9 @@ public class ChooseTableDialog extends ScrollableDialog implements EventHandler<
 	 *
 	 * @param stageOwner owner window.
 	 */
-	public static ChooseTableDialog showChooseTableDialog(Stage stageOwner) {
+	public static ChooseTableDialog showChooseTableDialog(Stage stageOwner, DownloadConnectionDialog dcd) {
 		LOG.info("showChooseTableDialog");
-		ChooseTableDialog ctd = new ChooseTableDialog(stageOwner);
+		ChooseTableDialog ctd = new ChooseTableDialog(stageOwner, dcd);
 		ctd.showAndWait(); // until it is closed
 		return ctd;
 	} /* showInfoDialog */

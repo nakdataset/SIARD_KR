@@ -73,6 +73,12 @@ public class DownloadDialog
       SiardBundle sb = SiardBundle.getSiardBundle();
       String sMessage = null;
 
+      LOG.info("dt.getArchive().getMetaData().getDbName() " + dt.getArchive().getMetaData().getDbName());
+      LOG.info("dt.getArchive().getMetaData().getProducerApplication() " + dt.getArchive().getMetaData().getProducerApplication());
+      LOG.info("dt.getArchive().getMetaData().getClientMachine() " + dt.getArchive().getMetaData().getClientMachine());
+      LOG.info("dt.getArchive().getMetaData().getArchive() " + dt.getArchive().getMetaData().getArchive());
+
+
       LOG.info("wse.getEventType() " + wse.getEventType());
       //TODO 최창근 추가 - 추출 결과
       String execute_result = "";
