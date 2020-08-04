@@ -1,5 +1,5 @@
 /*======================================================================
-PrimaryDataFromDb transfers primary data from databases to SIARD files. 
+PrimaryDataFromDb transfers primary data from databases to SIARD files.
 Application : Siard2
 Description : Transfers primary data from databases to SIARD files.
 ------------------------------------------------------------------------
@@ -34,8 +34,10 @@ import java.sql.Types;
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.Random;
+import java.util.StringTokenizer;
 
 import javax.xml.datatype.Duration;
 
@@ -62,7 +64,7 @@ import ch.enterag.utils.logging.IndentLogger;
  */
 public class PrimaryDataFromDb extends PrimaryDataTransfer
 {
-  /** logger */  
+  /** logger */
   private static IndentLogger _il = IndentLogger.getIndentLogger(PrimaryDataFromDb.class.getName());
   private static long _lREPORT_RECORDS = 1000;
   private Progress _progress = null;
@@ -72,14 +74,14 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
   private StopWatch _swGetCell = null;
   private StopWatch _swGetValue = null;
   private StopWatch _swSetValue = null;
-  
+
 	private int sftpcount = 0;
-	
+
 	/* S : 평균 다운로드 속도 출력 */
 	private static long totalFileSize = 0;
 	private static long	totalDownloadTime	= 0;
 	/* E : 평균 다운로드 속도 출력 */
-	
+
 	/* S : 다운로드 시간 출력 */
 	private static String startTime = "";
 	private static String	endTime = "";
@@ -113,7 +115,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
       bCancelRequested = _progress.cancelRequested();
     return bCancelRequested;
   } /* cancelRequested */
-  
+
   private void setValue(Value value, Object oValue)
     throws IOException, SQLException
   {
@@ -196,7 +198,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
         throw new SQLException("Invalid value type "+oValue.getClass().getName()+" encountered!");
     }
   } /* setValue */
-  
+
   /*------------------------------------------------------------------*/
   /** extract primary data of a record from the result set.
    * @param rs result set.
@@ -210,7 +212,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
     ResultSetMetaData rsmd = rs.getMetaData();
     if (rsmd.getColumnCount() != record.getCells())
       throw new IOException("Invalid number of result columns found!");
-    
+
 		String org_path = "";
 		String org_path_hash = "";
 		String filepath_siard	= "";
@@ -225,7 +227,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
       int iDataType = mc.getPreType();
       if (mc.getCardinality() >= 0)
         iDataType = Types.ARRAY;
-      MetaType mt = mc.getMetaType(); 
+      MetaType mt = mc.getMetaType();
       if (mt != null)
       {
         CategoryType cat = mt.getCategoryType();
@@ -362,7 +364,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 			{
 				org_path = (String) oValue;
 				//System.out.println("PrimaryDataFromDb 314 org_path=" + org_path);
-				
+
 				// 파일경로를 해쉬로 변환한다.
 				try
 				{
@@ -390,7 +392,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 					String	id					= prop.getProperty("id");
 					String	password		= prop.getProperty("password");
 					String	port				= prop.getProperty("port");
-					String	root				= prop.getProperty("root");
+//					String	root				= prop.getProperty("root");
 
 					String	remotepath	= "";
 					String	remotename	= "";
@@ -437,7 +439,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 					filedownload.download(remotepath, remotename, savepath);
 					this.downsizesum += filedownload.getFileSize();
 					filedownload.disconnection();
-					
+
 					Instant downend = Instant.now();
 					downtimesum = downtimesum.plus(java.time.Duration.between(downstart, downend));
 					downcount++;
@@ -593,20 +595,20 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
       }
       incDownloaded();
     }
-    
-		String hms = String.format("%2d:%02d:%02d", 
+
+		String hms = String.format("%2d:%02d:%02d",
 									downtimesum.toHours(),
-									downtimesum.toMinutes(), 
+									downtimesum.toMinutes(),
 									(downtimesum.toMillis() / 1000));
-		StopWatch sftpSw = StopWatch.getInstance();
+//		StopWatch sftpSw = StopWatch.getInstance();
 		float downavg = 0.0f;
 		if(this.downcount > 0)
 		{
 			downavg = ((this.downsizesum / 1000) / this.downcount);
 		}
-		System.out.println("다운로드 총 파일 크기 " + (this.downsizesum / 1000) 
+		System.out.println("다운로드 총 파일 크기 " + (this.downsizesum / 1000)
 					+ "kB,  평균 다운로드 속도 (" +  downavg + " kB/s), 다운로드 시간 " + hms);
-		
+
     System.out.println("    Record "+String.valueOf(lRecord)+" ("+sw.formatRate(rr.getByteCount()-lBytesStart,sw.stop())+" kB/s)");
     System.out.println("    Total: "+StopWatch.formatLong(lRecord)+" records ("+StopWatch.formatLong(rr.getByteCount())+" bytes in "+sw.formatMs()+" ms)");
     // System.out.println("    Create: "+swCreate.formatMs()+" ms, Get: "+swGet.formatMs()+" ms, Put: "+swPut.formatMs()+" ms");
@@ -614,44 +616,100 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
     if (!rs.isClosed())
       rs.close();
     if (!stmt.isClosed())
-      stmt.close();    	
+      stmt.close();
     rr.close();
     _il.exit();
   } /* getTable */
-  
+
   /*------------------------------------------------------------------*/
   /** download primary data of a schema.
    * @param schema schema
    * @throws IOException if an I/O error occurred.
    * @throws SQLException if a database error occurred.
    */
-  private void getSchema(Schema schema)
+  @SuppressWarnings("unchecked")
+	private void getSchema(Schema schema)
     throws IOException, SQLException
   {
-    _il.enter(schema.getMetaSchema().getName());
-    
+  	String schema_name = schema.getMetaSchema().getName();
+    _il.enter(schema_name);
+
 		ArrayList<String>	list = _archive.getTableCheckedList();
+		List<String> schemaSelList = new ArrayList<>(); //특정 스키마 전체 테이블 다운로드 할 스키마 List
 		boolean is_table_select	= false;
 		if(list != null && list.size() > 0)
 		{
-			is_table_select = true;
+		  //스키마와 테이블명에 대한 전체 다운로드
+			if(!"all".equals(list.get(0))) {
+				is_table_select = true;
+			}
+
+		  //특정 스키마 전체 테이블 다운로드 할 스키마 List
+			for(int ix = 0; ix < list.size(); ix++)
+			{
+				String str = list.get(ix);
+				if(str.indexOf("*") > -1) {
+					schemaSelList.add(str.substring(0, str.indexOf(".")));
+				}
+			}
 		}
-		
+
+		boolean is_schema_all = false;
     for (int iTable = 0; (iTable < schema.getTables()) && (!cancelRequested()); iTable++)
     {
       Table table = schema.getTable(iTable);
 
+      //특정 스키마에 대한 전체 테이블 (*)다운로드 처리
+      if(!is_schema_all && schemaSelList.size() > 0) {
+      	for (int j = 0; j < schemaSelList.size(); j++)
+      	{
+      		if(schema_name.toUpperCase().equals(schemaSelList.get(j).toUpperCase())) {
+      			is_schema_all = true;
+
+      			schemaSelList.remove(j);
+      			break;
+      		}
+      	}
+      }
+
+      //테이블 선택 로직
 			// 테이블을 명시하면
 			// 해당 테이블만 내려 받는다.
-			if(is_table_select == true)
+			if(is_table_select && !is_schema_all)
 			{
 				MetaTable meta_table = table.getMetaTable();
 
 				for(int ix = 0; ix < list.size(); ix++)
 				{
-					String name = (String) list.get(ix);
+					String name = list.get(ix);
+				  //테이블에 schema 추가함.
+					String schemaName = "";
+					String tableName = "";
 
-					if(meta_table.getName().toUpperCase().equals(name.toUpperCase()))
+					//"."이 없으면 스키마가 없는것으로 간주함.
+					if(name.indexOf(".") < 0) {
+						throw new IOException("스키마가 없는 테이블이 존재합니다. 테이블(t) 파라미터값 입력 형식은 \"스키마.테이블\"입니다. \n테이블:"+name + "\n스키마 및 테이블에 대한 전체 다운로드 시에서는 \"all\"을 입력해주세요.");
+					}
+
+					StringTokenizer st = new StringTokenizer(name, ".");
+
+					int index = 0;
+					while (st.hasMoreElements())
+      		{
+      			String parmName = (String) st.nextElement();
+      			if(parmName != null && !parmName.isEmpty()) {
+      				if(index == 0) { //스키마명
+      					schemaName = parmName.trim().toUpperCase();
+      				} else if(index == 1) {//테이블명
+      					tableName = parmName.trim().toUpperCase();
+      				}
+      			}
+      			index++;
+      		}
+
+				  //스키마와 테이블명이 모두 같아야 함.
+					if(meta_table.getName().toUpperCase().equals(tableName)
+							&& schema_name.toUpperCase().equals(schemaName))
 					{
 						getTable(table);
 						break;
@@ -678,13 +736,13 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
   {
     _il.enter();
     System.out.println("\r\nPrimary Data");
-    
+
 		/* S: SIARD 다운로드 시작 시간 */
 		String siardDownloadStartTime = dateToString();
 		System.out.println("SIARD Download Start Date : " + siardDownloadStartTime + "\r\n");
 		_il.event("SIARD Download Start Date : " + siardDownloadStartTime + "\r\n");
 		/* E: SIARD 다운로드 시작 시간 */
-		
+
     _progress = progress;
     /* determine total number of records in the database */
     _lRecordsTotal = 0;
@@ -699,6 +757,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
     }
     _lRecordsPercent = (_lRecordsTotal+99)/100;
     _lRecordsDownloaded = 0;
+
     /* now download */
     for (int iSchema = 0; (iSchema < _archive.getSchemas()) && (!cancelRequested()); iSchema++)
     {
@@ -708,7 +767,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
     if (cancelRequested())
       throw new IOException("\r\nDownload of primary data cancelled!");
     System.out.println("\r\nDownload terminated successfully.");
-    
+
 		/* S: SIARD 업로드 종료시간 */
 		String siardDownloadEndTime = dateToString();
 		System.out.println("SIARD Download End Date : " + siardDownloadEndTime);
@@ -728,11 +787,11 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 		System.out.println("총 소요시간 : " + diffTime);
 		_il.event("총 소요시간 : " + diffTime);
 		/* E: SIARD 업로드 종료시간 */
-		
+
     _conn.rollback();
     _il.exit();
   } /* download */
-  
+
   /*------------------------------------------------------------------*/
   /** constructor
    * @param conn database connection.
@@ -753,7 +812,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
   {
     return new PrimaryDataFromDb(conn, archive);
   } /* newInstance */
-  
+
 	/* S: 현재시간 조회 */
 	private String dateToString()
 	{
@@ -791,12 +850,12 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 	{
 		int		hour = 60 * 60;
 		int		minute = 60;
-		
+
 		long	diffHour = 0;
 		long	diffMinute = 0;
 		long	diffSec = 0;
 		long	remainderSec = 0;
-		
+
 		String	result = "";
 		String	trimStartTime	= startTime.trim();
 		String	trimEndTime = endTime.trim();

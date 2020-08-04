@@ -21,7 +21,9 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1427,33 +1429,106 @@ public class MetaDataFromDb
     if(_archive != null) {
     	list = _archive.getTableCheckedList();
     }
-	boolean is_table_select = false; // 테이블 목록을 가져와서 선택한 경우
-	if(list != null && list.size() > 0)
-	{
-		is_table_select = true;
-	}
+
+    if(list == null || list.size() < 0) {
+    	throw new IOException("테이블 정보가 없습니다. 테이블(t) 정보를 입력해주세요.");
+    }
+
+    List<String> schemaSelList = new ArrayList<>(); //특정 스키마 전체 테이블 다운로드 할 스키마 List
+		boolean is_table_select = false; // 테이블 목록을 가져와서 선택한 경우
+		if(list != null && list.size() > 0)
+		{
+		  //스키마와 테이블명에 대한 전체 다운로드
+			if(!"all".equals(list.get(0))) {
+				is_table_select = true;
+			}
+
+			for(int ix = 0; ix < list.size(); ix++)
+			{
+				String str = list.get(ix);
+				if(str.indexOf("*") > -1) {
+					schemaSelList.add(str.substring(0, str.indexOf(".")));
+				}
+			}
+		}
+
+	  //실제 다운로드 받은 테이블 건수
+//		int downloadTableCount = 0;
+		boolean is_schema_all = false;
+		String beforeTableSchema = "";
     while ((rs.next()) && (!cancelRequested()))
     {
       String sTableSchema = rs.getString("TABLE_SCHEM");
       String sTableName = rs.getString("TABLE_NAME");
       String sTableType = rs.getString("TABLE_TYPE");
-			if(is_table_select == true)
+
+      //현재 스키마명과 이전 스키마명을 비교
+      if(!beforeTableSchema.equals(sTableSchema)) {
+      	is_schema_all = false;
+      }
+
+      //특정 스키마에 대한 전체 테이블 (*)다운로드 처리
+      if(!is_schema_all && schemaSelList.size() > 0) {
+      	for (int j = 0; j < schemaSelList.size(); j++)
+      	{
+      		if(sTableSchema.toUpperCase().equals(schemaSelList.get(j).toUpperCase())) {
+      			is_schema_all = true;
+
+      			schemaSelList.remove(j);
+      			break;
+      		}
+      	}
+      }
+
+      //테이블 선택 로직
+      boolean is_exist = false;
+			if(is_table_select && !is_schema_all)
 			{
-				boolean is_exist = false;
 				for(int ix = 0; ix < list.size(); ix++)
 				{
 					String str = list.get(ix);
-					if(sTableName.equals(str))
+					//테이블에 schema 추가함.
+					String schemaName = "";
+					String tableName = "";
+
+					//"."이 없으면 스키마가 없는것으로 간주함.
+					if(str.indexOf(".") < 0) {
+						throw new IOException("스키마 또는 테이블 정보가 없습니다. 테이블(t) 파라미터값 입력 형식은 \"schema_name.table_name\"입니다. \n테이블:"+str + "\n스키마 및 테이블에 대한 전체 다운로드 시에서는 \"all\"을 입력해주세요.\n특정 스키마에 대한 전체 테이블 다운로드 시에는 \"schema_name.*\"으로 입력해주세요.");
+					}
+
+					StringTokenizer st = new StringTokenizer(str, ".");
+
+					int index = 0;
+      		while (st.hasMoreElements())
+      		{
+      			String parmName = (String) st.nextElement();
+      			if(parmName != null && !parmName.isEmpty()) {
+      				if(index == 0) { //스키마명
+      					schemaName = parmName.trim().toLowerCase();
+      				} else if(index == 1) {//테이블명
+      					tableName = parmName.trim().toLowerCase();
+      				}
+      			} else {
+      				throw new IOException("스키마 또는 테이블 정보가 없습니다. 테이블(t) 파라미터값 입력 형식은 \"schema_name.table_name\"입니다. \n테이블:"+str + "\n스키마 및 테이블에 대한 전체 다운로드 시에서는 \"all\"을 입력해주세요.\n특정 스키마에 대한 전체 테이블 다운로드 시에는 \"schema_name.*\"으로 입력해주세요.");
+      			}
+      			index++;
+      		}
+
+      		//스키마와 테이블명이 모두 같아야 함.
+      		if(sTableSchema.equals(schemaName) && sTableName.equals(tableName))
 					{
 						is_exist = true;
+//						downloadTableCount++; //입력값이 일치하는 테이블 카운트
 						break;
 					}
 				}
+
 				if(is_exist == false)
 				{
 					continue;
 				}
 			}
+
       if (!Arrays.asList(asTypes).contains(sTableType))
         throw new IOException("Invalid table type found!");
       String sRemarks = rs.getString("REMARKS");
@@ -1477,7 +1552,15 @@ public class MetaDataFromDb
 		  }
       getRows(mt);
       incTablesAnalyzed();
+
+      //현재 스키마명을 담는다.
+      beforeTableSchema = sTableSchema;
     }
+
+//		if(is_table_select && downloadTableCount == 0) {
+//			throw new IOException("입력된 스키마 또는 테이블이 존재하지 않습니다. 테이블(t)의 값을 확인해주세요.");
+//		}
+
     rs.close();
   } /* getTables */
 

@@ -182,6 +182,8 @@ public class SiardFromDb
     String sSiardFile = args.getOption("s");
     /* siard Table List (2020.07.28 - 신규 추가)*/
     String sTableList = args.getOption("t");
+    /* siard File Column List (2020.08.03 - 신규 추가)*/
+//    String sFileColumnList = args.getOption("fc");
 
     /* analyze the parameters */
     if (_iReturn == iRETURN_OK)
