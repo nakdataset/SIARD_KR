@@ -31,8 +31,8 @@ public class DownloadConnectionDialog
   private static final Logger LOG = Logger.getLogger(DownloadConnectionDialog.class);
 
   // TODO 최창근 추가 - siardapi.Archive.setTableCheckedList(ArrayList a) 인자값 변경하기 => List<?> list
-  public List<?> chooseTableList;
-  public List<?> chooseColumnList;
+  public List<String> chooseTableList;
+  public List<String> chooseColumnList;
 
   /*------------------------------------------------------------------*/
   /** display the connection dialog.

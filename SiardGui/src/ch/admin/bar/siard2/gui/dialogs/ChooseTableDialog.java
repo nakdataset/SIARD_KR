@@ -125,7 +125,7 @@ public class ChooseTableDialog extends ScrollableDialog implements EventHandler<
 		return count;
 	}
 
-	private List<?> getTableListByChooseTable(){
+	private List<String> getTableListByChooseTable(){
 		int size = _tvTableList.getItems().size();
 		List<String> chooseTableList = new ArrayList<String>();
 

@@ -682,7 +682,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
   	String schema_name = schema.getMetaSchema().getName();
     _il.enter(schema_name);
 
-		ArrayList<String>	list = _archive.getTableCheckedList();
+		List<String>	list = _archive.getTableCheckedList();
 		List<String> schemaSelList = new ArrayList<>(); //특정 스키마 전체 테이블 다운로드 할 스키마 List
 		boolean is_table_select	= false;
 		if(list != null && list.size() > 0)

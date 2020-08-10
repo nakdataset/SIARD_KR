@@ -30,12 +30,15 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
@@ -71,7 +74,7 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 
 		this.tableModel = tableModel;
 
-		//TODO getHistoryTitle 로 변경해야함
+		//TODO getColumnTitle 로 변경해야함
 		double dMinWidth = FxSizes.getTextWidth(SiardBundle.getSiardBundle().getInfoTitle()) + FxSizes.getCloseWidth() + dHSPACING;
 
 		VBox vboxDialog = createVBoxDialog();
@@ -122,7 +125,7 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		return count;
 	}
 
-	public List<?> getColumnListByChooseColumn(){
+	public List<String> getColumnListByChooseColumn(){
 		int size = _tvColumnList.getItems().size();
 		chooseColumnList = new ArrayList<String>();
 
@@ -159,6 +162,16 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 
 		double dMinWidth = 0;
 
+		HBox hboxFileConnection = createHBoxFileConnection();
+		if (dMinWidth < hboxFileConnection.getMinWidth()) {
+			dMinWidth = hboxFileConnection.getMinWidth();
+		}
+
+		vboxDialog.getChildren().add(hboxFileConnection);
+		VBox.setVgrow(hboxFileConnection, Priority.ALWAYS);
+
+		vboxDialog.getChildren().add(new Separator());
+
 		HBox hBoxTableView = createHBoxTableView();
 		if (dMinWidth < hBoxTableView.getMinWidth()) {
 			dMinWidth = hBoxTableView.getMinWidth();
@@ -179,6 +192,63 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 
 		return vboxDialog;
 	} /* createVBoxDialog */
+
+	private HBox createHBoxFileConnection(){
+	  SiardBundle sb = SiardBundle.getSiardBundle();
+
+	  HBox hboxButton = new HBox();
+
+	  TextField tfSFTPHost = new TextField();
+	  Label lblSFTPHost = createLabel("SFTP Host :", tfSFTPHost);
+
+	  HBox hboxDbUser = createHBox(lblSFTPHost, tfSFTPHost);
+	  hboxButton.getChildren().add(hboxDbUser);
+
+	  /*
+	  hboxButton.setPadding(new Insets(dINNER_PADDING));
+	  hboxButton.setSpacing(dHSPACING);
+	  hboxButton.setAlignment(Pos.TOP_RIGHT);
+	  hboxButton.getChildren().add(_btnDefault);
+	  hboxButton.setMinWidth(FxSizes.getTextWidth(sb.getOk()));
+	   */
+
+	  return hboxButton;
+	} /* createHBoxFileConnection */
+
+	/*------------------------------------------------------------------*/
+	  /** create a label for the given node.
+	   * @param sLabel label text
+	   * @param nodeFor node associated with label.
+	   * @return label.
+	   */
+	  protected Label createLabel(String sLabel, Node nodeFor)
+	  {
+	    Label lbl = new Label(sLabel);
+	    lbl.setPrefWidth(FxSizes.getNodeWidth(lbl));
+	    lbl.setLabelFor(nodeFor);
+	    return lbl;
+	  } /* createLabel */
+
+	  protected HBox createHBox(Label lbl, Node node)
+	  {
+	    HBox hbox = new HBox();
+	    lbl.setAlignment(Pos.BASELINE_RIGHT);
+	    hbox.setPadding(new Insets(dINNER_PADDING));
+	    hbox.setSpacing(dHSPACING);
+	    hbox.setAlignment(Pos.TOP_LEFT);
+	    hbox.getChildren().add(lbl);
+	    hbox.getChildren().add(node);
+	    double dWidth = 0.0;
+
+	    // TODO 최창근 수정 - 동적 크기조절을 위한 설정
+	    HBox.setHgrow(node, Priority.ALWAYS);
+	    if (node instanceof TextField) // PasswordField is a TextField
+	    	dWidth = ((TextField)node).getPrefWidth();
+	    else if (node instanceof CheckBox)
+	    	dWidth = ((CheckBox)node).getWidth();
+	    hbox.setMinWidth(lbl.getPrefWidth() + dHSPACING + dWidth);
+	    return hbox;
+	  } /* createHBox */
 
 	private HBox createHBoxTableView() {
 

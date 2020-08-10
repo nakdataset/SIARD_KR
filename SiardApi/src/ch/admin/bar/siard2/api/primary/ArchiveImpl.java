@@ -70,8 +70,8 @@ public class ArchiveImpl
   private static String targetDir = "";
   private static String filePath = "";
 
-  private static List<?> tableCheckedList = null;
-  private static List<?> columnCheckedList = null;
+  private static List<String> tableCheckedList = null;
+  private static List<String> columnCheckedList = null;
 
   private static String fileDown = "";
 
@@ -726,13 +726,13 @@ public void exportGenericTableSchema(OutputStream osXsd)
   }
 
   @Override
-  public void setTableCheckedList(List<?> list)
+  public void setTableCheckedList(List<String> list)
   {
 	ArchiveImpl.tableCheckedList = list;
   }
 
   @Override
-  public List<?> getTableCheckedList()
+  public List<String> getTableCheckedList()
   {
 	return ArchiveImpl.tableCheckedList;
   }
@@ -748,13 +748,13 @@ public void exportGenericTableSchema(OutputStream osXsd)
   }
 
   @Override
-  public void setColumnCheckedList(List<?> list) {
+  public void setColumnCheckedList(List<String> list) {
 	// TODO Auto-generated method stub
 	  ArchiveImpl.columnCheckedList = list;
   }
 
   @Override
-  public List<?> getColumnCheckedList() {
+  public List<String> getColumnCheckedList() {
 	// TODO Auto-generated method stub
 	return ArchiveImpl.columnCheckedList;
   }
