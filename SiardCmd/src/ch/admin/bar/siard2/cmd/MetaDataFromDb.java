@@ -1425,7 +1425,7 @@ public class MetaDataFromDb
     /**
      * 2020.07.28 - siardCmd 단독 실행 시 archive 가 널일 수 있음(테이블 목록 입력 안할경우)
      */
-    ArrayList<String> list = null;
+    List<?> list = null;
     if(_archive != null) {
     	list = _archive.getTableCheckedList();
     }

@@ -218,6 +218,8 @@ public class UploadDownloadAction {
 //
 					// 체크된 테이블 목록
 					archive.setTableCheckedList(dcd.chooseTableList);
+					// 체크된 컬럼 목록
+					archive.setColumnCheckedList(dcd.chooseColumnList);
 
 					archive.create(fileArchive);
 

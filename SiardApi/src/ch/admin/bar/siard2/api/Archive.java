@@ -260,11 +260,11 @@ public interface Archive
 
   public String getFilePath();
 
-  public void setTableCheckedList(List<?> list);
-  public List<?> getTableCheckedList();
+  public void setTableCheckedList(List<String> list);
+  public List<String> getTableCheckedList();
 
-  public void setColumnCheckedList(List<?> list);
-  public List<?> getColumnCheckedList();
+  public void setColumnCheckedList(List<String> list);
+  public List<String> getColumnCheckedList();
 
   public void setSchema(String sid);
   public String	getSchema();
