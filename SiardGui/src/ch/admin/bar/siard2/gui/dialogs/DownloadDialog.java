@@ -142,13 +142,11 @@ public class DownloadDialog
     public void handle(ActionEvent ae)
     {
       LOG.info("ae.getSource() " + ae.getSource());
-      if (ae.getSource() == _btnCancel)
-      {
+      if (ae.getSource() == _btnCancel){
         _dt.cancel();
         _btnCancel.setDisable(true);
-      }
-      else if (ae.getSource() == _btnDefault)
-      {
+
+      }else if (ae.getSource() == _btnDefault){
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("검증");
 		alert.setHeaderText("SIARD 파일 검증");
@@ -156,12 +154,9 @@ public class DownloadDialog
 		Optional<ButtonType> result = alert.showAndWait();
 
 		LOG.info("result.get() " + result.get());
-		if (result.get() == ButtonType.OK)
-		{
+		if (result.get() == ButtonType.OK){
 			verify_process = true;
-		}
-		else
-		{
+		}else{
 			verify_process = false;
 		}
 

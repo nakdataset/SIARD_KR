@@ -90,9 +90,13 @@ public class UploadDownloadAction {
 		Connection conn = null;
 		DownloadConnectionDialog dcd = DownloadConnectionDialog.showDownloadConnectionDialog(stage, sConnectionUrl, sDbUser);
 
-		if(dcd.getResult() == DownloadConnectionDialog.iRESULT_SUCCESS)
-			ChooseTableDialog.showChooseTableDialog(stage, dcd);
-//		dcd._iResult = ctd.getResult();
+		if(dcd.getResult() == DownloadConnectionDialog.iRESULT_SUCCESS) {
+			try {
+				ChooseTableDialog.showChooseTableDialog(stage, dcd);
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
 
 		LOG.info("dcd.getResult() " + dcd.getResult());
 		LOG.info("DownloadConnectionDialog.iRESULT_SUCCESS " + DownloadConnectionDialog.iRESULT_SUCCESS);
@@ -212,7 +216,9 @@ public class UploadDownloadAction {
 //						archive.setFilePath(dcd.getFilePath());
 //					}
 //
-//					archive.setTableCheckedList(dcd.getTableCheckedList()); // 체크된 테이블 목록
+					// 체크된 테이블 목록
+					archive.setTableCheckedList(dcd.chooseTableList);
+
 					archive.create(fileArchive);
 
 					if (dcd.isMetaDataOnly())
@@ -240,42 +246,6 @@ public class UploadDownloadAction {
 						boolean verify = dd.getVerify();
 						LOG.info("verify " + verify);
 
-						SiardGui owner = SiardGui.getSiardGui();
-
-//						if(verify == true)
-//						{
-//							Task<Void> task = new Task<Void>()
-//							{
-//								@Override
-//								public Void call() throws Exception
-//								{
-//									_stageSplash = new Stage(StageStyle.UNDECORATED);
-//									_stageSplash.initOwner(owner.getScene().getWindow());
-//									_stageSplash.initModality(Modality.WINDOW_MODAL);
-//
-//									scene = new Scene(ProcessingPane.newProcessingPane());
-//									_stageSplash.setScene(scene);
-//									_stageSplash.setAlwaysOnTop(true);
-//									_stageSplash.show();
-//
-//									while(process)
-//									{
-//										try
-//										{
-//											Thread.sleep(100);
-//										}
-//										catch(Exception e)
-//										{
-//											e.printStackTrace();
-//										}
-//									}
-//									_stageSplash.close();
-//
-//									return null;
-//								}
-//							};
-//						}
-
 						LOG.info("dd.getArchive().isValid() " + dd.getArchive().isValid());
 						if (dd.getArchive().isValid()) {
 							dd.getArchive().close();
@@ -296,13 +266,13 @@ public class UploadDownloadAction {
 						LOG.info("verify " + verify);
 						if(verify == true) {
 							process = false;
-
 							Alert alert = new Alert(AlertType.INFORMATION);
 							alert.setTitle("검증 완료");
 							alert.setHeaderText("Siard 파일 검증 완료");
 							alert.setContentText("Siard 파일 검증이 완료되었습니다.");
 							alert.showAndWait();
 						}
+
 					} else {
 						try {
 							dd.getArchive().close();
