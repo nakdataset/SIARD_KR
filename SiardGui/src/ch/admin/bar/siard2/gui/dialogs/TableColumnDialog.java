@@ -9,19 +9,23 @@
 package ch.admin.bar.siard2.gui.dialogs;
 
 import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import ch.admin.bar.siard2.cmd.SiardConnection;
 import ch.admin.bar.siard2.gui.SiardBundle;
+import ch.admin.bar.siard2.gui.models.ColumnModel;
 import ch.admin.bar.siard2.gui.models.HistoryDetailModel;
-import ch.config.db.HistoryDAO;
+import ch.admin.bar.siard2.gui.models.TableModel;
 import ch.enterag.utils.fx.FxSizes;
 import ch.enterag.utils.fx.FxStyles;
 import ch.enterag.utils.fx.ScrollableDialog;
+import ch.enterag.utils.fx.dialogs.MB;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -32,6 +36,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -45,54 +50,26 @@ import javafx.stage.Stage;
  *
  * @author Hartwig Thomas
  */
-public class HistoryDetailDialog extends ScrollableDialog implements EventHandler<ActionEvent> {
+public class TableColumnDialog extends ScrollableDialog implements EventHandler<ActionEvent> {
 
 	// 최창근 추가 - 로그
-	private static final Logger LOG = Logger.getLogger(HistoryDetailDialog.class);
+	private static final Logger LOG = Logger.getLogger(TableColumnDialog.class);
 
-	private String history_idx;
+	private TableView<ColumnModel> _tvColumnList;
 
-	/**
-	 * constructor
-	 * @param stageOwner owner window.
-	 */
-//	private HistoryDetailDialog(Stage stageOwner) {
-////		super(stageOwner, SiardBundle.getSiardBundle().getInfoTitle());
-//		// TODO text값 properties로 관리해야되지 않을까?
-//		super(stageOwner, "내역 타이틀 테스트");
-//		LOG.info("HistoryDialog");
-//
-////		Label label = new Label();
-//		// TODO text값 properties로 관리해야되지 않을까?
-////		label.setText("내역_테스트중");
-//
-//		double dMinWidth = FxSizes.getTextWidth(SiardBundle.getSiardBundle().getInfoTitle()) + FxSizes.getCloseWidth() + dHSPACING;
-//		LOG.info("1 dMinWidth " + dMinWidth);
-//
-//		VBox vboxDialog = createVBoxDialog();
-//
-//		if (dMinWidth < vboxDialog.getMinWidth()) {
-//			dMinWidth = vboxDialog.getMinWidth();
-//		}
-//
-//		setMinWidth(dMinWidth);
-//		/* scene */
-//		Scene scene = new Scene(vboxDialog);
-//		setScene(scene);
-//	}
+	protected TableModel tableModel;
 
-	private HistoryDetailDialog(Stage stageOwner, String history_idx) {
+	protected List<String> chooseColumnList;
+
+	private Button _btnDefault;
+
+	private TableColumnDialog(Stage stageOwner, TableModel tableModel) {
 //		super(stageOwner, SiardBundle.getSiardBundle().getInfoTitle());
+
 		// TODO text값 properties로 관리해야되지 않을까?
 		super(stageOwner, "내역 타이틀 테스트");
 
-		this.history_idx = history_idx;
-
-		LOG.info("HistoryDialog uploadDownloadDivCode " + history_idx);
-
-//		Label label = new Label();
-		// TODO text값 properties로 관리해야되지 않을까?
-//		label.setText("내역_테스트중");
+		this.tableModel = tableModel;
 
 		//TODO getHistoryTitle 로 변경해야함
 		double dMinWidth = FxSizes.getTextWidth(SiardBundle.getSiardBundle().getInfoTitle()) + FxSizes.getCloseWidth() + dHSPACING;
@@ -115,11 +92,55 @@ public class HistoryDetailDialog extends ScrollableDialog implements EventHandle
 	 * close dialog when the OK button is pressed.
 	 */
 	@Override
-	public void handle(ActionEvent ae) {
+	public void handle(ActionEvent event) {
 		LOG.info("handle");
+
+		if (event.getSource() == _btnDefault) {
+			SiardBundle sb = SiardBundle.getSiardBundle();
+
+			if(getChooseColumnCount() < 1) {
+				//TODO 최창근 추가 - 컬럼을 선택하라는 메시지 alert 추가 .properties로 메시지 관리
+				LOG.info("선택한 컬럼 없음");
+				MB.show(this, "제목", "내용", sb.getOk(), null);
+				return;
+			}
+
+			getColumnListByChooseColumn();
+		}
 
 		close();
 	} /* handle */
+
+	private int getChooseColumnCount() {
+		int count = 0;
+		int size = _tvColumnList.getItems().size();
+		for(int i=0; i<size; i++){
+			if(_tvColumnList.getItems().get(i).getChooseColumnFlag()) {
+				count++;
+			}
+    	}
+		return count;
+	}
+
+	public List<?> getColumnListByChooseColumn(){
+		int size = _tvColumnList.getItems().size();
+		chooseColumnList = new ArrayList<String>();
+
+		for(int i=0; i<size; i++){
+			if(_tvColumnList.getItems().get(i).getChooseColumnFlag()) {
+				LOG.info("선택 => " + _tvColumnList.getItems().get(i).getColumnType());
+
+//				chooseTableList.add(_tvColumnList.getItems().get(i).getTableName());
+
+				//TODO 최창근 추가 - siardcmd 에서 스키마.테이블명 구현되면 바꾸기
+				chooseColumnList.add(_tvColumnList.getItems().get(i).getColumnType() + "." +_tvColumnList.getItems().get(i).getColumnName());
+			}
+    	}
+
+		LOG.info(chooseColumnList.toString());
+
+		return chooseColumnList;
+	}
 
 	/*------------------------------------------------------------------*/
 	/**
@@ -168,44 +189,48 @@ public class HistoryDetailDialog extends ScrollableDialog implements EventHandle
 		hBoxTableView.setPadding(new Insets(dINNER_PADDING));
 		hBoxTableView.setSpacing(dHSPACING);
 
-		TableView<HistoryDetailModel> historyDetailTableView = new TableView<HistoryDetailModel>();
-		List<TableColumn<HistoryDetailModel, String>> historyTableColumnList = createHistoryDetailTableColumn();
-		historyDetailTableView.getColumns().addAll(historyTableColumnList);
-		historyDetailTableView.setEditable(true);
+		_tvColumnList = new TableView<ColumnModel>();
+
+		//TODO 최창근 추가 - 스키마,테이블,선택 properties에서 key=value로 관리(다국어 지원을 위한)
+		TableColumn<ColumnModel, String> columnName = new TableColumn<ColumnModel, String>("컬럼명");
+		TableColumn<ColumnModel, String> columnType = new TableColumn<ColumnModel, String>("컬럼타입");
+		TableColumn<ColumnModel, Boolean> chooseColumnFlag = new TableColumn<ColumnModel, Boolean>("선택");
+
+		columnName.setCellValueFactory(new PropertyValueFactory<ColumnModel, String>("columnType"));
+		columnType.setCellValueFactory(new PropertyValueFactory<ColumnModel, String>("columnName"));
+		chooseColumnFlag.setCellValueFactory(new PropertyValueFactory<ColumnModel, Boolean>("chooseColumnFlag"));
+		chooseColumnFlag.setCellFactory(CheckBoxTableCell.forTableColumn(chooseColumnFlag));
+
+		_tvColumnList.getColumns().add(columnName);
+		_tvColumnList.getColumns().add(columnType);
+		_tvColumnList.getColumns().add(chooseColumnFlag);
+		_tvColumnList.setEditable(true);
+
+		// TODO text값 properties로 관리해야되지 않을까?
+		_tvColumnList.setPlaceholder(new Label("데이터 없음 1122"));
+
+		SiardConnection.getSiardConnection().loadDriver(tableModel.getConnectionUrl());
+		// DriverManager.setLoginTimeout(0);
 
 		try {
-			HistoryDAO dao = new HistoryDAO();
+			Connection conn = null;
+			conn = DriverManager.getConnection(tableModel.getConnectionUrl(), tableModel.getUser(),  tableModel.getPassword());
+			conn.setAutoCommit(false);
 
-			Map<String, String> params = new LinkedHashMap<String, String>();
-			params.put("history_idx", history_idx);
-
-			List<Map> resultList = dao.selectListHistoryDetail(params);
-
-			for(int i=0; i<resultList.size(); i++) {
-				// TODO text값 properties로 관리해야되지 않을까?
-				HistoryDetailModel historyDetailModel = new HistoryDetailModel();
-				historyDetailModel.fromMap(resultList.get(i));
-				historyDetailTableView.getItems().add(historyDetailModel);
+			ResultSet rs = conn.getMetaData().getColumns(null, tableModel.getSchemaName(), tableModel.getTableName(), "%");
+			while (rs.next()) {
+				_tvColumnList.getItems().add(new ColumnModel(tableModel.getSchemaName(), tableModel.getTableName(), rs.getString("COLUMN_NAME"), rs.getString("TYPE_NAME"), false));
 			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
+		}catch(Exception e) {
 			e.printStackTrace();
 		}
 
-		// HISTORY_DETAIL_IDX 컬럼 숨기기
-		historyDetailTableView.getColumns().get(0).setVisible(false);
-		// HISTORY_IDX 컬럼 숨기기
-		historyDetailTableView.getColumns().get(1).setVisible(false);
-
-		// TODO text값 properties로 관리해야되지 않을까?
-		historyDetailTableView.setPlaceholder(new Label("데이터 없음 1122"));
-
-		hBoxTableView.getChildren().add(historyDetailTableView);
+		hBoxTableView.getChildren().add(_tvColumnList);
 
 		// 최창근 추가 - 테이블 크기별로 리사이징
-		autoResizeColumns(historyDetailTableView);
+		autoResizeColumns(_tvColumnList);
 
-		HBox.setHgrow(historyDetailTableView, Priority.ALWAYS);
+		HBox.setHgrow(_tvColumnList, Priority.ALWAYS);
 
 		return hBoxTableView;
 	}
@@ -245,33 +270,20 @@ public class HistoryDetailDialog extends ScrollableDialog implements EventHandle
 	    SiardBundle sb = SiardBundle.getSiardBundle();
 
 	    /* default button */
-	    Button btnDefault = new Button(sb.getOk());
-	    btnDefault.setDefaultButton(true);
-	    btnDefault.setOnAction(this);
+	    _btnDefault = new Button(sb.getOk());
+	    _btnDefault.setDefaultButton(true);
+	    _btnDefault.setOnAction(this);
 
 	    /* HBox for button */
 	    HBox hboxButton = new HBox();
 	    hboxButton.setPadding(new Insets(dINNER_PADDING));
 	    hboxButton.setSpacing(dHSPACING);
 	    hboxButton.setAlignment(Pos.TOP_RIGHT);
-	    hboxButton.getChildren().add(btnDefault);
+	    hboxButton.getChildren().add(_btnDefault);
 	    hboxButton.setMinWidth(FxSizes.getTextWidth(sb.getOk()));
 
 	    return hboxButton;
 	  } /* createHBoxButton */
-
-	/*------------------------------------------------------------------*/
-	/**
-	 * show the modal info dialog.
-	 *
-	 * @param stageOwner owner window.
-	 */
-//	public static void showHistoryDetailDialog(Stage stageOwner) {
-//		LOG.info("showHistoryDetailDialog");
-//		HistoryDetailDialog hdd = new HistoryDetailDialog(stageOwner);
-//		hdd.showAndWait(); // until it is closed
-//	} /* showInfoDialog */
-
 
 	private List<TableColumn<HistoryDetailModel, String>> createHistoryDetailTableColumn() {
 		List<TableColumn<HistoryDetailModel, String>> historyTableColumnList = new ArrayList<TableColumn<HistoryDetailModel, String>>();
@@ -311,9 +323,11 @@ public class HistoryDetailDialog extends ScrollableDialog implements EventHandle
 	 *
 	 * @param stageOwner owner window.
 	 */
-	public static void showHistoryDetailDialog(Stage stageOwner, String div) {
-		LOG.info("showHistoryDetailDialog");
-		HistoryDetailDialog hdd = new HistoryDetailDialog(stageOwner, div);
-		hdd.showAndWait(); // until it is closed
+	public static TableColumnDialog showTableColumnDialog(Stage stageOwner, TableModel tableModel) {
+		LOG.info("showTableColumnDialog");
+		TableColumnDialog tcd = new TableColumnDialog(stageOwner, tableModel);
+		tcd.showAndWait(); // until it is closed
+		return tcd;
 	} /* showInfoDialog */
+
 } /* class InfoDialog */

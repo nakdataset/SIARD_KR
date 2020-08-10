@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
+import java.util.List;
 
 /*====================================================================*/
 /** Archive interface provides access to primary data and metadata.
@@ -260,8 +260,11 @@ public interface Archive
 
   public String getFilePath();
 
-  public void setTableCheckedList(ArrayList a);
-  public ArrayList getTableCheckedList();
+  public void setTableCheckedList(List<?> list);
+  public List<?> getTableCheckedList();
+
+  public void setColumnCheckedList(List<?> list);
+  public List<?> getColumnCheckedList();
 
   public void setSchema(String sid);
   public String	getSchema();

@@ -127,7 +127,7 @@ public class FindDialog
     _tfFindString.setMinWidth(FxSizes.fromEms(iTEXT_COLUMNS));
 
     // 최창근 추가 - 텍스트필드 가변크기 변환을 위한 설정
-    hbox.setHgrow(_tfFindString, Priority.ALWAYS);
+    HBox.setHgrow(_tfFindString, Priority.ALWAYS);
 
     Label lblFindString = new Label(sFindStringLabel);
     lblFindString.setMinWidth(dLabelWidth);

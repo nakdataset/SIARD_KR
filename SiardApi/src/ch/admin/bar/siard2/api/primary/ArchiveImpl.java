@@ -6,10 +6,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -70,7 +70,8 @@ public class ArchiveImpl
   private static String targetDir = "";
   private static String filePath = "";
 
-  private static ArrayList list = null;
+  private static List<?> tableCheckedList = null;
+  private static List<?> columnCheckedList = null;
 
   private static String fileDown = "";
 
@@ -725,15 +726,15 @@ public void exportGenericTableSchema(OutputStream osXsd)
   }
 
   @Override
-  public void setTableCheckedList(ArrayList a)
+  public void setTableCheckedList(List<?> list)
   {
-	ArchiveImpl.list = a;
+	ArchiveImpl.tableCheckedList = list;
   }
 
   @Override
-  public ArrayList getTableCheckedList()
+  public List<?> getTableCheckedList()
   {
-	return ArchiveImpl.list;
+	return ArchiveImpl.tableCheckedList;
   }
 
   @Override
@@ -744,6 +745,18 @@ public void exportGenericTableSchema(OutputStream osXsd)
   @Override
   public String	getSchema() {
 	return ArchiveImpl.schema;
+  }
+
+  @Override
+  public void setColumnCheckedList(List<?> list) {
+	// TODO Auto-generated method stub
+	  ArchiveImpl.columnCheckedList = list;
+  }
+
+  @Override
+  public List<?> getColumnCheckedList() {
+	// TODO Auto-generated method stub
+	return ArchiveImpl.columnCheckedList;
   }
 
 } /* ArchiveImpl */

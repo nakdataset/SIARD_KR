@@ -24,9 +24,7 @@ public class AbstractDAO {
 	private List<String> fields = new ArrayList<String>();
 
 	protected void printQueryId(String queryId) {
-//		if(log.isDebugEnabled()){
-			log.info("Query \t: " + queryId);
-//		}
+		log.info("Query \t: " + queryId);
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})

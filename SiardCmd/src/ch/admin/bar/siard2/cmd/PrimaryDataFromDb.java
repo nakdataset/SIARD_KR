@@ -8,14 +8,9 @@ Created    : 01.09.2016, Hartwig Thomas, Enter AG, Rüti ZH
 ======================================================================*/
 package ch.admin.bar.siard2.cmd;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.Clob;
@@ -32,12 +27,12 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.text.ParseException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
-import java.util.Random;
 import java.util.StringTokenizer;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.xml.datatype.Duration;
 
@@ -52,6 +47,7 @@ import ch.admin.bar.siard2.api.Schema;
 import ch.admin.bar.siard2.api.Table;
 import ch.admin.bar.siard2.api.Value;
 import ch.admin.bar.siard2.api.generated.CategoryType;
+import ch.admin.bar.siard2.cmd.util.FileUtils;
 import ch.enterag.sqlparser.identifier.QualifiedId;
 import ch.enterag.utils.StopWatch;
 import ch.enterag.utils.background.Progress;
@@ -75,20 +71,9 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
   private StopWatch _swGetValue = null;
   private StopWatch _swSetValue = null;
 
-	private int sftpcount = 0;
-
-	/* S : 평균 다운로드 속도 출력 */
-	private static long totalFileSize = 0;
-	private static long	totalDownloadTime	= 0;
-	/* E : 평균 다운로드 속도 출력 */
-
-	/* S : 다운로드 시간 출력 */
-	private static String startTime = "";
-	private static String	endTime = "";
 	private java.time.Duration downtimesum = java.time.Duration.ZERO;
 	private int downcount = 0;
 	private long downsizesum = 0;
-	/* E : 다운로드 시간 출력 */
 
   /*------------------------------------------------------------------*/
   /** increment the number or records downloaded, issuing a notification,
@@ -213,10 +198,16 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
     if (rsmd.getColumnCount() != record.getCells())
       throw new IOException("Invalid number of result columns found!");
 
+
+    //TODO 최창근 추가
+    ExecutorService executorService = Executors.newCachedThreadPool();
+
+    /* AS-IS
 		String org_path = "";
 		String org_path_hash = "";
 		String filepath_siard	= "";
 		//FileDownloadArchive	downloadpath = new FileDownloadArchive();
+		 */
     for (int iCell = 0; iCell < record.getCells(); iCell++)
     {
     	_swGetCell.start();
@@ -339,6 +330,8 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
         oValue = null;
       _swGetValue.stop();
       _swSetValue.start();
+
+      /* AS-IS
 			String	sColumnName		= mc.getName();
 			boolean	is_filepath		= false;
 			String	filepathfield	= _archive.getFilePath();
@@ -504,13 +497,68 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 			{
 				setValue(cell, oValue);
 			}
+       */
 
-			//System.out.println("PrimaryDataFromDb 417");
+      setValue(cell, oValue);
+      // AS-IS stop 위치
+//			_swSetValue.stop();
 
-			_swSetValue.stop();
+			System.out.println("1 mc.getName() " + mc.getName());
+			System.out.println("2 oValue " + oValue);
 
-			//System.out.println("PrimaryDataFromDb 430");
+			//TODO 최창근 추가 - GUI에서 sftp 선택여부 받아오고, 해당컬럼의 데이터가 directory인지 검증하기
+			if("111111111111filePath".equals(mc.getName())) {
+				final String TARGER_FILE = oValue.toString();
+				Runnable runnable = new Runnable() {
+					@Override
+					public void run() {
+						try {
+							SFTPConnectionModel sftpConnectionModel = new SFTPConnectionModel();
+							sftpConnectionModel.setSourceFile(TARGER_FILE);
+							//TODO 최창근 추가 - 파일 저장경로 받아오기, 경로가 없다면 siard파일이랑 같은경로
+							sftpConnectionModel.setTargetFile("D:/sftp/download/");
+
+							//TODO 최창근 추가 - GUI에서 sftp 접속정보 받아오기
+							SFTPConnection sftpConnection = new SFTPConnection("192.168.1.153", "dsrms_db", "1234", 22);
+							sftpConnection.download(sftpConnectionModel);
+
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				};
+				executorService.execute(runnable);
+			}
+
+			System.out.println("iCell : " + iCell);
+			System.out.println("rs.getRow() : " + rs.getRow());
+
+			//TODO 최창근 추가 - GUI에서 fileCopy 선택여부 받아오고, 해당컬럼의 데이터가 directory인지 검증하기
+			if("fileName".equals(mc.getName())) {
+				final String SOURCE_FILE = oValue.toString();
+				Runnable runnable = new Runnable() {
+					@Override
+					public void run() {
+						try {
+							FileUtils fileUtis = new FileUtils();
+							//TODO 최창근 추가 - 파일 저장경로 받아오기, 경로가 없다면 siard파일이랑 같은경로
+							fileUtis.copy(SOURCE_FILE, "D:/sftp/download" + UUID.randomUUID().toString() + "/");
+//							FileUtils.copy(SOURCE_FILE, "D:/sftp/download" + CELL_INDEX + "/");
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				};
+				executorService.execute(runnable);
+			}
+
 		} /* loop over values */
+
+    //TODO 최창근 추가
+    executorService.shutdown();
+
+    // TODO stop 위치 옮김
+    _swSetValue.stop();
 	} /* getRecord */
 
   /*------------------------------------------------------------------*/
@@ -821,29 +869,6 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 	}
 	/* E: 현재시간 조회 */
 
-	/* S: 파일크기 문자열 변환 */
-	public String fileSizeToStr(long fileSize)
-	{
-		String fileSizeStr	= "";
-		int MB = 1024 * 1024;	// 1Mb
-		int	KB = 1024; // 1Kb
-
-		if(fileSize >= MB)
-		{
-			fileSizeStr = (fileSize / MB) + "Mb";
-		}
-		else if(fileSize >= KB)
-		{
-			fileSizeStr = (fileSize / KB) + "Kb";
-		}
-		else
-		{
-			fileSizeStr = fileSize + "Byte";
-		}
-
-		return fileSizeStr;
-	}
-	/* E: 파일크기 문자열 변환 */
 
 	/* S: 시간비교 */
 	public String timeDifference(String startTime, String endTime) throws ParseException

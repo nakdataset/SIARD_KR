@@ -28,6 +28,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -209,7 +210,6 @@ public class HistoryDialog extends ScrollableDialog implements EventHandler<Acti
 				Object clickRowObject =  historyTableView.getSelectionModel().selectedItemProperty().get();
 				int clickRowIndex = historyTableView.getSelectionModel().selectedIndexProperty().get();
 				HistoryModel historyModel = (HistoryModel) clickRowObject;
-
 //				System.out.println("history_idx : " + historyModel.getHistory_idx());
 //				System.out.println("table row : " + clickRowIndex);
 
@@ -226,7 +226,7 @@ public class HistoryDialog extends ScrollableDialog implements EventHandler<Acti
 		});
 
 		// TODO text값 properties로 관리해야되지 않을까?
-//		historyTableView.setPlaceholder(new Label("데이터 없음 1122"));
+		historyTableView.setPlaceholder(new Label("데이터 없음 1122"));
 
 		hBoxTableView.getChildren().add(historyTableView);
 
