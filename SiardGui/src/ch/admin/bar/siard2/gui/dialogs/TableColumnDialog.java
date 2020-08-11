@@ -326,24 +326,15 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 	    public void changed(ObservableValue<? extends Toggle> ovt, Toggle tOld, Toggle tNew)
 	    {
     		RadioButton rb = (RadioButton) ovt.getValue().getToggleGroup().getSelectedToggle();
-    		 if (rb == _rbSFTP) {
-                 String s = rb.getText();
-                 LOG.info("sftp 눌러땅 눌러썽 " + rb.getText());
+    		if (rb == _rbSFTP) {
+    			String s = rb.getText();
+    			LOG.info("sftp 눌러땅 눌러썽 " + rb.getText());
 
-             }else if (rb == _rbFileCopy) {
+    		}else if (rb == _rbFileCopy) {
+    			String s = rb.getText();
+    			LOG.info("파일카피피피피피카츄 " + rb.getText());
+    		}
 
-            	 String s = rb.getText();
-            	 LOG.info("파일카피피피피피카츄 " + rb.getText());
-             }
-
-
-	    	/*
-	      SiardConnection sc = SiardConnection.getSiardConnection();
-	      String sScheme = _mapSchemes.get(getSelectedTitle());
-	      int iSelectedOption = getSelectedOption();
-	      String sSampleUrl = sc.getSampleUrl(sScheme, _tfDbHost.getText(), _tfDbFolder.getText(), _tfDbName.getText(),iSelectedOption);
-	      _tfConnectionUrl.setText(sSampleUrl);
-	      */
 	    }
 	  }
 	  protected ToggleChangeListener _tcl = new ToggleChangeListener();
