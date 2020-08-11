@@ -8,6 +8,7 @@
  */
 package ch.admin.bar.siard2.gui.dialogs;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -25,7 +26,10 @@ import ch.admin.bar.siard2.gui.models.TableModel;
 import ch.enterag.utils.fx.FxSizes;
 import ch.enterag.utils.fx.FxStyles;
 import ch.enterag.utils.fx.ScrollableDialog;
+import ch.enterag.utils.fx.dialogs.FS;
 import ch.enterag.utils.fx.dialogs.MB;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -35,13 +39,18 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.Clipboard;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -58,13 +67,18 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 	// 최창근 추가 - 로그
 	private static final Logger LOG = Logger.getLogger(TableColumnDialog.class);
 
-	private TableView<ColumnModel> _tvColumnList;
-
 	protected TableModel tableModel;
-
 	protected List<String> chooseColumnList;
 
 	private Button _btnDefault;
+	private Button _btnCancel;
+	private Button _btnFileBrowser;
+
+	private RadioButton _rbSFTP;
+	private RadioButton _rbFileCopy;
+
+	private TableView<ColumnModel> _tvColumnList;
+	private PastingTextField _tfSFTPTargetFilePath;
 
 	private TableColumnDialog(Stage stageOwner, TableModel tableModel) {
 //		super(stageOwner, SiardBundle.getSiardBundle().getInfoTitle());
@@ -98,7 +112,10 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 	public void handle(ActionEvent event) {
 		LOG.info("handle");
 
-		if (event.getSource() == _btnDefault) {
+		if (event.getSource() == _btnCancel) {
+			close();
+
+		}else if (event.getSource() == _btnDefault) {
 			SiardBundle sb = SiardBundle.getSiardBundle();
 
 			if(getChooseColumnCount() < 1) {
@@ -109,9 +126,29 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 			}
 
 			getColumnListByChooseColumn();
-		}
 
-		close();
+			close();
+
+		}else if (event.getSource() == _btnFileBrowser) {
+//			UserProperties up = UserProperties.getUserProperties();
+	        SiardBundle sb = SiardBundle.getSiardBundle();
+//	        String sDbFolder = _tfDbFolder.getText();
+	        File fileDbFolder = new File(_tfSFTPTargetFilePath.getText());
+	        try
+	        {
+	          fileDbFolder = FS.chooseExistingFolder(TableColumnDialog.this,
+	            sb.getConnectionDbFolderTitle(), sb.getConnectionDbFolderMessage(), sb,
+	            fileDbFolder);
+	          if (fileDbFolder != null)
+	          {
+	            //up.setDatabaseFolder(fileDbFolder);
+	        	  _tfSFTPTargetFilePath.setText(fileDbFolder.getAbsolutePath());
+	          }
+	        }
+	        catch(Exception e) {
+	        	e.printStackTrace();
+	        }
+		}
 	} /* handle */
 
 	private int getChooseColumnCount() {
@@ -131,17 +168,11 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 
 		for(int i=0; i<size; i++){
 			if(_tvColumnList.getItems().get(i).getChooseColumnFlag()) {
-				LOG.info("선택 => " + _tvColumnList.getItems().get(i).getColumnType());
-
-//				chooseTableList.add(_tvColumnList.getItems().get(i).getTableName());
-
-				//TODO 최창근 추가 - siardcmd 에서 스키마.테이블명 구현되면 바꾸기
 				chooseColumnList.add(_tvColumnList.getItems().get(i).getColumnType() + "." +_tvColumnList.getItems().get(i).getColumnName());
 			}
     	}
 
 		LOG.info(chooseColumnList.toString());
-
 		return chooseColumnList;
 	}
 
@@ -162,13 +193,13 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 
 		double dMinWidth = 0;
 
-		HBox hboxFileConnection = createHBoxFileConnection();
-		if (dMinWidth < hboxFileConnection.getMinWidth()) {
-			dMinWidth = hboxFileConnection.getMinWidth();
+		VBox vboxFileConnection = createVBoxFileConnection();
+		if (dMinWidth < vboxFileConnection.getMinWidth()) {
+			dMinWidth = vboxFileConnection.getMinWidth();
 		}
 
-		vboxDialog.getChildren().add(hboxFileConnection);
-		VBox.setVgrow(hboxFileConnection, Priority.ALWAYS);
+		vboxDialog.getChildren().add(vboxFileConnection);
+		VBox.setVgrow(vboxFileConnection, Priority.ALWAYS);
 
 		vboxDialog.getChildren().add(new Separator());
 
@@ -193,17 +224,54 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		return vboxDialog;
 	} /* createVBoxDialog */
 
-	private HBox createHBoxFileConnection(){
+	private VBox createVBoxFileConnection(){
 	  SiardBundle sb = SiardBundle.getSiardBundle();
 
-	  HBox hboxButton = new HBox();
+	  VBox vbox = new VBox();
+
+	  HBox hboxRadioButton = createHBoxRadioButton();
+	  vbox.getChildren().add(hboxRadioButton);
 
 	  TextField tfSFTPHost = new TextField();
 	  Label lblSFTPHost = createLabel("SFTP Host :", tfSFTPHost);
+	  HBox hboxSFTPHost = createHBox(lblSFTPHost, tfSFTPHost);
+	  tfSFTPHost.setText("255.255.255.255");
+	  vbox.getChildren().add(hboxSFTPHost);
 
-	  HBox hboxDbUser = createHBox(lblSFTPHost, tfSFTPHost);
-	  hboxButton.getChildren().add(hboxDbUser);
+	  TextField tfSFTPPort = new TextField();
+	  Label lblSFTPPort = createLabel("SFTP Port :", tfSFTPPort);
+	  HBox hboxSFTPPort = createHBox(lblSFTPPort, tfSFTPPort);
+	  tfSFTPPort.setText("65536");
+	  vbox.getChildren().add(hboxSFTPPort);
 
+	  TextField tfSFTPUser = new TextField();
+	  Label lblSFTPUser = createLabel("SFTP User :", tfSFTPUser);
+	  HBox hboxSFTPUser = createHBox(lblSFTPUser, tfSFTPUser);
+	  tfSFTPUser.setText("abcdefghijklmnopqrstuvwxyz");
+	  vbox.getChildren().add(hboxSFTPUser);
+
+	  TextField tfSFTPPassword = new TextField();
+	  Label lblSFTPPassword = createLabel("SFTP Password :", tfSFTPPassword);
+	  HBox hboxSFTPPassword = createHBox(lblSFTPPassword, tfSFTPPassword);
+	  tfSFTPPassword.setText("abcdefghijklmnopqrstuvwxyz");
+	  vbox.getChildren().add(hboxSFTPPassword);
+
+	  _tfSFTPTargetFilePath = new PastingTextField("?");
+	  Label lblSFTPTargetFilePath = createLabel("SFTP FilePath :", _tfSFTPTargetFilePath);
+	  _btnFileBrowser = new Button(sb.getConnectionDbFolderButton());
+	  _tfSFTPTargetFilePath.setText("C:\\");
+//	  btnDbFolder.setOnAction(_aeh);
+	  _btnFileBrowser.setAlignment(Pos.BASELINE_RIGHT);
+	  _btnFileBrowser.setMinWidth(FxSizes.getNodeWidth(_btnFileBrowser));
+	  _btnFileBrowser.setOnAction(this);
+
+	  HBox hboxSFTPTargetFilePath = createHBox(lblSFTPTargetFilePath, _tfSFTPTargetFilePath, _btnFileBrowser);
+	  vbox.getChildren().add(hboxSFTPTargetFilePath);
+
+	  getMaxLabelPrefWidth(lblSFTPHost, lblSFTPPort, lblSFTPUser, lblSFTPUser, lblSFTPPassword, lblSFTPTargetFilePath);
+
+	  double dMinWidth = getMaxPaneMinWidth(hboxRadioButton, hboxSFTPHost, hboxSFTPPort,hboxSFTPUser,hboxSFTPPassword,hboxSFTPTargetFilePath);
+	  vbox.setMinWidth(dMinWidth);
 	  /*
 	  hboxButton.setPadding(new Insets(dINNER_PADDING));
 	  hboxButton.setSpacing(dHSPACING);
@@ -212,7 +280,7 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 	  hboxButton.setMinWidth(FxSizes.getTextWidth(sb.getOk()));
 	   */
 
-	  return hboxButton;
+	  return vbox;
 	} /* createHBoxFileConnection */
 
 	/*------------------------------------------------------------------*/
@@ -228,6 +296,57 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 	    lbl.setLabelFor(nodeFor);
 	    return lbl;
 	  } /* createLabel */
+
+	  protected HBox createHBoxRadioButton() {
+		  HBox hbox = new HBox();
+		  hbox.setPadding(new Insets(dINNER_PADDING));
+		  hbox.setSpacing(dHSPACING);
+		  hbox.setAlignment(Pos.TOP_LEFT);
+
+		  _rbSFTP = new RadioButton("SFTP");
+		  _rbFileCopy = new RadioButton("FILE");
+
+		  _rbSFTP.setSelected(true);
+
+		  ToggleGroup toggleGroup = new ToggleGroup();
+		  _rbSFTP.setToggleGroup(toggleGroup);
+		  _rbFileCopy.setToggleGroup(toggleGroup);
+
+		  toggleGroup.selectedToggleProperty().addListener(_tcl);
+		  // toggleGroup.selectedToggleProperty().addListener(null);
+
+		  hbox.getChildren().add(_rbSFTP);
+		  hbox.getChildren().add(_rbFileCopy);
+
+		  return hbox;
+	  }
+
+	  private class ToggleChangeListener implements ChangeListener<Toggle>{
+	    @Override
+	    public void changed(ObservableValue<? extends Toggle> ovt, Toggle tOld, Toggle tNew)
+	    {
+    		RadioButton rb = (RadioButton) ovt.getValue().getToggleGroup().getSelectedToggle();
+    		 if (rb == _rbSFTP) {
+                 String s = rb.getText();
+                 LOG.info("sftp 눌러땅 눌러썽 " + rb.getText());
+
+             }else if (rb == _rbFileCopy) {
+
+            	 String s = rb.getText();
+            	 LOG.info("파일카피피피피피카츄 " + rb.getText());
+             }
+
+
+	    	/*
+	      SiardConnection sc = SiardConnection.getSiardConnection();
+	      String sScheme = _mapSchemes.get(getSelectedTitle());
+	      int iSelectedOption = getSelectedOption();
+	      String sSampleUrl = sc.getSampleUrl(sScheme, _tfDbHost.getText(), _tfDbFolder.getText(), _tfDbName.getText(),iSelectedOption);
+	      _tfConnectionUrl.setText(sSampleUrl);
+	      */
+	    }
+	  }
+	  protected ToggleChangeListener _tcl = new ToggleChangeListener();
 
 	  protected HBox createHBox(Label lbl, Node node)
 	  {
@@ -250,6 +369,115 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 	    return hbox;
 	  } /* createHBox */
 
+	  protected HBox createHBox(Label lbl, PastingTextField ptfText, Button btn)
+	  {
+	    HBox hbox = new HBox();
+	    lbl.setAlignment(Pos.BASELINE_RIGHT);
+	    hbox.setPadding(new Insets(dINNER_PADDING));
+	    hbox.setSpacing(dHSPACING);
+	    hbox.setAlignment(Pos.TOP_LEFT);
+	    hbox.getChildren().add(lbl);
+	    hbox.getChildren().add(ptfText);
+	    HBox.getHgrow(ptfText);
+	    hbox.getChildren().add(btn);
+	    hbox.setMinWidth(lbl.getPrefWidth() + dHSPACING +
+	        ptfText.getPrefWidth() + dHSPACING +
+	        btn.getPrefWidth());
+
+	    HBox.setHgrow(ptfText, Priority.ALWAYS);
+	    return hbox;
+	  } /* createHBox */
+
+	  /*------------------------------------------------------------------*/
+	  /** compute the maximum pref width of the given labels and set their
+	   * min and pref widths to that value.
+	   * @param aLabels labels.
+	   * @return maximum pref width.
+	   */
+	  protected double getMaxLabelPrefWidth(Label... aLabel)
+	  {
+	    double dMaxPrefWidth = 0.0;
+	    for (int iLabel = 0; iLabel < aLabel.length; iLabel++)
+	    {
+	      Label lbl = aLabel[iLabel];
+	      if (lbl != null)
+	      {
+	        double dPrefWidth = lbl.getPrefWidth();
+	        if (dMaxPrefWidth < dPrefWidth)
+	          dMaxPrefWidth = dPrefWidth;
+	      }
+	    }
+	    for (int iLabel = 0; iLabel < aLabel.length; iLabel++)
+	    {
+	      Label lbl = aLabel[iLabel];
+	      if (lbl != null)
+	      {
+	        lbl.setMinWidth(dMaxPrefWidth);
+	        lbl.setPrefWidth(dMaxPrefWidth);
+	      }
+	    }
+	    return dMaxPrefWidth;
+	  } /* getMaxLabelPrefWidth */
+
+	  /*------------------------------------------------------------------*/
+	  /** compute the maximum min width of the given Panes.
+	   * @param apane Panes.
+	   * @return maximum min width.
+	   */
+	  protected double getMaxPaneMinWidth(Pane... apane)
+	  {
+	    double dMaxMinWidth = 0.0;
+	    for (int iPane = 0; iPane < apane.length; iPane++)
+	    {
+	      Pane pane = apane[iPane];
+	      if (pane != null)
+	      {
+	        double dMinWidth = pane.getMinWidth();
+	        if (dMaxMinWidth < dMinWidth)
+	          dMaxMinWidth = dMinWidth;
+	      }
+	    }
+	    return dMaxMinWidth;
+	  } /* getMaxPaneMinWidth */
+
+	  /*====================================================================*/
+	  /** PastingTextField implements non-editable field which can receive
+	   * paste events and serve as a drop target.
+	   */
+	  private class PastingTextField extends TextField{
+	    private boolean bChangeable = false;
+	    PastingTextField(String s)
+	    {
+	      super(s);
+	    }
+	    @Override
+	    public void replaceText(int start, int end, String text)
+	    {
+	      if (bChangeable)
+	        super.replaceText(start, end, text);
+	    }
+	    public void changeText(String s)
+	    {
+	      bChangeable = true;
+	      setText(s);
+	      bChangeable = false;
+	    }
+	    @Override
+	    public void paste()
+	    {
+	      Clipboard cb = Clipboard.getSystemClipboard();
+	      String sPasted = cb.getString();
+	      File file = new File(sPasted);
+	      // if we have a file, it gets priority over the string
+	      List<File> listFiles = cb.getFiles();
+	      if (listFiles.size() == 1)
+	        file = listFiles.get(0);
+	      if (file.isDirectory())
+	        changeText(file.getAbsolutePath());
+	    }
+	  } /* class */
+	  /*====================================================================*/
+
 	private HBox createHBoxTableView() {
 
 		LOG.info("createHBoxTableView");
@@ -270,6 +498,10 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		columnType.setCellValueFactory(new PropertyValueFactory<ColumnModel, String>("columnName"));
 		chooseColumnFlag.setCellValueFactory(new PropertyValueFactory<ColumnModel, Boolean>("chooseColumnFlag"));
 		chooseColumnFlag.setCellFactory(CheckBoxTableCell.forTableColumn(chooseColumnFlag));
+
+		columnName.prefWidthProperty().bind(_tvColumnList.widthProperty().multiply(0.4));
+		columnType.prefWidthProperty().bind(_tvColumnList.widthProperty().multiply(0.4));
+		chooseColumnFlag.prefWidthProperty().bind(_tvColumnList.widthProperty().multiply(0.2));
 
 		_tvColumnList.getColumns().add(columnName);
 		_tvColumnList.getColumns().add(columnType);
@@ -298,7 +530,7 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		hBoxTableView.getChildren().add(_tvColumnList);
 
 		// 최창근 추가 - 테이블 크기별로 리사이징
-		autoResizeColumns(_tvColumnList);
+		// autoResizeColumns(_tvColumnList);
 
 		HBox.setHgrow(_tvColumnList, Priority.ALWAYS);
 
@@ -344,12 +576,17 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 	    _btnDefault.setDefaultButton(true);
 	    _btnDefault.setOnAction(this);
 
+	    _btnCancel = new Button(sb.getCancel());
+	    _btnCancel.setCancelButton(true);
+	    _btnCancel.setOnAction(this);
+
 	    /* HBox for button */
 	    HBox hboxButton = new HBox();
 	    hboxButton.setPadding(new Insets(dINNER_PADDING));
 	    hboxButton.setSpacing(dHSPACING);
 	    hboxButton.setAlignment(Pos.TOP_RIGHT);
 	    hboxButton.getChildren().add(_btnDefault);
+	    hboxButton.getChildren().add(_btnCancel);
 	    hboxButton.setMinWidth(FxSizes.getTextWidth(sb.getOk()));
 
 	    return hboxButton;
