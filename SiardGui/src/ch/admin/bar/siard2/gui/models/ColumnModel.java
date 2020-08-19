@@ -6,37 +6,37 @@ import javafx.beans.property.SimpleStringProperty;
 
 public class ColumnModel extends TableModel
 {
-	public SimpleStringProperty	columnType;
 	public SimpleStringProperty	columnName;
+	public SimpleStringProperty	columnType;
 	public BooleanProperty chooseColumnFlag;
 
-	public ColumnModel(String columnType, String columnName, boolean chooseColumnFlag) {
-		this.columnType = new SimpleStringProperty(columnType);
+	public ColumnModel(String columnName, String columnType, boolean chooseColumnFlag) {
 		this.columnName = new SimpleStringProperty(columnName);
+		this.columnType = new SimpleStringProperty(columnType);
 		this.chooseColumnFlag = new SimpleBooleanProperty(chooseColumnFlag);
 	}
 
-	public ColumnModel(String schemaName, String tableName, String columnType, String columnName, boolean chooseColumnFlag) {
+	public ColumnModel(String schemaName, String tableName, String columnName, String columnType, boolean chooseColumnFlag) {
 		// super
 		setSchemaName(schemaName);
 		setTableName(tableName);
 
-		this.columnType = new SimpleStringProperty(columnType);
 		this.columnName = new SimpleStringProperty(columnName);
+		this.columnType = new SimpleStringProperty(columnType);
 		this.chooseColumnFlag = new SimpleBooleanProperty(chooseColumnFlag);
 	}
 
-	public String getColumnType() {
-		return columnType.get();
-	}
-	public void setColumnType(SimpleStringProperty columnType) {
-		this.columnType = columnType;
-	}
 	public String getColumnName() {
 		return columnName.get();
 	}
 	public void setColumnName(SimpleStringProperty columnName) {
 		this.columnName = columnName;
+	}
+	public String getColumnType() {
+		return columnType.get();
+	}
+	public void setColumnType(SimpleStringProperty columnType) {
+		this.columnType = columnType;
 	}
 	public boolean getChooseColumnFlag() {
 		return chooseColumnFlag.get();

@@ -8,6 +8,7 @@ Created    : 01.09.2016, Hartwig Thomas, Enter AG, Rüti ZH
 ======================================================================*/
 package ch.admin.bar.siard2.cmd;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -30,9 +31,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.xml.datatype.Duration;
 
@@ -47,6 +45,7 @@ import ch.admin.bar.siard2.api.Schema;
 import ch.admin.bar.siard2.api.Table;
 import ch.admin.bar.siard2.api.Value;
 import ch.admin.bar.siard2.api.generated.CategoryType;
+import ch.admin.bar.siard2.api.primary.FileDownloadModel;
 import ch.admin.bar.siard2.cmd.util.FileUtils;
 import ch.enterag.sqlparser.identifier.QualifiedId;
 import ch.enterag.utils.StopWatch;
@@ -200,7 +199,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 
 
     //TODO 최창근 추가
-    ExecutorService executorService = Executors.newCachedThreadPool();
+//    ExecutorService executorService = Executors.newCachedThreadPool();
 
     /* AS-IS
 		String org_path = "";
@@ -500,64 +499,124 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
        */
 
       setValue(cell, oValue);
-      // AS-IS stop 위치
 //			_swSetValue.stop();
 
-			System.out.println("1 mc.getName() " + mc.getName());
-			System.out.println("2 oValue " + oValue);
+			// TODO 최창근 추가 - _archive.getFile().getParent()->.siard파일 떨어지는 경로, 사용자가 첨부파일 저장경로를 선택하지 않았을경우 해당 경로 첨부파일 저장하기
+			/*
+			System.out.println("_archive.getColumnCheckedMap().toString() : " + _archive.getColumnCheckedMap().toString());
+			System.out.println("mc.getParentMetaTable() : " + mc.getParentMetaTable());
+			System.out.println("mc.getParentMetaTable().getParentMetaSchema() : " + mc.getParentMetaTable().getParentMetaSchema());
+			 */
 
-			//TODO 최창근 추가 - GUI에서 sftp 선택여부 받아오고, 해당컬럼의 데이터가 directory인지 검증하기
-			if("111111111111filePath".equals(mc.getName())) {
-				final String TARGER_FILE = oValue.toString();
-				Runnable runnable = new Runnable() {
-					@Override
-					public void run() {
-						try {
-							SFTPConnectionModel sftpConnectionModel = new SFTPConnectionModel();
-							sftpConnectionModel.setSourceFile(TARGER_FILE);
-							//TODO 최창근 추가 - 파일 저장경로 받아오기, 경로가 없다면 siard파일이랑 같은경로
-							sftpConnectionModel.setTargetFile("D:/sftp/download/");
+			for(String key : _archive.getColumnCheckedMap().keySet() ) {
+				FileDownloadModel fileDownloadModel = _archive.getColumnCheckedMap().get(key);
 
-							//TODO 최창근 추가 - GUI에서 sftp 접속정보 받아오기
-							SFTPConnection sftpConnection = new SFTPConnection("192.168.1.153", "dsrms_db", "1234", 22);
-							sftpConnection.download(sftpConnectionModel);
+				//테이블 컬럼 선택값이 null이면 continue
+				if(fileDownloadModel == null) continue;
 
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-				};
-				executorService.execute(runnable);
-			}
+				//선택한 컬럼 리스트에 존재하지 않으면 continue
+				if(!fileDownloadModel.getChooseColumnList().contains(mc.getName())) continue;
 
-			System.out.println("iCell : " + iCell);
-			System.out.println("rs.getRow() : " + rs.getRow());
+				//TODO 테스트 용 로그
+				System.out.println();
+				System.out.println("현재컬럼 => " + mc.getName());
+				System.out.println("선택컬럼 => " + fileDownloadModel.getChooseColumnList().toString());
+				System.out.println("존재여부 => " + fileDownloadModel.getChooseColumnList().contains(mc.getName()));
 
-			//TODO 최창근 추가 - GUI에서 fileCopy 선택여부 받아오고, 해당컬럼의 데이터가 directory인지 검증하기
-			if("fileName".equals(mc.getName())) {
 				final String SOURCE_FILE = oValue.toString();
-				Runnable runnable = new Runnable() {
-					@Override
-					public void run() {
-						try {
-							FileUtils fileUtis = new FileUtils();
-							//TODO 최창근 추가 - 파일 저장경로 받아오기, 경로가 없다면 siard파일이랑 같은경로
-							fileUtis.copy(SOURCE_FILE, "D:/sftp/download" + UUID.randomUUID().toString() + "/");
-//							FileUtils.copy(SOURCE_FILE, "D:/sftp/download" + CELL_INDEX + "/");
-						} catch (Exception e) {
-							e.printStackTrace();
+
+				if(fileDownloadModel.isSftpFlag()) {
+					try {
+						String targetFilePath = "";
+						targetFilePath = fileDownloadModel.getTargetFilePath();
+
+						// 파일 저장경로 받아오기, 경로가 없다면 siard파일이랑 같은경로
+						if("".equals(targetFilePath.trim())) {
+							targetFilePath = _archive.getFile().getParent();
 						}
+						FileDownloadModel model = new FileDownloadModel();
+						model.setSourceFile(SOURCE_FILE);
+						model.setTargetFile(targetFilePath);
+
+						SFTPConnection sftpConnection = new SFTPConnection(fileDownloadModel.getHost(), fileDownloadModel.getUser(), fileDownloadModel.getPassword(), fileDownloadModel.getPort());
+						sftpConnection.download(model);
+
+					} catch (Exception e) {
 					}
-				};
-				executorService.execute(runnable);
+
+					//쓰레드 풀 사용
+//					Runnable runnable = new Runnable() {
+//						@Override
+//						public void run() {
+//							try {
+//								String targetFilePath = "";
+//								targetFilePath = fileDownloadModel.getTargetFilePath();
+//
+//								//TODO 최창근 추가 - 파일 저장경로 받아오기, 경로가 없다면 siard파일이랑 같은경로
+//								if("".equals(targetFilePath)) {
+//									targetFilePath = _archive.getFile().getParent();
+//								}
+//								FileDownloadModel model = new FileDownloadModel();
+//								model.setSourceFile(SOURCE_FILE);
+//								model.setTargetFile(targetFilePath);
+//
+//								SFTPConnection sftpConnection = new SFTPConnection(fileDownloadModel.getHost(), fileDownloadModel.getUser(), fileDownloadModel.getPassword(), fileDownloadModel.getPort());
+//								sftpConnection.download(model);
+//
+//							} catch (Exception e) {
+//								e.printStackTrace();
+//							}
+//						}
+//					};
+//					executorService.execute(runnable);
+
+				}else if(fileDownloadModel.isFileCopyFlag()) {
+
+					try {
+						String targetFilePath = "";
+						targetFilePath = fileDownloadModel.getTargetFilePath();
+
+						// 파일 저장경로 받아오기, 경로가 없다면 siard파일이랑 같은경로
+						if("".equals(targetFilePath.trim())) {
+							targetFilePath = _archive.getFile().getParent();
+						}
+
+						FileUtils fileUtis = new FileUtils();
+						fileUtis.copy(fileDownloadModel.getSourceFilePath() + File.separator + SOURCE_FILE, targetFilePath + File.separator);
+					} catch (Exception e) {
+					}
+
+					//쓰레드 풀 사용
+//					Runnable runnable = new Runnable() {
+//						@Override
+//						public void run() {
+//							try {
+//								String targetFilePath = "";
+//								targetFilePath = fileDownloadModel.getTargetFilePath();
+//
+//								//TODO 최창근 추가 - 파일 저장경로 받아오기, 경로가 없다면 siard파일이랑 같은경로
+//								if("".equals(targetFilePath)) {
+//									targetFilePath = _archive.getFile().getParent();
+//								}
+//
+//								FileUtils fileUtis = new FileUtils();
+//								fileUtis.copy(fileDownloadModel.getSourceFilePath() + File.separator + SOURCE_FILE, targetFilePath + UUID.randomUUID().toString() + "/");
+//							} catch (Exception e) {
+//								e.printStackTrace();
+//							}
+//						}
+//					};
+//					executorService.execute(runnable);
+
+				}
+
 			}
 
 		} /* loop over values */
 
     //TODO 최창근 추가
-    executorService.shutdown();
+//    executorService.shutdown();
 
-    // TODO stop 위치 옮김
     _swSetValue.stop();
 	} /* getRecord */
 

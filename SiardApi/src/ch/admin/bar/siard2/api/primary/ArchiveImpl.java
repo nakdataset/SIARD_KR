@@ -71,7 +71,7 @@ public class ArchiveImpl
   private static String filePath = "";
 
   private static List<String> tableCheckedList = null;
-  private static List<String> columnCheckedList = null;
+  private static Map<String, FileDownloadModel> chooseColumnMap = null;
 
   private static String fileDown = "";
 
@@ -748,15 +748,15 @@ public void exportGenericTableSchema(OutputStream osXsd)
   }
 
   @Override
-  public void setColumnCheckedList(List<String> list) {
+  public void setColumnCheckedMap(Map<String, FileDownloadModel> map) {
 	// TODO Auto-generated method stub
-	  ArchiveImpl.columnCheckedList = list;
+	ArchiveImpl.chooseColumnMap = map;
   }
 
   @Override
-  public List<String> getColumnCheckedList() {
+  public Map<String, FileDownloadModel> getColumnCheckedMap() {
 	// TODO Auto-generated method stub
-	return ArchiveImpl.columnCheckedList;
+	return ArchiveImpl.chooseColumnMap;
   }
 
 } /* ArchiveImpl */

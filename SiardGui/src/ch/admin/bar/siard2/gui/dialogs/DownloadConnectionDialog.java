@@ -10,10 +10,14 @@ Created    : 27.06.2017, Hartwig Thomas, Enter AG, Rüti ZH
 ======================================================================*/
 package ch.admin.bar.siard2.gui.dialogs;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import ch.admin.bar.siard2.api.primary.FileDownloadModel;
 import ch.admin.bar.siard2.gui.SiardBundle;
 import javafx.stage.Stage;
 
@@ -30,9 +34,8 @@ public class DownloadConnectionDialog
   //최창근 추가 - 로그
   private static final Logger LOG = Logger.getLogger(DownloadConnectionDialog.class);
 
-  // TODO 최창근 추가 - siardapi.Archive.setTableCheckedList(ArrayList a) 인자값 변경하기 => List<?> list
   public List<String> chooseTableList;
-  public List<String> chooseColumnList;
+  public Map<String, FileDownloadModel> chooseColumnMap;
 
   /*------------------------------------------------------------------*/
   /** display the connection dialog.
@@ -49,6 +52,9 @@ public class DownloadConnectionDialog
         null,null,
         _sb.getConnectionDownloadViewsAsTablesLabel(),
         _sb.getConnectionDownloadViewsAsTablesTooltip());
+
+    chooseTableList = new ArrayList<String>();
+    chooseColumnMap = new HashMap<String, FileDownloadModel>();
 
     LOG.info("sConnectionUrl " + sConnectionUrl);
     LOG.info("sDbUser " + sDbUser);

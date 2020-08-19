@@ -215,11 +215,14 @@ public class UploadDownloadAction {
 //					if(dcd.getFilePath() != null && dcd.getFilePath().trim().length() > 0) {
 //						archive.setFilePath(dcd.getFilePath());
 //					}
-//
+
 					// 체크된 테이블 목록
 					archive.setTableCheckedList(dcd.chooseTableList);
+
+					//TODO 최창근 추가 - MAP으로 변경하기
 					// 체크된 컬럼 목록
-					archive.setColumnCheckedList(dcd.chooseColumnList);
+					archive.setColumnCheckedMap(dcd.chooseColumnMap);
+					LOG.info("targetTable and targetColumn " + dcd.chooseColumnMap.toString());
 
 					archive.create(fileArchive);
 
