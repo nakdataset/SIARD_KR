@@ -5,10 +5,13 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import ch.admin.bar.siard2.api.primary.FileDownloadModel;
 import ch.admin.bar.siard2.cmd.SiardConnection;
 import ch.admin.bar.siard2.gui.SiardBundle;
 import ch.admin.bar.siard2.gui.models.TableModel;
@@ -54,12 +57,15 @@ public class ChooseTableDialog extends ScrollableDialog implements EventHandler<
 	protected Button _btnCancel = null;
 
 	private CheckBox _cbAllChooseTable = null;
+	private Label _lblAllChooseTable = null;
 
 	private TableView<TableModel> _tvTableList = null;
 
 	// properties
 	protected DownloadConnectionDialog dcd;
 	protected TableColumnDialog tcd;
+
+	private Map<String, FileDownloadModel> chooseColumnMap;
 
 	private Connection conn = null;
 
@@ -71,6 +77,7 @@ public class ChooseTableDialog extends ScrollableDialog implements EventHandler<
 		this.dcd = dcd;
 		this.stageOwner = stageOwner;
 
+		chooseColumnMap = new HashMap<String, FileDownloadModel>();
 		//TODO getChooseTableTitle 로 변경해야함
 		double dMinWidth = FxSizes.getTextWidth(SiardBundle.getSiardBundle().getInfoTitle()) + FxSizes.getCloseWidth() + dHSPACING;
 
@@ -106,7 +113,10 @@ public class ChooseTableDialog extends ScrollableDialog implements EventHandler<
 
 			dcd.chooseTableList = getTableListByChooseTable();
 
-			dcd.chooseColumnList = tcd.getColumnListByChooseColumn();
+			for(int i=0; i<dcd.chooseTableList.size(); i++) {
+				// chooseColumnMap.get(dcd.chooseTableList.get(i));
+				dcd.chooseColumnMap.put(dcd.chooseTableList.get(i), chooseColumnMap.get(dcd.chooseTableList.get(i)));
+			}
 
 			dcd._iResult = iRESULT_SUCCESS;
 		}
@@ -132,8 +142,6 @@ public class ChooseTableDialog extends ScrollableDialog implements EventHandler<
 		for(int i=0; i<size; i++){
 			if(_tvTableList.getItems().get(i).getChooseTableFlag()) {
 				LOG.info("선택 => " + _tvTableList.getItems().get(i).getTableName());
-
-//				chooseTableList.add(_tvTableList.getItems().get(i).getTableName());
 
 				//TODO 최창근 추가 - siardcmd 에서 스키마.테이블명 구현되면 바꾸기
 				chooseTableList.add(_tvTableList.getItems().get(i).getSchemaName() + "." +_tvTableList.getItems().get(i).getTableName());
@@ -193,25 +201,24 @@ public class ChooseTableDialog extends ScrollableDialog implements EventHandler<
 	    _cbAllChooseTable.setOnAction(_aeh);
 
 	    // TODO 최창근 추가 - 전체선택 properties 다국어 지원 추가
-	    Label lblAllChooseTable = new Label("전체선택");
-	    lblAllChooseTable.setLabelFor(_cbAllChooseTable);
-	    lblAllChooseTable.setAlignment(Pos.BASELINE_RIGHT);
+	    _lblAllChooseTable = new Label("전체선택");
+	    _lblAllChooseTable.setLabelFor(_cbAllChooseTable);
+	    _lblAllChooseTable.setAlignment(Pos.BASELINE_RIGHT);
 
-	    hbox.getChildren().add(lblAllChooseTable);
+	    hbox.getChildren().add(_lblAllChooseTable);
 	    hbox.getChildren().add(_cbAllChooseTable);
 
 	    return hbox;
 	}
-
 
 	private class ActionEventHandler implements EventHandler<ActionEvent>{
 
 		@Override
 		public void handle(ActionEvent event) {
 			// TODO Auto-generated method stub
+
 			if(event.getSource() == _cbAllChooseTable) {
 				allChooseTable();
-				_tvTableList.refresh();
 			}
 
 		}
@@ -223,6 +230,7 @@ public class ChooseTableDialog extends ScrollableDialog implements EventHandler<
 		for(int i=0, size=_tvTableList.getItems().size(); i<size; i++){
 			_tvTableList.getItems().get(i).setCheck(_cbAllChooseTable.isSelected());
     	}
+		_tvTableList.refresh();
 	}
 
 	void getTableNameByColumn(Connection conn, TableModel tableModel) {
@@ -310,8 +318,17 @@ public class ChooseTableDialog extends ScrollableDialog implements EventHandler<
 					tempTableModel.setSchemaName(tableModel.getSchemaName());
 					tempTableModel.setTableName(tableModel.getTableName());
 
+					_tvTableList.getItems().get(clickRowIndex).setCheck(true);
+					_tvTableList.refresh();
+
 					LOG.info("before tcd");
 					tcd = TableColumnDialog.showTableColumnDialog(stageOwner, tempTableModel);
+					if(tcd.getResult() == iRESULT_SUCCESS) {
+
+						LOG.info("tcd.chooseColumnList " + tcd.fileDownloadModel.getChooseColumnList().toString());
+						// map 만들어서 넣어보자 key schema.table, value columnList
+						chooseColumnMap.put(tableModel.getSchemaName() + "." +tableModel.getTableName(), tcd.fileDownloadModel);
+					}
 					LOG.info("after tcd");
 				}
 			}

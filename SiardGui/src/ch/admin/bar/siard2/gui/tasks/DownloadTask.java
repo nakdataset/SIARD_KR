@@ -96,6 +96,8 @@ public class DownloadTask
       updateProgress(0,100);
       PrimaryDataFromDb pdfd = PrimaryDataFromDb.newInstance(_conn, _archive);
       pdfd.setQueryTimeout(up.getQueryTimeoutSeconds());
+
+      //여기서 호출하는거네?
       pdfd.download(this);
     }
     _il.exit();

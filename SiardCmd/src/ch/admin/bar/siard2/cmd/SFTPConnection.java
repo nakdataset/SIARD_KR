@@ -8,6 +8,8 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpProgressMonitor;
 
+import ch.admin.bar.siard2.api.primary.FileDownloadModel;
+
 public class SFTPConnection{
 
 	private String host;
@@ -28,46 +30,62 @@ public class SFTPConnection{
 		this.port = port;
 	}
 
-	public void download(SFTPConnectionModel sftpConnectionModel) throws Exception {
+	public void download(FileDownloadModel fileDownloadModel){
 		long startTime = 0;
 		long estimatedTime = 0;
 		startTime = System.currentTimeMillis();
 
-		initSFTPConnection(sftpConnectionModel);
+		try {
+			// TODO 최창근 추가 - 입력값이 잘못 되었을때 예외 메시지 출력해주기
+			initSFTPConnection(fileDownloadModel);
+		}catch(Exception e) {
+			System.out.println("SFTP 접근정보가 잘못되었습니다.");
+			// e.printStackTrace();
+		}
 
 		try {
-			channelSftp.stat(sftpConnectionModel.getSourceFile()); // => No such file
+			channelSftp.stat(fileDownloadModel.getSourceFile()); // => No such file
 		}catch(Exception e) {
-//			e.printStackTrace();
-			disConnection();
+			try {
+				disConnection();
+			}catch(Exception ee) {
+
+			}
 			return;
 		}
 
 		try {
 
-			String sourceFilePath = sftpConnectionModel.getSourceFile().substring(0, sftpConnectionModel.getSourceFile().lastIndexOf("/") + 1);
+			String sourceFilePath = fileDownloadModel.getSourceFile().substring(0, fileDownloadModel.getSourceFile().lastIndexOf("/") + 1);
+			File sourceFileObj = new File(fileDownloadModel.getSourceFile());
+			File targetFileObj = new File(fileDownloadModel.getTargetFile() + File.separator + sourceFilePath);
+
+			if(!targetFileObj.exists()) {
+				targetFileObj.mkdirs();
+			}
+
 			channelSftp.cd(sourceFilePath);
+			channelSftp.get(fileDownloadModel.getSourceFile(), targetFileObj + File.separator + sourceFileObj.getName(), new MyProgressMonitor(), ChannelSftp.OVERWRITE);
 
-			File sourceFileObj = new File(sftpConnectionModel.getSourceFile());
-			File targetFileObj = new File(sftpConnectionModel.getTargetFile() + "/" + sourceFileObj.getName());
-
-			channelSftp.get(sftpConnectionModel.getSourceFile(), sftpConnectionModel.getTargetFile() + "/" + sourceFileObj.getName(), new MyProgressMonitor(), ChannelSftp.OVERWRITE);
-
-			System.out.println("File downloaded successfully - " + sourceFileObj.getAbsolutePath());
-			System.out.println("File downloaded successfully - " + targetFileObj.getAbsolutePath());
+			System.out.println("sourceFileObj File downloaded successfully - " + fileDownloadModel.getSourceFile());
+			System.out.println("targetFileObj File downloaded successfully - " + targetFileObj.getAbsolutePath());
 
 		} catch (Exception e) {
 			e.printStackTrace();
 
 		} finally {
-			disConnection();
+			try {
+				disConnection();
+			}catch(Exception e) {
+
+			}
 		}
 
 		estimatedTime = System.currentTimeMillis() - startTime;
 		System.out.println("execute time(ms) : " + estimatedTime);
 	}
 
-	private void initSFTPConnection(SFTPConnectionModel sftpConnectionModel) throws Exception{
+	private void initSFTPConnection(FileDownloadModel fileDownloadModel) throws Exception{
 		System.out.println("connecting... " + host);
 
 		jsch = new JSch();
@@ -80,7 +98,7 @@ public class SFTPConnection{
 		channelSftp = (ChannelSftp) channel;
 	}
 
-	private void disConnection() {
+	private void disConnection() throws Exception{
 		if (session.isConnected()) {
 			System.out.println("disconnecting... " + session.getHost());
 			channelSftp.disconnect();
