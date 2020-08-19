@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
+
+import ch.admin.bar.siard2.api.primary.FileDownloadModel;
 
 /*====================================================================*/
 /** Archive interface provides access to primary data and metadata.
@@ -263,8 +266,8 @@ public interface Archive
   public void setTableCheckedList(List<String> list);
   public List<String> getTableCheckedList();
 
-  public void setColumnCheckedList(List<String> list);
-  public List<String> getColumnCheckedList();
+  public void setColumnCheckedMap(Map<String, FileDownloadModel> map);
+  public Map<String, FileDownloadModel> getColumnCheckedMap();
 
   public void setSchema(String sid);
   public String	getSchema();
