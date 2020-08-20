@@ -186,17 +186,6 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		}
 	} /* handle */
 
-	private int getChooseColumnCount() {
-		int count = 0;
-		int size = _tvColumnList.getItems().size();
-		for (int i = 0; i < size; i++) {
-			if (_tvColumnList.getItems().get(i).getChooseColumnFlag()) {
-				count++;
-			}
-		}
-		return count;
-	}
-
 	public void setColumnListByChooseColumn() {
 		int size = _tvColumnList.getItems().size();
 		List<String> chooseColumnList = new ArrayList<String>();
@@ -354,6 +343,7 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		return hbox;
 	}
 
+	//TODO 최창근 추가 - setText 테스트 후 삭제하기
 	private VBox createVBoxSFTPConnection() {
 		VBox vbox = new VBox();
 		vbox.setPadding(new Insets(dINNER_PADDING));
