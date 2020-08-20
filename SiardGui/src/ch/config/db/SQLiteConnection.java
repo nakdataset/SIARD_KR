@@ -23,13 +23,13 @@ public class SQLiteConnection {
 
 			if(conn != null) return conn;
 
-			String dbConnectionURL = "jdbc:sqlite:" + DATABASE_FILE_PATH + File.separator + DATABASE_FILE_NAME;
-
+			String rootPath = System.getProperty("user.dir");
+			File dbFilePath = new File(rootPath + File.separator + DATABASE_FILE_PATH);
 			try {
-				String rootPath = System.getProperty("user.dir");
-				File dbFilePath = new File(rootPath + File.separator + DATABASE_FILE_PATH);
+				rootPath = System.getProperty("user.dir");
+				dbFilePath = new File(rootPath + File.separator + DATABASE_FILE_PATH);
 				if(!dbFilePath.exists()) {
-					dbFilePath.mkdir();
+					dbFilePath.mkdirs();
 				}
 				LOG.info("db 파일 경로 생성 성공 => " + dbFilePath);
 			}catch(Exception e) {
@@ -43,6 +43,7 @@ public class SQLiteConnection {
 				LOG.error("드라이버 로딩 실패");
 			}
 
+			String dbConnectionURL = "jdbc:sqlite:" + dbFilePath + File.separator + DATABASE_FILE_NAME;
 			try {
 				// 읽기 전용
 				/*
