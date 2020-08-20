@@ -21,6 +21,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import ch.admin.bar.siard2.api.Archive;
@@ -28,6 +31,7 @@ import ch.admin.bar.siard2.api.MetaColumn;
 import ch.admin.bar.siard2.api.MetaSchema;
 import ch.admin.bar.siard2.api.MetaTable;
 import ch.admin.bar.siard2.api.primary.ArchiveImpl;
+import ch.admin.bar.siard2.api.primary.FileDownloadModel;
 import ch.enterag.utils.EU;
 import ch.enterag.utils.ProgramInfo;
 import ch.enterag.utils.cli.Arguments;
@@ -90,6 +94,17 @@ public class SiardFromDb
   private File _fileExportXml = null;
   //2020.07.28 - siardCmd 테이블 목록 변수
   private ArrayList<String> _tableList = new ArrayList<>();
+  //2020.08.10 - siardCmd 파일 컬럼 목록 변수
+  private ArrayList<String> _fileColumnList = new ArrayList<>();
+  //2020.08.11 - siardCmd 파일 다운로드 정보 입력
+  private String _sAtchTargetFilePath = null; //첨부파일 타겟 경로
+  private String _sAtchSourceFilePath = null; //첨부파일 소스 경로(root경로)
+  private String _sSftpHost = null; //sftp IP
+  private String _sSftpPort = "22"; //sftp port(default)
+  private String _sSftpUser = null; //sftp id
+  private String _sSftpPasswd = null; //sftp password
+  private boolean _sftpFlag = false;
+  private boolean _fileCopyFlag = false;
 
   private Archive _archive = null;
   private Connection _conn = null;
@@ -128,7 +143,32 @@ public class SiardFromDb
     System.out.println("                       (contents will be deleted if they exist!)");
     System.out.println("  <mime type>          MIME type of data in the largest LOB column of database");
     System.out.println("  <JDBC URL>           JDBC URL of database to be downloaded");
-    System.out.print("                       e.g. ");
+    System.out.println("========== 이하 Siard_KR 추가 argument ==========");
+    System.out.println("  -t : 다운로드 대상 테이블 입력 (입력 형식은 '스키마명.테이블명')");
+    System.out.println("    - 전체 스키마 및 테이블 다운로드 : ex) -t=\"all\"");
+    System.out.println("    - 특정 스키마에 대한 전체 테이블 다운로드 : ex) -t=\"schema1.*\"");
+    System.out.println("    - 특정 테이블 다운로드 : ex) -t=\"schema1.table1,schema1.table2,schema2.table1\"");
+    System.out.println("  -fc : 첨부파일의 경로가 포함된 컬럼명 입력 (입력 형식은 '테이블명.컬럼명')");
+    System.out.println("    - ex) -fc=\"table1.filePath\"");
+    System.out.println("  -tfp : 첨부파일의 target file path를 입력(다운로드 받을 경로)");
+    System.out.println("    - ex) -tfp=\"/siardCmd/attachFile/\"");
+    System.out.println("  -sfp : 첨부파일의 source file path를 입력(다운로드 대상(root) 경로)");
+    System.out.println("    - ex) -sfp=\"/data/attachFile/\"");
+    System.out.println("  -host : sftp 접속 host IP");
+    System.out.println("    - ex) -host=\"127.0.0.1\"");
+    System.out.println("  -port : sftp 접속 port (입력을 안하거나 잘못된 값(숫자가 아닌 값)으로 입력한 경우 sftp기본 포트(22)로 진행)");
+    System.out.println("    - ex) -port=\"22\"");
+    System.out.println("  -su : sftp 접속 user");
+    System.out.println("    - ex) -su=\"user\"");
+    System.out.println("  -sp : sftp 접속 password");
+    System.out.println("    - ex) -sp=\"password\"");
+    System.out.println("  -sftp : sftp 방식 사용(flag)");
+    System.out.println("    - ex) -sftp");
+    System.out.println("  -file : file copy 방식 사용(flag)");
+    System.out.println("    - ex) -file");
+    System.out.println("   * 기본적으로 sftp와 file은 둘 중 하나만 입력 가능합니다.");
+    System.out.println("   * 만약 둘 다 입력할 경우 siard 다운로드 자체가 진행되지 않습니다.");
+    System.out.println("   * 단, 둘 다 입력하지 않을 경우에는 파일 다운로드만 진행하지 않습니다.(DB정보에 대한 siard 다운로드는 정상 진행)");
     SiardConnection sc = SiardConnection.getSiardConnection();
     String[] asSchemes = sc.getSchemes();
     for (int i = 0; i < asSchemes.length; i++)
@@ -146,8 +186,9 @@ public class SiardFromDb
 
 	/*------------------------------------------------------------------*/
 	/** reads the parameters from the command line or from the config file.
+	 * @throws IOException
 	*/
-	private void getParameters(String[] asArgs)
+	private void getParameters(String[] asArgs) throws IOException
   {
 	  _il.enter();
     _iReturn = iRETURN_OK;
@@ -183,7 +224,30 @@ public class SiardFromDb
     /* siard Table List (2020.07.28 - 신규 추가)*/
     String sTableList = args.getOption("t");
     /* siard File Column List (2020.08.03 - 신규 추가)*/
-//    String sFileColumnList = args.getOption("fc");
+    String sFileColumnList = args.getOption("fc");
+    /* siard Target File Path (예시 : fp="/siardCmd/file/") (2020.08.11 - 신규 추가)*/
+    _sAtchTargetFilePath = args.getOption("tfp");
+    /* siard Source File Path (예시 : fp="/siardCmd/file/") (2020.08.11 - 신규 추가)*/
+    _sAtchSourceFilePath = args.getOption("sfp");
+    /* siard sftp host ip (2020.08.11 - 신규 추가)*/
+    _sSftpHost = args.getOption("host");
+    /* siard sftp host port (2020.08.11 - 신규 추가)*/
+    if (isNumber(args.getOption("port"))) {
+    	_sSftpPort = args.getOption("port");
+    }
+    /* siard sftp user (2020.08.11 - 신규 추가)*/
+    _sSftpUser = args.getOption("su");
+    /* siard sftp password (2020.08.11 - 신규 추가)*/
+    _sSftpPasswd = args.getOption("sp");
+    /* sftp flag */
+    if (args.getOption("sftp") != null)
+    	_sftpFlag = true;
+    /* fileCopy flag */
+    if (args.getOption("file") != null)
+    	_fileCopyFlag = true;
+
+    System.out.println("");
+    System.out.println("================================RETURN MESSAGE START================================");
 
     /* analyze the parameters */
     if (_iReturn == iRETURN_OK)
@@ -192,18 +256,25 @@ public class SiardFromDb
       if (sTableList != null) {
       	_tableList = new ArrayList<>();
 
-      	if(sTableList.indexOf(",") > -1) {
-      		StringTokenizer st = new StringTokenizer(sTableList, ",");
+    		StringTokenizer st = new StringTokenizer(sTableList, ",");
 
-      		while (st.hasMoreElements())
-      		{
-      			String tableName = (String) st.nextElement();
-      			_tableList.add(tableName.trim().toLowerCase());
-      		}
-      	} else {
-      		_tableList.add(sTableList.trim());
-      	}
+    		while (st.hasMoreElements())
+    		{
+    			String tableName = (String) st.nextElement();
+    		  //schema.table -> 2개가 나와야함.
+    			checkArgumentValue(tableName, 2);
+    			_tableList.add(tableName.trim());
+    		}
       }
+      
+      if (sTableList == null)
+      {
+        System.out.println("테이블(-t=\"schema.table\")은 필수 입력입니다.");
+        System.out.println(" - 모든 스키마 및 테이블을 다운로드 할 경우에는 -t=\"all\"을 입력해주세요.");
+        System.out.println(" - 특정 스키마에 대한 모든 테이블을 다운로드 할 경우에는 -t=\"schema.*\"을 입력해주세요.");
+        _iReturn = iRETURN_ERROR;
+      }
+      
       if (sSiardFile != null)
       	_fileSiard = new File(sSiardFile);
       if (sExportXml != null)
@@ -280,7 +351,63 @@ public class SiardFromDb
         System.out.println("Database password must be given!");
         _iReturn = iRETURN_ERROR;
       }
+
+      /**
+       * 20200820 - 파일 다운로드 관련 argument 체크
+       */
+      if(_sftpFlag && _fileCopyFlag) {
+    		System.out.println("sftp 및 file 인자는 둘 중 하나만 입력해야합니다. \n -sftp : sftp방식 파일 다운로드 \n -file : file copy방식 파일 다운로드");
+        System.out.println("둘 다 입력할 경우 siard 다운로드 자체가 진행되지 않습니다.");
+        System.out.println("단, 둘 다 입력하지 않을 경우에는 파일 다운로드만 진행하지 않습니다.(DB정보에 대한 siard 다운로드는 정상 진행)");
+				_iReturn = iRETURN_ERROR;
+    	}
+      //2020.08.10 - siardCmd 파라미터로 받은 파일 컬럼 목록 세팅하기
+    	if(_iReturn != iRETURN_ERROR && (_sftpFlag || _fileCopyFlag)) {
+    		if (sFileColumnList == null) {
+    			System.out.println("파일 다운로드 처리시 파일 컬럼(-fc=\"schema.table.column\")은 필수 입력입니다.");
+  				_iReturn = iRETURN_ERROR;
+    		}
+    		if (sFileColumnList != null) {
+    			_fileColumnList = new ArrayList<>();
+
+  				StringTokenizer st = new StringTokenizer(sFileColumnList, ",");
+
+  				while (st.hasMoreElements())
+  				{
+  					String columnName = (String) st.nextElement();
+  					//schema.table.column -> 3개가 나와야함.
+  					checkArgumentValue(columnName, 3);
+  					_fileColumnList.add(columnName.trim());
+  				}
+
+    			//2020.08.11 - siardCmd 파라미터로 받은 sftp 입력값 체크
+    			if (_sAtchTargetFilePath == null) {
+    				System.out.println("파일 다운로드 처리시 target file path(-tfp=\"target file path\")는 필수 입력입니다.");
+    				_iReturn = iRETURN_ERROR;
+    			}
+    			if (_fileCopyFlag && _sAtchSourceFilePath == null) {
+    				System.out.println("file copy 방식의 파일 다운로드 처리시 source file path(-sfp=\"source file path\")는 필수 입력입니다.");
+    				_iReturn = iRETURN_ERROR;
+    			}
+    			if (_sftpFlag && _sSftpHost == null) {
+    				System.out.println("sftp 방식의 파일 다운로드 처리시 host ip(-host=\"host ip\")는 필수 입력입니다.");
+    				_iReturn = iRETURN_ERROR;
+    			}
+    			if (_sftpFlag && _sSftpUser == null) {
+    				System.out.println("sftp 방식의 파일 다운로드 처리시 user(-su=\"user\")는 필수 입력입니다.");
+    				_iReturn = iRETURN_ERROR;
+    			}
+    			if (_sftpFlag && _sSftpPasswd == null) {
+    				System.out.println("sftp 방식의 파일 다운로드 처리시 password(-sp=\"password\")는 필수 입력입니다.");
+    				_iReturn = iRETURN_ERROR;
+    			}
+    		}
+    	}
     }
+
+    System.out.println("================================RETURN MESSAGE END================================");
+    System.out.println("");
+
     /* print and log the parameters */
     if (_iReturn == iRETURN_OK)
     {
@@ -312,7 +439,28 @@ public class SiardFromDb
 	  _il.exit();
   } /* getParameters */
 
-  /*====================================================================
+  //argument value값 체크
+  private void checkArgumentValue(String value, int checkInt) {
+  	String valueTitle = (checkInt == 2 ? "테이블" : "파일 컬럼");
+		if(value.split("[.]").length != checkInt) {
+			System.out.println(valueTitle + "은 (-fc=\"schema.table.column\") 형식으로 입력해야합니다.");
+			System.out.println(" - 관련 " + valueTitle + " = " + value);
+			_iReturn = iRETURN_ERROR;
+		}
+	}
+
+  //숫자값 체크
+  private boolean isNumber(String port)
+  {
+  	try {
+  		Integer.parseInt(port);
+  		return true;
+  	} catch (NumberFormatException e) {
+  		return false;
+  	}
+  }
+
+	/*====================================================================
   constructor
   ====================================================================*/
 	/*------------------------------------------------------------------*/
@@ -373,12 +521,51 @@ public class SiardFromDb
 	          //archive에 파라미터로 받은 테이블 목록 세팅.
 	          if(_tableList.size() > 0) {
 	          	System.out.println("_tableList is not null");
-	          	_archive.setOriginalDir(""); // 파일 원래 경로
+	          	_archive.setOriginalDir(""); //원본 파일 경로
 		          _archive.setFileDown("SFTP");
-		          _archive.setSchema(""); //TODO : 추후 스키마데이터 입력 받게되면 추가해야함.
+		          _archive.setSchema("");
 		          _archive.setTargetDir(fileSiard.getParent());
 		          _archive.setFilePath("");
 	          	_archive.setTableCheckedList(_tableList);
+
+	          	/**
+	          	 * 20200819 - 파일 다운로드 관련 데이터 세팅 추가
+	          	 * file download flag 입력여부 확인 후 진행. (sftp 또는 file copy)
+	          	 */
+	          	Map<String, FileDownloadModel> chooseColumnMap = new HashMap<String, FileDownloadModel>();
+	          	if(_fileCopyFlag || _sftpFlag) {
+	          		FileDownloadModel fileModel = new FileDownloadModel();
+	          		fileModel.setTargetFilePath(_sAtchTargetFilePath);
+	          		fileModel.setSourceFilePath(_sAtchSourceFilePath);
+	          		fileModel.setHost(_sSftpHost);
+	          		fileModel.setPort(Integer.parseInt(_sSftpPort));
+	          		fileModel.setUser(_sSftpUser);
+	          		fileModel.setPassword(_sSftpPasswd);
+	          		fileModel.setFileCopyFlag(_fileCopyFlag);
+	          		fileModel.setSftpFlag(_sftpFlag);
+
+	          		//파일 컬럼 세팅
+	          		List<String> rFileColumnList = new ArrayList<String>();
+
+	          		for (int i = 0; i < _tableList.size(); i++)	{
+	          			String table_schemaTable = _tableList.get(i);
+	          			fileModel.setSchemaName(_tableList.get(i).substring(0, table_schemaTable.lastIndexOf(".")));
+	          			fileModel.setTableName(_tableList.get(i).substring(table_schemaTable.lastIndexOf(".")+1));
+
+	          			//각 테이블 별로 파일 컬럼 리스트를 세팅
+	          			for (int j = 0; j < _fileColumnList.size(); j++) {
+	          				String column_schemaTable = _fileColumnList.get(j).substring(0, _fileColumnList.get(j).lastIndexOf("."));
+	          				String columnName = _fileColumnList.get(j).substring(_fileColumnList.get(j).lastIndexOf(".")+1);
+	          				if(table_schemaTable.equals(column_schemaTable)) {
+	          					rFileColumnList.add(columnName);
+	          				}
+	          			}
+	          			fileModel.setChooseColumnList(rFileColumnList);
+	          			chooseColumnMap.put(table_schemaTable, fileModel);
+	          		}
+	          	}
+	          	_archive.setColumnCheckedMap(chooseColumnMap);
+
 	          	mdfd = MetaDataFromDb.newInstance(_conn.getMetaData(), _archive.getMetaData(), _archive);
 	          } else {
 	          	System.out.println("_tableList is null");

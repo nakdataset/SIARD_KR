@@ -783,10 +783,10 @@ public class MetaDataFromDb
   {
   	String sTypeName = rs.getString("TYPE_NAME");
 
-  	//2020.07.29 - json 타입에 대한 처리 (json => varchar)
+  	//2020.07.29 - json 타입에 대한 처리 (json => clob)
   	//Types에 정의되어 있지 않은 타입(json 등)은 아래 데이터가 null이므로, 디폴트 값을 지정함.
-  	int iDataType = Types.VARCHAR;
-  	long lColumnSize = 255;
+  	int iDataType = Types.CLOB;
+  	long lColumnSize = 65535;
   	int iDecimalDigits = 0;
   	if(!"json".equals(sTypeName)) {
   		iDataType = rs.getInt("DATA_TYPE");
@@ -852,8 +852,8 @@ public class MetaDataFromDb
     //데이터타입이 null(0) 인 경우 처리 로직 추가.
     else if (iDataType == Types.NULL)
     {
-    	//2020.07.28 - Types에 정의되어 있지 않은 타입(json 등)의 경우 null(0)으로 들어옴. varchar로 전환되도록 함.
-		iDataType = Types.VARCHAR;
+    	//2020.07.28 - Types에 정의되어 있지 않은 타입(json 등)의 경우 null(0)으로 들어옴. clob로 전환되도록 함.
+		iDataType = Types.CLOB;
 		mc.setPreType(iDataType, lColumnSize, iDecimalDigits);
     }
     else
@@ -1425,27 +1425,27 @@ public class MetaDataFromDb
     /**
      * 2020.07.28 - siardCmd 단독 실행 시 archive 가 널일 수 있음(테이블 목록 입력 안할경우)
      */
-    List<?> list = null;
+    List<String> tableList = null;
     if(_archive != null) {
-    	list = _archive.getTableCheckedList();
+    	tableList = _archive.getTableCheckedList();
     }
 
-    if(list == null || list.size() < 0) {
+    if(tableList == null || tableList.size() < 0) {
     	throw new IOException("테이블 정보가 없습니다. 테이블(t) 정보를 입력해주세요.");
     }
 
     List<String> schemaSelList = new ArrayList<>(); //특정 스키마 전체 테이블 다운로드 할 스키마 List
 		boolean is_table_select = false; // 테이블 목록을 가져와서 선택한 경우
-		if(list != null && list.size() > 0)
+		if(tableList != null && tableList.size() > 0)
 		{
 		  //스키마와 테이블명에 대한 전체 다운로드
-			if(!"all".equals(list.get(0))) {
+			if(!"all".equals(tableList.get(0))) {
 				is_table_select = true;
 			}
 
-			for(int ix = 0; ix < list.size(); ix++)
+			for(int ix = 0; ix < tableList.size(); ix++)
 			{
-				String str = list.get(ix);
+				String str = tableList.get(ix);
 				if(str.indexOf("*") > -1) {
 					schemaSelList.add(str.substring(0, str.indexOf(".")));
 				}
@@ -1484,9 +1484,9 @@ public class MetaDataFromDb
       boolean is_exist = false;
 			if(is_table_select && !is_schema_all)
 			{
-				for(int ix = 0; ix < list.size(); ix++)
+				for(int ix = 0; ix < tableList.size(); ix++)
 				{
-					String str = list.get(ix);
+					String str = tableList.get(ix);
 					//테이블에 schema 추가함.
 					String schemaName = "";
 					String tableName = "";
