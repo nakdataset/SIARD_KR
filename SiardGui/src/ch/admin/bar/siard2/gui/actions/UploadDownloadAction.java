@@ -31,9 +31,9 @@ import ch.admin.bar.siard2.gui.MruFile;
 import ch.admin.bar.siard2.gui.SiardBundle;
 import ch.admin.bar.siard2.gui.SiardGui;
 import ch.admin.bar.siard2.gui.UserProperties;
-import ch.admin.bar.siard2.gui.dialogs.ChooseTableDialog;
 import ch.admin.bar.siard2.gui.dialogs.DownloadConnectionDialog;
 import ch.admin.bar.siard2.gui.dialogs.DownloadDialog;
+import ch.admin.bar.siard2.gui.dialogs.TableDialog;
 import ch.admin.bar.siard2.gui.dialogs.UploadConnectionDialog;
 import ch.admin.bar.siard2.gui.dialogs.UploadDialog;
 import ch.enterag.utils.fx.dialogs.FS;
@@ -92,7 +92,7 @@ public class UploadDownloadAction {
 
 		if(dcd.getResult() == DownloadConnectionDialog.iRESULT_SUCCESS) {
 			try {
-				ChooseTableDialog.showChooseTableDialog(stage, dcd);
+				TableDialog.showChooseTableDialog(stage, dcd);
 			}catch(Exception e) {
 				e.printStackTrace();
 			}
