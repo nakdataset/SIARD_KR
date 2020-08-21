@@ -29,6 +29,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 
 /*====================================================================*/
 /** MainPanel implements the main panel of the SIARD GUI.
@@ -65,6 +67,9 @@ public class MainPane extends BorderPane
   /** split pane */
   private SplitPane _sp = null;
 
+  /** tool bar */ /* IntraDIGM */
+  private MainToolBar _mtb = null; /* IntraDIGM */
+
   /**-----------------------------------------------------------------*/
   /** setArchive displays archive.
    */
@@ -77,47 +82,82 @@ public class MainPane extends BorderPane
   /*------------------------------------------------------------------*/
   /** constructor
    */
-  private MainPane()
-  {
-    super();
-
-    LOG.info("");
-    setPadding(new Insets(FxSizes.fromExes(dPADDING_EX)));
-    setMinWidth(FxSizes.fromEms(dMIN_WIDTH_EM));
-    setMinHeight(FxSizes.fromExes(dMIN_HEIGHT_EX));
-
-    _mmb = MainMenuBar.getMainMenuBar();
-
-    setTop(_mmb);
-
-    _sp = new SplitPane();
-    _atv = new ArchiveTreeView();
-    _dsp = new DetailsScrollPane();
-
-    // 최창근 추가 - 트리메뉴 width를 고정시켜서 구분선 안움직이게
-    _atv.setMinWidth(300);
-    _atv.setMaxWidth(300);
-
-    _sp.getItems().addAll(_atv,_dsp);
-    _dsp.prefViewportWidthProperty().bind(widthProperty());
-    _dsp.prefViewportHeightProperty().bind(heightProperty());
-
-    setCenter(_sp);
-
-    _sp.setDividerPosition(0,0.0);
-
-    _lblStatus = new Label("");
-    _lblStatus.prefWidthProperty().bind(widthProperty());
-    _lblStatus.setStyle(FxStyles.sSTYLE_MESSAGE);
-
-    setBottom(_lblStatus);
-
-    setMargin(_mmb, new Insets(FxSizes.fromEms(dMARGIN_EM)));
-    setMargin(_sp, new Insets(FxSizes.fromEms(dMARGIN_EM)));
-    setMargin(_lblStatus, new Insets(FxSizes.fromEms(dMARGIN_EM)));
-
-    setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
-  } /* constructor MainPane */
+//  private MainPane()
+//  {
+//    super();
+//
+//    LOG.info("");
+//    setPadding(new Insets(FxSizes.fromExes(dPADDING_EX)));
+//    setMinWidth(FxSizes.fromEms(dMIN_WIDTH_EM));
+//    setMinHeight(FxSizes.fromExes(dMIN_HEIGHT_EX));
+//
+//    _mmb = MainMenuBar.getMainMenuBar();
+//
+//    setTop(_mmb);
+//
+//    _sp = new SplitPane();
+//    _atv = new ArchiveTreeView();
+//    _dsp = new DetailsScrollPane();
+//
+//    // 최창근 추가 - 트리메뉴 width를 고정시켜서 구분선 안움직이게
+//    _atv.setMinWidth(300);
+//    _atv.setMaxWidth(300);
+//
+//    _sp.getItems().addAll(_atv,_dsp);
+//    _dsp.prefViewportWidthProperty().bind(widthProperty());
+//    _dsp.prefViewportHeightProperty().bind(heightProperty());
+//
+//    setCenter(_sp);
+//
+//    _sp.setDividerPosition(0,0.0);
+//
+//    _lblStatus = new Label("");
+//    _lblStatus.prefWidthProperty().bind(widthProperty());
+//    _lblStatus.setStyle(FxStyles.sSTYLE_MESSAGE);
+//
+//    setBottom(_lblStatus);
+//
+//    setMargin(_mmb, new Insets(FxSizes.fromEms(dMARGIN_EM)));
+//    setMargin(_sp, new Insets(FxSizes.fromEms(dMARGIN_EM)));
+//    setMargin(_lblStatus, new Insets(FxSizes.fromEms(dMARGIN_EM)));
+//
+//    setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
+//  } /* constructor MainPane */
+  private MainPane(){
+		super();
+		setPadding(new Insets(FxSizes.fromExes(dPADDING_EX)));
+		setMinWidth(FxSizes.fromEms(dMIN_WIDTH_EM));
+		setMinHeight(FxSizes.fromExes(dMIN_HEIGHT_EX));
+		_mmb = MainMenuBar.getMainMenuBar();
+		/* ADD - IntraDIGM */
+		_mtb = MainToolBar.getMainToolBar();
+		VBox topContainer = new VBox(); // Creates a container to hold all Menu Objects.
+		topContainer.getChildren().add(_mmb);
+		topContainer.getChildren().add(_mtb);
+		setTop(topContainer);
+		/* ADD - End */
+		_sp = new SplitPane();
+		_atv = new ArchiveTreeView();
+		/* ADD - IntraDIGM */
+		_atv.setMinWidth(Region.USE_PREF_SIZE);
+		_atv.setMaxWidth(Region.USE_PREF_SIZE);
+		_atv.setPrefWidth(231); /* 285 */
+		/* ADD - End */
+		_dsp = new DetailsScrollPane();
+		_sp.getItems().addAll(_atv, _dsp);
+		_dsp.prefViewportWidthProperty().bind(widthProperty());
+		_dsp.prefViewportHeightProperty().bind(heightProperty());
+		setCenter(_sp);
+		_sp.setDividerPosition(0, 0.0);
+		_lblStatus = new Label("");
+		_lblStatus.prefWidthProperty().bind(widthProperty());
+		_lblStatus.setStyle(FxStyles.sSTYLE_MESSAGE);
+		setBottom(_lblStatus);
+		setMargin(_mmb, new Insets(FxSizes.fromEms(dMARGIN_EM)));
+		setMargin(_sp, new Insets(FxSizes.fromEms(dMARGIN_EM)));
+		setMargin(_lblStatus, new Insets(FxSizes.fromEms(dMARGIN_EM)));
+		setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
+	} /* constructor MainPane */
 
   /*------------------------------------------------------------------*/
   /** refreshLanguage redisplays the pane in the given language.
@@ -125,6 +165,9 @@ public class MainPane extends BorderPane
   public void refreshLanguage()
   {
     _mmb.refreshLanguage();
+
+    _mtb.refreshLanguage(); /* IntraDIGM */
+
     _dsp.reset();
   } /* refreshLanguage */
 
@@ -139,12 +182,18 @@ public class MainPane extends BorderPane
       _lblStatus.setText(sStatus);
       {
         _mmb.setDisable(true);
+
+        _mtb.setDisable(true); /* IntraDIGM */
+
         _atv.setDisable(true);
       }
     }
     else
     {
       _atv.setDisable(false);
+
+      _mtb.setDisable(false); /* IntraDIGM */
+
       _mmb.setDisable(false);
       _lblStatus.setText("");
     }

@@ -1,5 +1,4 @@
 /*
- * ====================================================================== SiardGui implements the
  * graphical user interface of SIARD Suite 2.x Application: SIARD GUI Description: SiardGui
  * implements the graphical user interface of SIARD Suite 2.x Platform : JAVA 1.7, JavaFX 2.2
  * ------------------------------------------------------------------------ Copyright : Swiss
@@ -57,6 +56,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
@@ -826,18 +826,24 @@ public class SiardGui extends Application
 		LOG.info("iCompare > 0 : " + (iCompare > 0));
 		if (iCompare > 0) {
 			LOG.info("sInstalledVersion : " + sInstalledVersion);
-			if (sInstalledVersion == null) {
-				// display message that there is no version installed
-				iResult = MB.show(getStage(), sb.getInstalledNoneTitle(),
-					sb.getInstalledNoneMessage(up.getFile(), getVersion()),
-					sb.getYes(), sb.getNo());
-				LOG.info("iResult : " + iResult);
-			} else {
-				// display message, that an older version is installed
-				iResult = MB.show(getStage(), sb.getInstalledOlderTitle(),
-					sb.getInstalledOlderMessage(sInstalledVersion, up.getFile(), up.getInstalledPath(null), getVersion()),
-					sb.getYes(), sb.getNo());
+
+			try {
+				if (sInstalledVersion == null) {
+					// display message that there is no version installed
+					iResult = MB.show(getStage(), sb.getInstalledNoneTitle(),
+						sb.getInstalledNoneMessage(up.getFile(), getVersion()),
+						sb.getYes(), sb.getNo());
+					LOG.info("iResult : " + iResult);
+				} else {
+					// display message, that an older version is installed
+					iResult = MB.show(getStage(), sb.getInstalledOlderTitle(),
+						sb.getInstalledOlderMessage(sInstalledVersion, up.getFile(), up.getInstalledPath(null), getVersion()),
+						sb.getYes(), sb.getNo());
+				}
+			}catch(Exception e) {
+				e.printStackTrace();
 			}
+
 		} else if (iCompare < 0) {
 			// display message, that a more recent version is installed
 			MB.show(getStage(), sb.getInstalledNewerTitle(),
@@ -901,6 +907,9 @@ public class SiardGui extends Application
 				Scene scene = new Scene(MainPane.getMainPane());
 				scene.setCursor(Cursor.DEFAULT);
 				_stage.setScene(scene);
+
+				_stage.getIcons().add(new Image(MainMenuBar.class.getResourceAsStream("res/favicon.png"))); /* IntraDIGM */
+
 				_stage.toFront();
 				_stage.show();
 

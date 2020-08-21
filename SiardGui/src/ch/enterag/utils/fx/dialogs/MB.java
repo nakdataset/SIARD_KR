@@ -102,11 +102,13 @@ public class MB
     hbox.setSpacing(dHSPACING); // between Cancel and OK
     hbox.setAlignment(Pos.TOP_RIGHT);
     hbox.getChildren().add(_btnDefault);
-    HBox.setMargin(_btnDefault, new Insets(dOUTER_PADDING));
+
+//    HBox.setMargin(_btnDefault, new Insets(dOUTER_PADDING)); /* IntraDIGM */
+
     if (_btnCancel != null)
     {
       hbox.getChildren().add(_btnCancel);
-      HBox.setMargin(_btnCancel, new Insets(dOUTER_PADDING));
+   // HBox.setMargin(_btnCancel, new Insets(dOUTER_PADDING)); /* IntraDIGM */
     }
 
     /* width of title and text */
@@ -126,13 +128,18 @@ public class MB
 
     /* VBox for prompt and buttons */
     VBox vbox = new VBox();
-    vbox.setPadding(new Insets(dOUTER_PADDING));
+
+//    vbox.setPadding(new Insets(dOUTER_PADDING)); /* IntraDIGM */
+    vbox.setPadding(new Insets(dOUTER_PADDING, dOUTER_PADDING, 0, dOUTER_PADDING)); /* IntraDIGM */
+
     vbox.setSpacing(dVSPACING);
     vbox.setMinWidth(dMinWidth);
     vbox.setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
     vbox.getChildren().add(txtPrompt);
     VBox.setMargin(txtPrompt, new Insets(dOUTER_PADDING,dOUTER_PADDING,dOUTER_PADDING,0));
     vbox.getChildren().add(hbox);
+
+    setResizable(false); /* IntraDIGM */
 
     /* scene */
     Scene scene = new Scene(vbox);

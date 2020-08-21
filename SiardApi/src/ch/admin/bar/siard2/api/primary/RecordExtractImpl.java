@@ -1,15 +1,19 @@
 /*======================================================================
-RecordExtractImpl implements the RecordExtract interface. 
+RecordExtractImpl implements the RecordExtract interface.
 Application : SIARD 2.0
-Description : RecordExtractImpl implements the RecordExtract interface. 
+Description : RecordExtractImpl implements the RecordExtract interface.
 ------------------------------------------------------------------------
 Copyright  : Swiss Federal Archives, Berne, Switzerland, 2016
 Created    : 01.10.2016, Hartwig Thomas, Enter AG, Rüti ZH
 ======================================================================*/
 package ch.admin.bar.siard2.api.primary;
 
-import java.io.*;
-import ch.admin.bar.siard2.api.*;
+import java.io.IOException;
+
+import ch.admin.bar.siard2.api.Record;
+import ch.admin.bar.siard2.api.RecordDispenser;
+import ch.admin.bar.siard2.api.RecordExtract;
+import ch.admin.bar.siard2.api.Table;
 
 /*====================================================================*/
 /** RecordExtractImpl implements the RecordExtract interface.
@@ -29,48 +33,48 @@ public class RecordExtractImpl
   /** {@inheritDoc} */
   @Override
   public Table getTable() { return _table; }
-  
+
   private long _lOffset = -1;
   /*------------------------------------------------------------------*/
   /** {@inheritDoc} */
   @Override
   public long getOffset() { return _lOffset; }
-  
+
   private long _lDelta = -1;
   /*------------------------------------------------------------------*/
   /** {@inheritDoc} */
   @Override
   public long getDelta() { return _lDelta; }
-  
+
   private RecordExtract _rsParent = null;
   /*------------------------------------------------------------------*/
   /** {@inheritDoc} */
   @Override
   public RecordExtract getParentRecordExtract() { return _rsParent; }
-  
+
   private Record _recordOffset = null;
   /*------------------------------------------------------------------*/
   /** {@inheritDoc} */
   @Override
   public Record getRecord() { return _recordOffset; }
-  
-  private RecordExtract[] _ars = null; 
+
+  private RecordExtract[] _ars = null;
 
   /*------------------------------------------------------------------*/
-  /** construct a root record set of a table. 
+  /** construct a root record set of a table.
    * @param table for root record set.
    */
   private RecordExtractImpl(Table table)
   {
     _table = table;
     _lDelta = 1;
-    for (long lDelta = _lDelta; lDelta < table.getMetaTable().getRows(); lDelta = lDelta*_iMAX_RECORDS) 
+    for (long lDelta = _lDelta; lDelta < table.getMetaTable().getRows(); lDelta = lDelta*_iMAX_RECORDS)
       _lDelta = lDelta;
     _lOffset = 0;
   } /* constructor */
-  
+
   /*------------------------------------------------------------------*/
-  /** construct a record set in a record set. 
+  /** construct a record set in a record set.
    * @param rsParent parent record set or null for root.
    * @param iRecordSet index of new record set in parent record set.
    * @param record record at offset.
@@ -83,7 +87,7 @@ public class RecordExtractImpl
     _lOffset = rsParent.getOffset() + iRecordSet*rsParent.getDelta();
     _lDelta = rsParent.getDelta() / _iMAX_RECORDS;
   } /* constructor */
-  
+
   /*------------------------------------------------------------------*/
   /** factory for a root record set in a table.
    * @param table table instance containing all records.
@@ -115,7 +119,7 @@ public class RecordExtractImpl
       lRecords = lRows - _lOffset;
     return lRecords;
   } /* getRecords */
-  
+
   /*------------------------------------------------------------------*/
   /** {@inheritDoc} */
   @Override
@@ -128,7 +132,7 @@ public class RecordExtractImpl
       String sRows = String.valueOf(getTable().getMetaTable().getRows());
       if (getParentRecordExtract() != null)
       {
-        String sOffset = String.valueOf(_lOffset);
+    	String sOffset = String.valueOf(_lOffset + 1); /* IntraDIGM */
         while(sOffset.length() < sRows.length())
           sOffset = "0"+sOffset;
         sLabel = _sLABEL_ROW+sOffset;
@@ -177,7 +181,7 @@ public class RecordExtractImpl
     }
     rd.close();
   } /* loadRecordExtract */
-  
+
   /*------------------------------------------------------------------*/
   /** {@inheritDoc} */
   @Override
@@ -188,14 +192,14 @@ public class RecordExtractImpl
       loadRecordExtract();
     return _ars[iRecordExtract];
   } /* getRecordExtract */
-  
+
   /*------------------------------------------------------------------*/
   /** {@inheritDoc}
-   * toString() returns the label of the record extract which is to be 
-   * displayed as the label of the record extract node of the tree 
-   * displaying the archive.   
+   * toString() returns the label of the record extract which is to be
+   * displayed as the label of the record extract node of the tree
+   * displaying the archive.
    */
-  @Override 
+  @Override
   public String toString()
   {
     return getLabel();

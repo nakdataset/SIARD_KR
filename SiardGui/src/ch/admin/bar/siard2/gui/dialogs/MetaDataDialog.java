@@ -1,38 +1,54 @@
 /*======================================================================
 MetaDataDialog applies given XSL to metadata and displays it in a browser.
 Application : Siard2
-Description : MetaDataDialog applies given XSL to metadata and displays 
+Description : MetaDataDialog applies given XSL to metadata and displays
               it in a browser.
-Platform    : Java 7, JavaFX 2.2   
+Platform    : Java 7, JavaFX 2.2
 ------------------------------------------------------------------------
 Copyright  : 2017, Enter AG, Rüti ZH, Switzerland
 Created    : 05.07.2017, Hartwig Thomas
 ======================================================================*/
 package ch.admin.bar.siard2.gui.dialogs;
 
-import java.io.*;
-import javax.xml.transform.*;
-import javax.xml.transform.stream.*;
-import javafx.event.*;
-import javafx.geometry.*;
-import javafx.scene.*;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.stage.*;
-import ch.enterag.utils.fx.*;
-import ch.enterag.utils.fx.dialogs.*;
-import ch.enterag.utils.logging.*;
-import ch.admin.bar.siard2.api.*;
-import ch.admin.bar.siard2.gui.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
+import ch.admin.bar.siard2.api.Archive;
+import ch.admin.bar.siard2.gui.SiardBundle;
 import ch.admin.bar.siard2.gui.actions.MetaDataAction;
-import ch.admin.bar.siard2.gui.browser.*;
+import ch.admin.bar.siard2.gui.browser.BrowserRegion;
+import ch.enterag.utils.fx.FxSizes;
+import ch.enterag.utils.fx.FxStyles;
+import ch.enterag.utils.fx.ScrollableDialog;
+import ch.enterag.utils.fx.dialogs.MB;
+import ch.enterag.utils.logging.IndentLogger;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 /*====================================================================*/
 /** MetaDataDialog applies given XSL to metadata and displays it in a browser.
  * @author Hartwig Thomas
  */
 public class MetaDataDialog
-  extends ScrollableDialog 
+  extends ScrollableDialog
   implements EventHandler<ActionEvent>
 {
   /* counteract Oracle idiocy which in xmlparserv2 overrides standard XML
@@ -44,7 +60,7 @@ public class MetaDataDialog
     System.setProperty("javax.xml.transform.TransformerFactory","com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl");
     System.setProperty("org.w3c.dom.DOMImplementationSourceList","com.sun.org.apache.xerces.internal.dom.DOMImplementationSourceImpl");
   }
-  /** logger */  
+  /** logger */
   private static IndentLogger _il = IndentLogger.getIndentLogger(MetaDataDialog.class.getName());
   /** archive */
   private Archive _archive = null;
@@ -73,7 +89,7 @@ public class MetaDataDialog
     else
       close();
   } /* handle */
-  
+
   /*------------------------------------------------------------------*/
   /** create the HBox with the OK button.
    * @return HBox with OK button.
@@ -123,34 +139,54 @@ public class MetaDataDialog
     br.setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
     return br;
   } /* createBrowserRegion */
-  
+
   /*------------------------------------------------------------------*/
   /** create the VBox for the dialog containing a browser region
    * for the meta data HTML and the buttons.
    * @return
    */
+//  private VBox createVBoxDialog()
+//  {
+//    VBox vbox = new VBox();
+//    vbox.setPadding(new Insets(dOUTER_PADDING));
+//    vbox.setSpacing(dVSPACING);
+//    vbox.setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
+//    double dMinWidth = 0.0;
+//    /* browser region with HTML */
+//    BrowserRegion br = createBrowserRegion();
+//    if (dMinWidth < br.getPrefWidth())
+//      dMinWidth = br.getPrefWidth();
+//    vbox.getChildren().add(br);
+//    /* HBox with save XML, save HTML and OK button */
+//    HBox hbox = createHBoxButtons();
+//    if (dMinWidth < hbox.getMinWidth())
+//      dMinWidth = hbox.getMinWidth();
+//    /* three buttons: save XML, save HTML, Cancel */
+//    vbox.getChildren().add(hbox);
+//    vbox.setMinWidth(dMinWidth);
+//    return vbox;
+//  } /* createVBoxDialog */
+
+  /* Intradigm ===================================== */
   private VBox createVBoxDialog()
-  {
-    VBox vbox = new VBox();
-    vbox.setPadding(new Insets(dOUTER_PADDING));
-    vbox.setSpacing(dVSPACING);
-    vbox.setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
-    double dMinWidth = 0.0;
-    /* browser region with HTML */
-    BrowserRegion br = createBrowserRegion();
-    if (dMinWidth < br.getPrefWidth())
-      dMinWidth = br.getPrefWidth();
-    vbox.getChildren().add(br);
-    /* HBox with save XML, save HTML and OK button */
-    HBox hbox = createHBoxButtons();
-    if (dMinWidth < hbox.getMinWidth())
-      dMinWidth = hbox.getMinWidth();
-    /* three buttons: save XML, save HTML, Cancel */
-    vbox.getChildren().add(hbox);
-    vbox.setMinWidth(dMinWidth);
-    return vbox;
-  } /* createVBoxDialog */
-  
+	{
+		VBox vbox = new VBox();
+		vbox.setPadding(new Insets(dOUTER_PADDING));
+		vbox.setSpacing(dVSPACING);
+		vbox.setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
+
+		BrowserRegion br = createBrowserRegion();
+
+		VBox.setVgrow(br, Priority.ALWAYS);
+
+		vbox.getChildren().add(br);
+
+		HBox hbox = createHBoxButtons();
+		vbox.getChildren().add(hbox);
+		return vbox;
+	} /* createVBoxDialog */
+  /* ===================================== Intradigm */
+
   /*------------------------------------------------------------------*/
   /** constructor transforms metadata to HTML using XSL and displays
    * it in a browser window.
@@ -213,8 +249,8 @@ public class MetaDataDialog
       String sMetaDataXml = new String(baos.toByteArray());
       /* transform meta data to HTML */
       String sMetaDataHtml = transformMetaData(fileXsl,sMetaDataXml);
-      MetaDataDialog mdd = new MetaDataDialog(stageOwner, archive, sMetaDataXml, sMetaDataHtml); 
-      mdd.showAndWait(); // until it is closed 
+      MetaDataDialog mdd = new MetaDataDialog(stageOwner, archive, sMetaDataXml, sMetaDataHtml);
+      mdd.showAndWait(); // until it is closed
     }
     catch(TransformerConfigurationException tce)
     {

@@ -167,7 +167,7 @@ public class PropertyHBox extends HBox implements ObservableValue<String>{
       _tic.setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
 
     //TODO 최창근 추가 - 동적 크기 조절을 위한 설정 추가
-    super.setHgrow(_tic, Priority.ALWAYS);
+    HBox.setHgrow(_tic, Priority.ALWAYS);
 
     _bMandatory = bMandatory;
 

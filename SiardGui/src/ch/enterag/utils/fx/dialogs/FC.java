@@ -654,7 +654,10 @@ public class FC
       String sOk,String sCancel)
   {
     _vbox = new VBox();
-    _vbox.setPadding(new Insets(dINNER_PADDING));
+
+//    _vbox.setPadding(new Insets(dINNER_PADDING)); /* IntraDIGM */
+    _vbox.setPadding(new Insets(dOUTER_PADDING * 2, dOUTER_PADDING, 0, dOUTER_PADDING)); /* IntraDIGM */
+
     _vbox.setSpacing(dVSPACING);
     _vbox.setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
     if (sMessage != null)
@@ -665,6 +668,10 @@ public class FC
     _vbox.getChildren().add(createButtons(fileInitial,sOk,sCancel));
     _vbox.setMinWidth(FxSizes.getNodeWidth(_vbox));
     _vbox.setMinHeight(FxSizes.getNodeHeight(_vbox));
+
+    _tv.setMinWidth((_vbox.getMinWidth() - dHSPACING) / 2); /* IntraDIGM */
+	_lv.setMinWidth((_vbox.getMinWidth() - dHSPACING) / 2); /* IntraDIGM */
+
     return _vbox;
   } /* createVBox */
 
@@ -833,6 +840,9 @@ public class FC
     {
       FC fs = new FC(stageOwner,true,true,sTitle,sMessage,sOk,sCancel,sPathLabel,sFolderLabel,
         fileInitialFolder,bIncludeHidden,null,null,null,null);
+
+      	fs.setResizable(false); /* IntraDIGM */
+
         fs.showAndWait();
       fileResultFolder = fs.getResult();
     }
@@ -877,6 +887,9 @@ public class FC
     {
       FC fs = new FC(stageOwner,false,true,sTitle,sMessage,sOk,sCancel,sPathLabel,sFolderLabel,
         fileInitialFolder,bIncludeHidden,null,null,null,null);
+
+      fs.setResizable(false); /* IntraDIGM */
+
       fs.showAndWait();
       fileResultFolder = fs.getResult();
     }
@@ -965,6 +978,9 @@ public class FC
       FC fs = new FC(stageOwner,true,false,sTitle,sMessage,sOk,sCancel,sPathLabel,sFileLabel,
         fileInitialFile,bIncludeHidden,listExtensions, null, null,null);
       fs.showAndWait();
+
+      fs.setResizable(false); /* IntraDIGM */
+
       fileResultFile = fs.getResult();
     }
     else
@@ -1026,6 +1042,9 @@ public class FC
     {
       FC fs = new FC(stageOwner,false,false,sTitle,sMessage,sOk,sCancel,sPathLabel,sFileLabel,
         fileInitialFile,bIncludeHidden,listExtensions, sOverwriteQuery, sYes, sNo);
+
+      fs.setResizable(false); /* IntraDIGM */
+
       fs.showAndWait();
       fileResultFile = fs.getResult();
     }

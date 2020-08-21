@@ -150,7 +150,8 @@ public class RecordExtractTableView
       {
         RecordExtract reChild = _re.getRecordExtract(iRecordExtract);
         List<Object> listValues = new ArrayList<Object>();
-        listValues.add(reChild.getOffset());
+//        listValues.add(reChild.getOffset());
+        listValues.add(reChild.getOffset() + 1); /* IntraDIGM */
         Record record = reChild.getRecord();
         for (int iCell = 0; iCell < record.getCells(); iCell++)
         {

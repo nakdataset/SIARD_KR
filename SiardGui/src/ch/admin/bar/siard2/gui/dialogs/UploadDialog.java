@@ -261,8 +261,10 @@ public class UploadDialog
     Archive archive, Connection conn, boolean bMetaDataOnly, MetaDataToDb mdtd)
   {
     _il.enter(conn, archive,String.valueOf(bMetaDataOnly));
-    UploadDialog ud = null;
-    ud = new UploadDialog(stageOwner, archive, conn, bMetaDataOnly, mdtd);
+    UploadDialog ud = new UploadDialog(stageOwner, archive, conn, bMetaDataOnly, mdtd);
+
+    ud.setResizable(false); /* IntraDIGM */
+
     ud.showAndWait();
     System.setOut(ud._psOut);
     System.setErr(ud._psErr);

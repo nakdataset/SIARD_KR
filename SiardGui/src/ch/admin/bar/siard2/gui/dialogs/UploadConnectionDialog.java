@@ -22,12 +22,15 @@ import ch.admin.bar.siard2.api.Archive;
 import ch.admin.bar.siard2.api.MetaData;
 import ch.admin.bar.siard2.gui.SchemaMapping;
 import ch.admin.bar.siard2.gui.SiardBundle;
+import ch.enterag.utils.fx.FxSizes;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -125,7 +128,12 @@ public class UploadConnectionDialog
       String sSchema = md.getMetaSchema(iSchema).getName();
       TextField tfSchema = new TextField(mapSchemas.get(sSchema));
       tfSchema.textProperty().addListener(_scl);
+
+      HBox.setHgrow(tfSchema, Priority.ALWAYS); /* IntraDIGM */
+
       Label lblSchema = createLabel(sSchema,tfSchema);
+      lblSchema.setAlignment(Pos.BASELINE_RIGHT); /* IntraDIGM */
+
       if (dLabelWidth < lblSchema.getPrefWidth())
         dLabelWidth = lblSchema.getPrefWidth();
       _mapSchemas.put(lblSchema, tfSchema);
@@ -134,12 +142,20 @@ public class UploadConnectionDialog
     for (Iterator<Label> iterLabel = _mapSchemas.keySet().iterator(); iterLabel.hasNext(); )
     {
       Label lbl = iterLabel.next();
-      lbl.setPrefWidth(dLabelWidth);
+
+      lbl.setPrefWidth(dLabelWidth); /* IntraDIGM */
+//      lbl.setPrefWidth(getTmpDbSchemeLabel().getPrefWidth()); /* IntraDIGM */
+//      lbl.setMinWidth(getTmpDbSchemeLabel().getPrefWidth()); /* IntraDIGM */
+
       TextField tf = _mapSchemas.get(lbl);
       tf.setPrefWidth(dTextWidth);
+
       HBox hbox = createHBox(lbl,tf);
+//      hbox.setAlignment(Pos.TOP_LEFT); /* IntraDIGM */
+
       if (dMinWidth < hbox.getMinWidth())
         dMinWidth = hbox.getMinWidth();
+
       vbox.getChildren().add(hbox);
     }
     vbox.setMinWidth(dMinWidth);
@@ -205,6 +221,10 @@ public class UploadConnectionDialog
     Stage stageOwner, String sConnectionUrl, String sDbUser, Archive archive)
   {
     UploadConnectionDialog ucd = new UploadConnectionDialog(stageOwner, sConnectionUrl, sDbUser, archive);
+
+    Rectangle2D rectScreen = FxSizes.getScreenBounds(); /* IntraDIGM */
+    ucd.setWidth(rectScreen.getWidth() * 0.4); /* IntraDIGM */
+
     ucd.showAndWait();
     return ucd;
   } /* showUploadConnectionDialog */

@@ -281,10 +281,10 @@ public class DownloadDialog
     boolean bMetaDataOnly, boolean bViewsAsTables)
   {
     _il.enter(conn, archive,String.valueOf(bMetaDataOnly));
-    DownloadDialog dd = null;
     LOG.info("1 showDownloadDialog");
-    dd = new DownloadDialog(stageOwner, conn, archive, bMetaDataOnly, bViewsAsTables);
+    DownloadDialog dd = new DownloadDialog(stageOwner, conn, archive, bMetaDataOnly, bViewsAsTables);
     LOG.info("2 showDownloadDialog");
+    dd.setResizable(false); /* IntraDIGM */
     dd.showAndWait();
     LOG.info("3 showDownloadDialog");
     System.setOut(dd._psOut);

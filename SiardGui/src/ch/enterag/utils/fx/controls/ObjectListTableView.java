@@ -1,7 +1,7 @@
 /*======================================================================
-The ObjectListTableView has lists of objects as records.   
+The ObjectListTableView has lists of objects as records.
 Application: SIARD GUI
-Description: The ObjectListTableView has lists of objects as records. 
+Description: The ObjectListTableView has lists of objects as records.
 Platform   : JAVA 1.7, JavaFX 2.2
 ------------------------------------------------------------------------
 Copyright  : Swiss Federal Archives, Berne, Switzerland, 2017
@@ -10,28 +10,56 @@ Created    : 10.08.2017, Hartwig Thomas, Enter AG, Rüti ZH
 
 package ch.enterag.utils.fx.controls;
 
-import java.math.*;
-import java.text.*;
-import java.util.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 import javax.xml.datatype.Duration;
 
+import ch.enterag.sqlparser.Interval;
+import ch.enterag.sqlparser.SqlLiterals;
+import ch.enterag.utils.BU;
+import ch.enterag.utils.DU;
+import ch.enterag.utils.fx.FxSizes;
+import ch.enterag.utils.fx.FxStyles;
 import javafx.application.Platform;
-import javafx.beans.property.*;
-import javafx.beans.value.*;
-import javafx.collections.*;
-import javafx.event.*;
-import javafx.geometry.*;
-import javafx.scene.*;
-import javafx.scene.control.*;
-import javafx.scene.input.*;
-import javafx.scene.layout.*;
-import javafx.scene.text.*;
-import javafx.util.*;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollBar;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Skin;
+import javafx.scene.control.SkinBase;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TablePosition;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.text.Text;
+import javafx.util.Callback;
 import javafx.util.Pair;
-
-import ch.enterag.utils.*;
-import ch.enterag.utils.fx.*;
-import ch.enterag.sqlparser.*;
 
 /*====================================================================*/
 /** a table view with a list of objects per row.
@@ -39,7 +67,7 @@ import ch.enterag.sqlparser.*;
  * - generates an action event ("show cell") for double clicks or enter
  * keys on a cell. The target of the action event is an ObjectTableCell
  * with information about row and column index.
- *  
+ *
  * @author Hartwig Thomas
  */
 public class ObjectListTableView
@@ -105,11 +133,11 @@ public class ObjectListTableView
       }
     }
   };
-  
+
   /*------------------------------------------------------------------*/
   /** select a range in the given table cell
    * @param otc table cell.
-   * @param iStartOffset start offset of range. 
+   * @param iStartOffset start offset of range.
    * @param iEndOffset end offset of range.
    * @return selected text field in table cell.
    */
@@ -191,7 +219,7 @@ public class ObjectListTableView
   private EventHandler<MouseEvent> _mef = new EventHandler<MouseEvent>()
   {
     /*----------------------------------------------------------------*/
-    /** mouse event on the way to text field is redirected to 
+    /** mouse event on the way to text field is redirected to
      * containing table cell.
      */
     @Override
@@ -212,7 +240,7 @@ public class ObjectListTableView
   private EventHandler<MouseEvent> _meh = new EventHandler<MouseEvent>()
   {
     /*----------------------------------------------------------------*/
-    /** mouse event from table cell translates double click events to 
+    /** mouse event from table cell translates double click events to
      * show cell events.
      */
     @Override
@@ -223,7 +251,7 @@ public class ObjectListTableView
         ObjectTableCell otc = (ObjectTableCell)me.getTarget();
         me.consume();
         otc.selectAll();
-        Platform.runLater(new Runnable() 
+        Platform.runLater(new Runnable()
         {
           ObjectTableCell _otc = null;
           public Runnable init(ObjectTableCell otc)
@@ -242,21 +270,21 @@ public class ObjectListTableView
       // otherwise bubble up ...
     } /* handle */
   };
-  
+
   @SuppressWarnings({ "rawtypes", "unused" })
   private void displaySelectionAndFocus()
   {
     for (TablePosition tpSelected : getSelectionModel().getSelectedCells())
       System.out.println("Selected "+tpSelected.getRow()+"/"+tpSelected.getColumn());
-    TablePosition tpFocus = (TablePosition)getFocusModel().getFocusedCell();
+    TablePosition tpFocus = getFocusModel().getFocusedCell();
     if (tpFocus != null)
       System.out.println("Focussed "+tpFocus.getRow()+"/"+tpFocus.getColumn());
     else
       System.out.println("No focus!");
   } /* displaySelectionAndFocus */
-  
+
   /** key event handler for table cell */
-  private EventHandler<KeyEvent> _keh = new EventHandler<KeyEvent>() 
+  private EventHandler<KeyEvent> _keh = new EventHandler<KeyEvent>()
   {
     /*------------------------------------------------------------------*/
     /** key event from table cell translates enter key pressed events
@@ -268,7 +296,7 @@ public class ObjectListTableView
     {
       // System.out.println("Key Event Handler");
       // displaySelectionAndFocus();
-      TablePosition tpFocus = (TablePosition)ObjectListTableView.this.getFocusModel().getFocusedCell();
+      TablePosition tpFocus = ObjectListTableView.this.getFocusModel().getFocusedCell();
       if (tpFocus != null)
       {
         int iRow = tpFocus.getRow();
@@ -278,7 +306,7 @@ public class ObjectListTableView
           ke.consume();
           ObjectTableCell otc = ObjectListTableView.this.getTableCell(iRow,iColumn);
           otc.selectAll();
-          Platform.runLater(new Runnable() 
+          Platform.runLater(new Runnable()
           {
             ObjectTableCell _otc = null;
             public Runnable init(ObjectTableCell otc)
@@ -347,7 +375,7 @@ public class ObjectListTableView
       }
     }
     /*================================================================*/
-    
+
     private TableCellTextField _tctf = null;
     private int _iRow = 0;
     public int getRow() { return _iRow; }
@@ -376,7 +404,7 @@ public class ObjectListTableView
       else
         setVisible(false);
     } /* addTableCell */
-    
+
     /*----------------------------------------------------------------*/
     /** constructor registers mouse and key event handlers.
      */
@@ -393,7 +421,7 @@ public class ObjectListTableView
       }
       else
       {
-        layoutBoundsProperty().addListener(new ChangeListener<Bounds>() 
+        layoutBoundsProperty().addListener(new ChangeListener<Bounds>()
         {
           @Override
           public void changed(ObservableValue<? extends Bounds> ovb,
@@ -424,7 +452,7 @@ public class ObjectListTableView
     private String tweakSelectionHandlers(Object oItem)
     {
       String sStyle = "";
-      if ((getColumn() == 0) && 
+      if ((getColumn() == 0) &&
           ((oItem instanceof Integer) || (oItem instanceof Long)))
       {
         sStyle = FxStyles.sSTYLE_BACKGROUND_LIGHTGREY;
@@ -435,11 +463,11 @@ public class ObjectListTableView
         _tctf.setStyle(FxStyles.sSTYLE_BACKGROUND_TRANSPARENT);
       return sStyle;
     } /* tweakSelectionHandlers */
-    
+
     /*----------------------------------------------------------------*/
     /** updateItem converts item to string and sets alignment.
      * Also, the row and column is determined.
-     * @param oItem is a pair of a List<Object> record and an object list 
+     * @param oItem is a pair of a List<Object> record and an object list
      *   table column constructed by the cell value factory below.
      * @param bEmpty true, if cell should be empty.
      */
@@ -454,7 +482,7 @@ public class ObjectListTableView
         ObjectListTableColumn oltc = pairItem.getValue();
         _iRow = ObjectListTableView.this.getItems().indexOf(listRecord);
         _iColumn = oltc.getColumn();
-        Object oValue = listRecord.get(_iColumn); 
+        Object oValue = listRecord.get(_iColumn);
         // System.out.println("update "+getId()+": "+getRow()+"/"+getColumn()+" "+oValue);
         addTableCell();
         if (!bEmpty)
@@ -493,12 +521,12 @@ public class ObjectListTableView
     } /* updateItem */
 
     /*----------------------------------------------------------------*/
-    /** set the focus to this table cell. 
+    /** set the focus to this table cell.
      * (The focus within the table view is managed by the table view.)
      */
     public void setFocus()
     {
-      Platform.runLater(new Runnable() 
+      Platform.runLater(new Runnable()
       {
         @Override
         public void run()
@@ -510,7 +538,7 @@ public class ObjectListTableView
         }
       });
     } /* setFocus */
-    
+
     /*----------------------------------------------------------------*/
     /** select a range of text in the text field.
      * @param iStartOffset start offset.
@@ -519,7 +547,7 @@ public class ObjectListTableView
      */
     public TextField selectRange(int iStartOffset, int iEndOffset)
     {
-      Platform.runLater(new Runnable() 
+      Platform.runLater(new Runnable()
       {
         private int _iStart = -1;
         private int _iEnd = -1;
@@ -547,7 +575,7 @@ public class ObjectListTableView
      */
     public void selectAll()
     {
-      Platform.runLater(new Runnable() 
+      Platform.runLater(new Runnable()
       {
         @Override
         public void run()
@@ -560,13 +588,13 @@ public class ObjectListTableView
         }
       });
     } /* selectAll */
-    
+
     /*----------------------------------------------------------------*/
     /** deselect the table cell.
      */
     public void deselect()
     {
-      Platform.runLater(new Runnable() 
+      Platform.runLater(new Runnable()
       {
         @Override
         public void run()
@@ -577,7 +605,7 @@ public class ObjectListTableView
         }
       });
     } /* deselect */
-    
+
   } /* class ObjectTableCell */
 
   /*==================================================================*/
@@ -590,7 +618,7 @@ public class ObjectListTableView
     /** index of this TableColumn
      * @return index of this TableColumn
      */
-    public int getColumn() 
+    public int getColumn()
     {
       int iColumn = 0;
       if (getTableView() != null)
@@ -601,7 +629,7 @@ public class ObjectListTableView
       }
       return iColumn;
     } /* getColumn */
-    
+
     /*----------------------------------------------------------------*/
     /** constructor installs cell factory and cell value factory
      * @param sHeader header of table column.
@@ -634,9 +662,9 @@ public class ObjectListTableView
         } /* call */
       });
     } /* constructor ObjectListTableColumn */
-    
+
   } /* class ObjectListTableColumn */
-  
+
   /*==================================================================*/
   /*------------------------------------------------------------------*/
   /** constructor
@@ -659,13 +687,16 @@ public class ObjectListTableView
     addEventHandler(KeyEvent.KEY_PRESSED, _keh);
     ObservableList<List<Object>> data = FXCollections.observableArrayList();
     setItems(data);
-    setFixedCellSize(FxSizes.getEx());
-    // List<Object> items are to be added to this empty data list ... 
+
+//    setFixedCellSize(FxSizes.getEx()); /* IntraDIGM */
+    setFixedCellSize(FxSizes.getEx() * 1.5); /* IntraDIGM */
+
+    // List<Object> items are to be added to this empty data list ...
     setPlaceholder(new Label("")); // for empty table
     // default: after 10 rows display scroll bar */
     setMaxVisibleRows(_iMaxVisibleRows);
   } /* constructor ObjectListTableView */
-  
+
   /*------------------------------------------------------------------*/
   /** set maximum rows to display (scroll bar limit).
    * @param iMaxVisibleRows maximum visible rows.
@@ -687,10 +718,10 @@ public class ObjectListTableView
       setTableHeight();
     }
   };
-  
+
   /*==================================================================*/
   /** visibility listener: recompute table height, when scrollbar visibility changes */
-  ChangeListener<Boolean> _sbvl = new ChangeListener<Boolean>() 
+  ChangeListener<Boolean> _sbvl = new ChangeListener<Boolean>()
   {
     @Override
     public void changed(ObservableValue<? extends Boolean> ovb,
@@ -704,7 +735,7 @@ public class ObjectListTableView
   /** get scroll bar of the given orientation from the skin.
    * N.B.: Java 9/10 makes it virtually impossible to use an external
    * JAVA 1.8 implementation of JavaFX! com.sun.javafx.scene.control.skin
-   * and javafx.scene.control.skin clash!! 
+   * and javafx.scene.control.skin clash!!
    * @param tvs table view skin.
    * @param orientation orientation.
    * @return scroll bar or null, if it does not exist.
@@ -758,7 +789,7 @@ public class ObjectListTableView
     int iRows = getItems().size();
     if (iRows > _iMaxVisibleRows)
       iRows = _iMaxVisibleRows;
-    
+
     /* header */
     double dTableHeight = getInsets().getTop()+getInsets().getBottom();
     /* TableHeaderRow */ StackPane thr = (/*TableHeaderRow*/StackPane)lookup("TableHeaderRow");
@@ -779,15 +810,20 @@ public class ObjectListTableView
     }
     // System.out.println("ScrollBar has height: "+dScrollBarHeight);
     dTableHeight += dScrollBarHeight;
- 
+
     // System.out.println("Table has height: "+dTableHeight);
-    setMaxHeight(dTableHeight);
+
+//    setMaxHeight(dTableHeight); /* IntraDIGM */
+    double dMaxHeight = getMaxHeight(); /* IntraDIGM */
+	if (dTableHeight < dMaxHeight)
+		setMaxHeight(dTableHeight);
+
     setPrefHeight(dTableHeight);
     setMinHeight(dTableHeight);
   } /* setTableHeight */
-  
+
   /*------------------------------------------------------------------*/
-  /** initiates computing of table height 
+  /** initiates computing of table height
    * and setting of minHeight, prefHeight, maxHeight.
    * (Listen to them, for notification!)
    */
@@ -802,7 +838,7 @@ public class ObjectListTableView
         setTableHeight(tvs);
       else
       {
-        skinProperty().addListener(new ChangeListener<Skin<?>>() 
+        skinProperty().addListener(new ChangeListener<Skin<?>>()
         {
           @Override
           public void changed(ObservableValue<? extends Skin<?>> ovs,
@@ -846,7 +882,7 @@ public class ObjectListTableView
     }
     return sb.toString();
   } /* getHeaders */
-  
+
   /*------------------------------------------------------------------*/
   /** get cell values of row with given index separated by tabs.
    * @param iIndex row.
@@ -863,7 +899,7 @@ public class ObjectListTableView
     }
     return sb.toString();
   } /* getRecord */
-  
+
   /*------------------------------------------------------------------*/
   /** put a string into the system clipboard.
    * @param s string to be copied.
@@ -897,7 +933,7 @@ public class ObjectListTableView
     }
     copyString(sb.toString());
   } /* copyTable */
-  
+
   /*------------------------------------------------------------------*/
   /** select a range in a table cell.
    * @param iRow row of cell.
@@ -908,7 +944,7 @@ public class ObjectListTableView
    */
   public TextField selectRange(int iRow, int iColumn, int iOffset, int iLength)
   {
-    /* make the desired cell visible (and thus make sure, it is updated 
+    /* make the desired cell visible (and thus make sure, it is updated
      * and added to in _llTableCells) */
     scrollTo(iRow);
     scrollToColumn(getColumns().get(iColumn));

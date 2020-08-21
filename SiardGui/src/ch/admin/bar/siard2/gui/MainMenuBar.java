@@ -82,6 +82,9 @@ public class MainMenuBar
   private MenuItem _miDownloadHistory = null;
   private MenuItem _miUploadHistory = null;
 
+  private MenuItem _miDownloadStory = null; /* IntraDIGM */
+  private MenuItem _miUploadStory = null; /* IntraDIGM */
+
   /*==================================================================*/
   private class ToggleChangeListener
     implements ChangeListener<Toggle>
@@ -204,6 +207,17 @@ public class MainMenuBar
       sg.history("0002");
     }
 
+    /* IntraDIGM */
+    else if (mi == _miDownloadStory) {
+    	sg.history("0001");
+//    	sg.openDownloadStory();
+    }
+    /* IntraDIGM */
+    else if (mi == _miUploadStory) {
+    	sg.history("0002");
+//    	sg.openUploadStory();
+    }
+
   } /* handle */
 
   /*------------------------------------------------------------------*/
@@ -259,6 +273,11 @@ public class MainMenuBar
     _miOptions.setDisable(false);
     _miHelp.setDisable(false);
     _miInfo.setDisable(false);
+
+    _miDownloadStory.setDisable(false); /* IntraDIGM */
+    _miUploadStory.setDisable(false); /* IntraDIGM */
+    MainToolBar.getMainToolBar().restrict(); /* IntraDIGM */
+
   } /* restrict */
 
   /*------------------------------------------------------------------*/
@@ -307,6 +326,10 @@ public class MainMenuBar
     _menuHistory.setText(sb.getMenuHistory());
     _miDownloadHistory.setText(sb.getMenuHistoryDownload());
     _miUploadHistory.setText(sb.getMenuHistoryUpload());
+
+    _miDownloadStory.setText(sb.getMenuFileDownloadStory()); /* IntraDIGM */
+    _miUploadStory.setText(sb.getMenuFileUploadStory()); /* IntraDIGM */
+
   } /* refreshLanguage */
 
   /*------------------------------------------------------------------*/
@@ -463,11 +486,15 @@ public class MainMenuBar
     _menuHistory = new Menu();
     _miDownloadHistory = createMenuItem();
     _menuHistory.getItems().add(_miDownloadHistory);
-
     _miUploadHistory = createMenuItem();
     _menuHistory.getItems().add(_miUploadHistory);
     getMenus().add(_menuHistory);
 
+
+    _miDownloadStory = createMenuItem(); /* IntraDIGM */
+	_menuFile.getItems().add(_miDownloadStory);
+	_miUploadStory = createMenuItem(); /* IntraDIGM */
+	_menuFile.getItems().add(_miUploadStory);
 
 
     _menuTools = new Menu();

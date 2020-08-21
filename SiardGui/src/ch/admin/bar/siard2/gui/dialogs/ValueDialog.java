@@ -222,6 +222,11 @@ public class ValueDialog
     _sLocation = sLocation;
     LOG.info("ValueDialog");
     _vbox = createVBoxDialog();
+
+    _vbox.setPadding(new Insets(dOUTER_PADDING*2,dOUTER_PADDING,0,dOUTER_PADDING)); /* IntraDIGM */
+	_vbox.setSpacing(dVSPACING); /* IntraDIGM */
+	_vbox.setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY); /* IntraDIGM */
+
     /* scene */
     double dWidth = _vbox.getMinWidth()+10.0;
     if (dWidth > FxSizes.getScreenBounds().getWidth()/2.0)
@@ -379,6 +384,9 @@ public class ValueDialog
     else
     {
       ValueDialog vd = new ValueDialog(stageOwner, sLocation, value, iMaxInlineSize);
+
+      vd.setResizable(false); /* IntraDIGM */
+
       vd.showAndWait();
     }
   } /* displayValue */

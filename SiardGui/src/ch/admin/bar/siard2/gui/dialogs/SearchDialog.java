@@ -130,6 +130,9 @@ public class SearchDialog
     _btnOk = new Button(sOk);
     _btnOk.setDefaultButton(true);
     _btnOk.setOnAction(this);
+
+    _btnOk.setDisable(true); /* IntraDIGM */
+
     hbox.getChildren().add(_btnOk);
     _btnCancel = new Button(sCancel);
     _btnCancel.setCancelButton(true); // associate it with ESC key
@@ -194,7 +197,7 @@ public class SearchDialog
     _tfFindString.textProperty().addListener(_scl);
 
     // 최창근 추가 - 텍스트필드 가변크기 변환을 위한 설정
-    hbox.setHgrow(_tfFindString, Priority.ALWAYS);
+    HBox.setHgrow(_tfFindString, Priority.ALWAYS);
 
     Label lblFindString = new Label(sFindStringLabel);
     lblFindString.setMinWidth(dLabelWidth);
@@ -216,7 +219,10 @@ public class SearchDialog
   private VBox createVBox(SiardBundle sb, MetaTable mt, String sFindString, boolean bMatchCase)
   {
     VBox vbox = new VBox();
-    vbox.setPadding(new Insets(dINNER_PADDING));
+
+//    vbox.setPadding(new Insets(dINNER_PADDING)); /* IntraDIGM */
+    vbox.setPadding(new Insets(dOUTER_PADDING*2,dOUTER_PADDING,0,dOUTER_PADDING)); /* IntraDIGM */
+
     vbox.setSpacing(dVSPACING);
     vbox.setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
 
@@ -274,6 +280,9 @@ public class SearchDialog
 	LOG.info("showSearchDialog");
 
     SearchDialog sd = new SearchDialog(stageOwner,mt,sFindString,bMatchCase);
+
+    sd.setResizable(false); /* IntraDIGM */
+
     sd.showAndWait();
     return sd;
   } /* showSearchDialog */

@@ -1,32 +1,43 @@
 /*======================================================================
-InfoDialog displays meta data of the program. 
+InfoDialog displays meta data of the program.
 Application : Siard2
-Description : InfoDialog displays meta data of the program. 
-Platform    : Java 7, JavaFX 2.2   
+Description : InfoDialog displays meta data of the program.
+Platform    : Java 7, JavaFX 2.2
 ------------------------------------------------------------------------
 Copyright  : 2017, Enter AG, Rüti ZH, Switzerland
 Created    : 12.01.2017, Hartwig Thomas
 ======================================================================*/
 package ch.admin.bar.siard2.gui.dialogs;
 
-import java.text.*;
-import java.util.*;
-import javafx.event.*;
-import javafx.geometry.*;
-import javafx.scene.*;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.scene.text.*;
-import javafx.stage.*;
-import ch.enterag.utils.fx.*;
-import ch.admin.bar.siard2.gui.*;
+import java.text.SimpleDateFormat;
+import java.util.List;
+
+import ch.admin.bar.siard2.gui.SiardBundle;
+import ch.admin.bar.siard2.gui.SiardGui;
+import ch.enterag.utils.fx.FxSizes;
+import ch.enterag.utils.fx.FxStyles;
+import ch.enterag.utils.fx.ScrollableDialog;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 /*====================================================================*/
-/** InfoDialog displays meta data of the program. 
+/** InfoDialog displays meta data of the program.
  * @author Hartwig Thomas
  */
 public class InfoDialog
-  extends ScrollableDialog 
+  extends ScrollableDialog
   implements EventHandler<ActionEvent>
 {
   /*------------------------------------------------------------------*/
@@ -93,7 +104,7 @@ public class InfoDialog
     lblCredits.setLabelFor(txt);
     return lblCredits;
   } /* createLabel */
-  
+
   /*------------------------------------------------------------------*/
   /** create a Text containing the credits in the list.
    * @param listCredits list of credits.
@@ -138,7 +149,7 @@ public class InfoDialog
     }
     return hboxCredits;
   } /* createHBoxCredits */
-  
+
   /*------------------------------------------------------------------*/
   /** create the VBox containing the credits.
    * @return VBox with credits.
@@ -182,7 +193,7 @@ public class InfoDialog
       lblContributors.setPrefWidth(dLabelWidth);
     if (lblProvenances != null)
       lblProvenances.setPrefWidth(dLabelWidth);
-    
+
     double dMinWidth = 0.0;
     HBox hboxCreators = createHBoxCredits(lblCreators, txtCreators);
     if (hboxCreators != null)
@@ -229,7 +240,7 @@ public class InfoDialog
     hboxButton.setMinWidth(FxSizes.getTextWidth(sb.getOk()));
     return hboxButton;
   } /* createHBoxButton */
-  
+
   /*------------------------------------------------------------------*/
   /** create the main VBox of the dialog
    * @return main VBox
@@ -238,7 +249,10 @@ public class InfoDialog
   {
     /* VBox for title area, separator, credits area, separator and OK button */
     VBox vboxDialog = new VBox();
-    vboxDialog.setPadding(new Insets(dOUTER_PADDING));
+
+//    vboxDialog.setPadding(new Insets(dOUTER_PADDING)); /* IntraDIGM */
+    vboxDialog.setPadding(new Insets(dOUTER_PADDING * 2, dOUTER_PADDING, 0, dOUTER_PADDING)); /* IntraDIGM */
+
     vboxDialog.setSpacing(dVSPACING);
     vboxDialog.setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
     double dMinWidth = 0;
@@ -259,7 +273,7 @@ public class InfoDialog
     vboxDialog.setMinWidth(dMinWidth);
     return vboxDialog;
   } /* createVBoxDialog */
-  
+
   /*------------------------------------------------------------------*/
   /** constructor
    * @param stageOwner owner window.
@@ -281,15 +295,18 @@ public class InfoDialog
     Scene scene = new Scene(vboxDialog);
     setScene(scene);
   } /* constructor InfoDialog */
-  
+
   /*------------------------------------------------------------------*/
   /** show the modal info dialog.
    * @param stageOwner owner window.
    */
   public static void showInfoDialog(Stage stageOwner)
   {
-    InfoDialog id = new InfoDialog(stageOwner); 
-    id.showAndWait(); // until it is closed 
+    InfoDialog id = new InfoDialog(stageOwner);
+
+    id.setResizable(false); /* IntraDIGM */
+
+    id.showAndWait(); // until it is closed
   } /* showInfoDialog */
-  
+
 } /* class InfoDialog */

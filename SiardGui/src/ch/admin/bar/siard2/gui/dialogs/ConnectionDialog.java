@@ -35,7 +35,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -130,6 +129,10 @@ public abstract class ConnectionDialog extends ScrollableDialog{
   /** check box for views as tables */
   private CheckBox _cbViewsAsTables = null;
   public boolean isViewsAsTables() { return (_iResult == 1) && (_cbViewsAsTables != null)? _cbViewsAsTables.isSelected(): false; }
+
+  /** Temp */ /* IntraDIGM */
+  protected Label tmpDbSchemeLabel = null; /* IntraDIGM */
+  public Label getTmpDbSchemeLabel(){ return tmpDbSchemeLabel; } /* IntraDIGM */
 
   /*====================================================================*/
   /** DragEventHandler handles dropping folders on DbFolder field.
@@ -708,6 +711,8 @@ public abstract class ConnectionDialog extends ScrollableDialog{
       _tgOptions.selectedToggleProperty().addListener(_tcl);
     }
 
+    tmpDbSchemeLabel = lblDbSchemeLabel; /* IntraDIGM */
+
     getMaxLabelPrefWidth(lblDbSchemeLabel,lblDbHostLabel,lblDbNameLabel,lblDbFolderLabel);
 
     HBox hboxDbScheme = createHBox(lblDbSchemeLabel, _cbDbScheme);
@@ -912,7 +917,8 @@ public abstract class ConnectionDialog extends ScrollableDialog{
       String sLoadViewsAsTablesLabel, String sLoadViewsAsTablesTooltip)
   {
     VBox vbox = new VBox();
-    vbox.setPadding(new Insets(dOUTER_PADDING));
+//    vbox.setPadding(new Insets(dOUTER_PADDING));
+    vbox.setPadding(new Insets(dOUTER_PADDING*2,dOUTER_PADDING,0,dOUTER_PADDING)); /* IntraDIGM */
     vbox.setSpacing(dVSPACING);
     vbox.setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
 
@@ -936,8 +942,8 @@ public abstract class ConnectionDialog extends ScrollableDialog{
     vbox.getChildren().add(hboxButton);
 
     //TODO 최창근 추가 - 중요!! 테스트 후 반드시 삭제 =========
-    HBox hboxTestButton = createHBoxTestButtons();
-    vbox.getChildren().add(hboxTestButton);
+//    HBox hboxTestButton = createHBoxTestButtons();
+//    vbox.getChildren().add(hboxTestButton);
     // 중요!! 테스트 후 반드시 삭제 =========
 
     double dMinWidth = getMaxPaneMinWidth(_vboxParameters,vboxConnectionUrl,vboxConnectionParameters,hboxButton);
@@ -976,17 +982,22 @@ public abstract class ConnectionDialog extends ScrollableDialog{
     if (dMinWidth < vboxDialog.getMinWidth())
       dMinWidth = vboxDialog.getMinWidth();
     /* adapt dialog width to screen */
-    dMinWidth += 2*dOUTER_PADDING;
+    dMinWidth += 2*dOUTER_PADDING; /* IntraDIGM */
+
+    /*
     Rectangle2D rectScreen = FxSizes.getScreenBounds();
     if (dMinWidth >= rectScreen.getWidth())
       dMinWidth = rectScreen.getWidth()-2*dSCREEN_PADDING;
+    */
+//    setResizable(false); /* IntraDIGM */
     setMinWidth(dMinWidth);
+
     /* scene */
     Scene scene = new Scene(vboxDialog);
     setScene(scene);
 
     //TODO 최창근 추가 - 테스트 후 삭제
-    testInit();
+     testInit();
 
   } /* constructor DownloadConnectionDialog */
 

@@ -2,7 +2,7 @@
 SpecialFolder implements a number of special folders.
 Version     : $Id: SpecialFolder.java 607 2016-02-23 12:18:01Z hartwig $
 Application : Utilities
-Description : SpecialFolder is an abstract class that statically 
+Description : SpecialFolder is an abstract class that statically
               implements a number of special folders.
 ------------------------------------------------------------------------
 Copyright  : Enter AG, Zurich, Switzerland, 2007
@@ -10,14 +10,21 @@ Created    : 31.10.2007, Hartwig Thomas
 ======================================================================*/
 package ch.enterag.utils.io;
 
-import java.io.*;
-import java.net.*;
-import java.nio.file.*;
-import ch.enterag.utils.*;
-import ch.enterag.utils.lang.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import ch.enterag.utils.EU;
+import ch.enterag.utils.SU;
+import ch.enterag.utils.lang.Threads;
 
 /*====================================================================*/
-/** SpecialFolder is an abstract class that statically 
+/** SpecialFolder is an abstract class that statically
     implements a number of special folders.
  @author Hartwig Thomas
  */
@@ -30,7 +37,7 @@ public abstract class SpecialFolder
   private static final String sDATA_DIRECTORY = "data";
   private static final String sAPPLICATIONS_DIRECTORY = "applications";
   private static final String sTEMP_DIRECTORY = "temp";
-	
+
   /*====================================================================
   (private) data members
   ====================================================================*/
@@ -43,7 +50,7 @@ public abstract class SpecialFolder
    * root folder for the class.
    * @param sClassName path of class in the format /package/Class.class
    * @param bReport true, if success must be reported on System.out.
-   * @return File for Jar containing class or for folder containing 
+   * @return File for Jar containing class or for folder containing
    *         the class, if class is not in a Jar.
    */
   public static File getJarFromClass(String sClassName, boolean bReport)
@@ -81,6 +88,7 @@ public abstract class SpecialFolder
       }
       else
       {
+    	System.err.println("getJarFromClass("+sClassName+")"); /* IntraDIGM */
         System.err.println("Not in a JAR!");
         if (url.getProtocol().equals("file"))
         {
@@ -97,41 +105,41 @@ public abstract class SpecialFolder
     // catch(ClassNotFoundException cnfe) { System.err.println(EU.getExceptionMessage(cnfe)); }
     return fileJar;
   } /* getJarFromClass */
-  
+
   /*------------------------------------------------------------------*/
   /** returns the JAR file which contains the given class or the root
    * folder for the class.
    * @param classAnchor class in the format /package/Class.class
    * @param bReport true, if success must be reported on System.out.
-   * @return File for Jar containing class or folder containing 
+   * @return File for Jar containing class or folder containing
    *         the class, if class is not in a Jar.
   */
   public static File getJarFromClass(Class<?> classAnchor, boolean bReport)
   {
     return getJarFromClass("/"+classAnchor.getName().replaceAll("\\.", "/")+".class", bReport);
   } /* getJarFromClass */
-  
+
   /*------------------------------------------------------------------*/
-  /** returns JAR file which contains the class with the main() method 
+  /** returns JAR file which contains the class with the main() method
    * that started the program.
    * @return File for Jar containing class or folder containing the
    *         class with the main() method that started the program.
-   */         
+   */
   public static File getMainJar()
   {
     return getJarFromClass(Threads.getMainClass(Threads.getMainThread()),false);
   } /* getMainJar */
-  
+
   /*------------------------------------------------------------------*/
   /** returns JAR file which contains the first class in the current thread.
    * @return File for Jar containing class or folder containing the
    *         class with the main() method that started the current thread.
-   */         
+   */
   public static File getCurrentMainJar()
   {
     return getJarFromClass(Threads.getMainClass(Thread.currentThread()),false);
   } /* getMainCurrentJar */
-  
+
   /*------------------------------------------------------------------*/
   /** search for given file name in the folders of the PATH environment variable.
    * @param sFile file name.
@@ -156,7 +164,7 @@ public abstract class SpecialFolder
     }
     return fileFound;
   } /* findInPath */
-  
+
   /*------------------------------------------------------------------*/
   /** returns the user's home directory.
    * For Windows: C:\Users\&lt;user&gt;
@@ -179,7 +187,7 @@ public abstract class SpecialFolder
 	  File fileHome = new File(getUserHome());
 	  return fileHome.getAbsolutePath()+File.separator+"Desktop";
 	} /* getDesktopFolder */
-	
+
   /*------------------------------------------------------------------*/
   /** returns the data directory under the user's home directory,
    *  creating it if it did not exist.
@@ -201,7 +209,7 @@ public abstract class SpecialFolder
       fileUserAppHome.mkdirs();
     return sUserAppHome;
   } /* getUserDataHome */
-  
+
   /*------------------------------------------------------------------*/
   /** removes the data directory under the user's home directory,
    *  if it is empty.
@@ -216,7 +224,7 @@ public abstract class SpecialFolder
 		try { Files.deleteIfExists(pathUserAppHome); }
 		catch (IOException ie) { System.err.println(ie.getClass().getName()+": "+ie.getMessage()); }
 	} /* removeUserDataHome */
-	
+
   /*------------------------------------------------------------------*/
   /** returns the local directory under the user's home directory,
    *  creating it if it did not exist.
@@ -238,7 +246,7 @@ public abstract class SpecialFolder
       fileUserLocalHome.mkdirs();
     return sUserLocalHome;
   } /* getUserLocalHome */
-  
+
   /*------------------------------------------------------------------*/
   /** removes the local directory under the user's home directory,
    *  if it is empty.
@@ -253,9 +261,9 @@ public abstract class SpecialFolder
     try { Files.deleteIfExists(pathUserLocalHome); }
     catch (IOException ie) { System.err.println(ie.getClass().getName()+": "+ie.getMessage()); }
   } /* removeUserLocalHome */
-  
+
   /*------------------------------------------------------------------*/
-  /** returns the temp directory for the user, creating it if it did 
+  /** returns the temp directory for the user, creating it if it did
    * not exist.
    * For Windows: %TEMP%
    * For UNIX: ~/temp
@@ -272,7 +280,7 @@ public abstract class SpecialFolder
       fileTemp.mkdirs();
     return sTemp;
   } /* getUserLocalHome */
-  
+
   /*------------------------------------------------------------------*/
   /** returns the JAVA settings directory under the user's home directory,
    *  creating it if it did not exist.
@@ -289,5 +297,5 @@ public abstract class SpecialFolder
 			fileUserJavaSettings.mkdir();
 		return sUserJavaSettings;
 	} /* getUserJavaSettings */
-	
+
 } /* class SpecialFolder */

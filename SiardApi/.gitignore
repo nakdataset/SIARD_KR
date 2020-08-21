@@ -7,7 +7,7 @@
 # dist contains the binary build results
 /dist/**
 # generated sources
-# src/ch/admin/bar/siard2/api/generated/**
+src/ch/admin/bar/siard2/api/generated/**
 # build.properties store the user-specific properties 
 # and should never be checked in or out.
 # use build.properties.template as a template for 

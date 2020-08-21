@@ -136,14 +136,16 @@ public class InstallUninstallHandler
           sb.getUninstallationErrorTitle(),
           sb.getUninstallationErrorDesktopMessage(ut.getDesktopError()),
           sb.getOk(),null);
-      if (!_bQuiet)
-      {
-        String sMessage = sb.getUninstallationSuccessSettingsMessage(up.getInstalledPath(null), up.getFile());
-        if (ut.areFilesRemoved()) // settings and files removed
-          sMessage = sb.getUninstallationSuccessFilesMessage(up.getInstalledPath(null), up.getFile());
-        MB.show(SiardGui.getSiardGui().getStage(),
-          sb.getUninstallationSuccessTitle(), sMessage,
-          sb.getOk(), null);
+      if (!_bQuiet) {
+		File _file = new File(SpecialFolder.getUserJavaSettings() + File.separator + up.getApplicationName() + ".properties"); /* IntraDIGM */
+		// String sMessage = sb.getUninstallationSuccessSettingsMessage(up.getInstalledPath(null), up.getFile());
+		String sMessage = sb.getUninstallationSuccessSettingsMessage(up.getInstalledPath(null), _file);
+		if (ut.areFilesRemoved()) // settings and files removed
+			// sMessage = sb.getUninstallationSuccessFilesMessage(up.getInstalledPath(null), up.getFile());
+			sMessage = sb.getUninstallationSuccessFilesMessage(up.getInstalledPath(null), _file);
+		MB.show(SiardGui.getSiardGui().getStage(),
+			sb.getUninstallationSuccessTitle(), sMessage,
+			sb.getOk(), null);
       }
       up.setInstalledVersion(null);
       _il.event("Storing uninstallation ...");

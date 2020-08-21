@@ -10,13 +10,19 @@ Created    : 10.05.2017, Hartwig Thomas, Enter AG, Zurich
 
 package ch.admin.bar.siard2.gui;
 
-import java.io.*;
-import java.util.*;
-import ch.enterag.utils.io.*;
-import ch.enterag.utils.lang.*;
-import ch.enterag.utils.logging.*;
-import ch.admin.bar.siard2.api.*;
-import ch.admin.bar.siard2.cmd.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Properties;
+import java.util.StringTokenizer;
+
+import ch.admin.bar.siard2.api.Archive;
+import ch.admin.bar.siard2.cmd.SiardConnection;
+import ch.enterag.utils.io.SpecialFolder;
+import ch.enterag.utils.lang.Execute;
+import ch.enterag.utils.logging.IndentLogger;
 
 /*====================================================================*/
 /** User properties contains the user's properties in a property
@@ -31,7 +37,7 @@ public class UserProperties extends Properties
   ====================================================================*/
 	/** singleton */
 	private static UserProperties _up = null;
-  /** logger */  
+  /** logger */
   private static IndentLogger _il = IndentLogger.getIndentLogger(UserProperties.class.getName());
   /** properties file */
   private File _file = null;
@@ -52,7 +58,7 @@ public class UserProperties extends Properties
     _sApplicationName = sApplicationName;
     _file = new File(SpecialFolder.getUserJavaSettings() + File.separator+sApplicationName+".properties");
   } /* setApplicationName */
-  
+
   /*------------------------------------------------------------------*/
   /** constructor sets the file name to &lt;user.home&gt;/&lt;application&gt;/user.properties
    * @param sApplicationName name of the application to be used for the
@@ -63,7 +69,7 @@ public class UserProperties extends Properties
   	super();
   	setApplicationName(sApplicationName.toLowerCase().replace(' ','_'));
   } /* constructor UserProperties */
-  
+
   /*------------------------------------------------------------------*/
   /** returns singleton UserProperties.
   @return singleton instance of UserProperties.
@@ -74,7 +80,7 @@ public class UserProperties extends Properties
       _up = new UserProperties(SiardGui.getApplication()+" "+Archive.sMETA_DATA_VERSION);
     return _up;
   } /* getInstance */
-  
+
   /*====================================================================
   public methods
   ====================================================================*/
@@ -97,7 +103,7 @@ public class UserProperties extends Properties
   	  bSuccess = true;
   	}
   	catch(FileNotFoundException fnfe)
-  	{ 
+  	{
   		_il.exception(fnfe);
     	_il.event("file "+_file.getAbsolutePath()+" does not exist!");
  		}
@@ -105,7 +111,7 @@ public class UserProperties extends Properties
   	_il.exit(String.valueOf(bSuccess));
   	return bSuccess;
   } /* load */
-  
+
   /*------------------------------------------------------------------*/
   /** deletes the UserProperties file.
   @return true, if successfully deleted.
@@ -128,7 +134,7 @@ public class UserProperties extends Properties
   	_il.exit(String.valueOf(bSuccess));
   	return bSuccess;
   } /* delete */
-  
+
   /*------------------------------------------------------------------*/
   /** stores singleton UserProperties.
   @return true, if successfully stored.
@@ -158,7 +164,7 @@ public class UserProperties extends Properties
   	_il.exit();
   	return bSuccess;
   } /* store */
-  
+
   /*------------------------------------------------------------------*/
   /** get string property.
    * @param sKey property key.
@@ -184,7 +190,7 @@ public class UserProperties extends Properties
     else
       remove(sKey);
   } /* setString */
-  
+
   /*------------------------------------------------------------------*/
   /** get boolean property.
    * @param sKey property key.
@@ -208,7 +214,7 @@ public class UserProperties extends Properties
   {
     setProperty(sKey,Boolean.toString(bValue));
   } /* setBoolean */
-  
+
   /*------------------------------------------------------------------*/
   /** get double property.
    * @param sKey property key.
@@ -232,7 +238,7 @@ public class UserProperties extends Properties
   {
     setProperty(sKey,Double.toString(dValue));
   } /* setDouble */
-  
+
   /*------------------------------------------------------------------*/
   /** get int property.
    * @param sKey property key.
@@ -256,7 +262,7 @@ public class UserProperties extends Properties
   {
     setProperty(sKey,Integer.toString(iValue));
   } /* setInt */
-  
+
   /*------------------------------------------------------------------*/
   /** get file property.
    * @param sKey property key.
@@ -283,7 +289,7 @@ public class UserProperties extends Properties
     else
       remove(sKey);
   } /* setFile */
-  
+
   /*====================================================================
   convenience methods for accessing all fields
   ====================================================================*/
@@ -291,7 +297,7 @@ public class UserProperties extends Properties
   private static final String sUI_LANGUAGE_KEY = "ui.language";
   public String getUiLanguage(String sDefault) { return getString(sUI_LANGUAGE_KEY,sDefault);  }
   public void setUiLanguage(String sLanguage) { setString(sUI_LANGUAGE_KEY,sLanguage); }
-  
+
   private static final String sSTAGE_MAXIMIZED_KEY = "stage.maximized";
   public boolean getStageMaximized(boolean bDefault) { return getBoolean(sSTAGE_MAXIMIZED_KEY, bDefault); }
   public void setStageMaximized(boolean bStageMaximized) { setBoolean(sSTAGE_MAXIMIZED_KEY, bStageMaximized); }
@@ -299,11 +305,11 @@ public class UserProperties extends Properties
   private static final String sSTAGE_MINIMIZED_KEY = "stage.minimized";
   public boolean getStageMinimized(boolean bDefault) { return getBoolean(sSTAGE_MINIMIZED_KEY, bDefault); }
   public void setStageMinimized(boolean bStageMinimized) { setBoolean(sSTAGE_MINIMIZED_KEY, bStageMinimized); }
-  
+
   private static final String sSTAGE_X_KEY = "stage.x";
   public double getStageX(double dDefault) { return getDouble(sSTAGE_X_KEY,dDefault); }
   public void setStageX(double dStageX) { setDouble(sSTAGE_X_KEY, dStageX); }
-  
+
   private static final String sSTAGE_Y_KEY = "stage.y";
   public double getStageY(double dDefault) { return getDouble(sSTAGE_Y_KEY,dDefault); }
   public void setStageY(double dStageY) { setDouble(sSTAGE_Y_KEY, dStageY); }
@@ -311,35 +317,35 @@ public class UserProperties extends Properties
   private static final String sSTAGE_WIDTH_KEY = "stage.width";
   public double getStageWidth(double dDefault) { return getDouble(sSTAGE_WIDTH_KEY,dDefault); }
   public void setStageWidth(double dStageWidth) { setDouble(sSTAGE_WIDTH_KEY, dStageWidth); }
-  
+
   private static final String sSTAGE_HEIGHT_KEY = "stage.height";
   public double getStageHeight(double dDefault) { return getDouble(sSTAGE_HEIGHT_KEY,dDefault); }
   public void setStageHeight(double dStageHeight) { setDouble(sSTAGE_HEIGHT_KEY, dStageHeight); }
-  
+
   private static final String sINSTALLED_PATH_KEY = "installed.path";
   public File getInstalledPath(File fileDefault) { return getFile(sINSTALLED_PATH_KEY,fileDefault); }
   public void setInstalledPath(File fileInstalledPath) { setFile(sINSTALLED_PATH_KEY,fileInstalledPath); }
-  
+
   private static final String sINSTALLED_VERSION_KEY = "installed.version";
   public String getInstalledVersion(String sDefault) { return getString(sINSTALLED_VERSION_KEY,sDefault); }
   public void setInstalledVersion(String sInstalledVersion) { setString(sINSTALLED_VERSION_KEY,sInstalledVersion); }
-  
+
   private static final String sFIND_STRING_KEY = "find.string";
   public String getFindString() { return getString(sFIND_STRING_KEY, null); }
   public void setFindString(String sFindString) { setString(sFIND_STRING_KEY, sFindString); }
-  
+
   private static final String sFIND_MATCH_CASE_KEY = "find.match.case";
   public boolean getFindMatchCase() { return getBoolean(sFIND_MATCH_CASE_KEY, false); }
   public void setFindMatchCase(boolean bMatchCase) { setBoolean(sFIND_MATCH_CASE_KEY, bMatchCase); }
-  
+
   private static final String sSEARCH_STRING_KEY = "search.string";
   public String getSearchString() { return getString(sSEARCH_STRING_KEY, null); }
   public void setSearchString(String sSearchString) { setString(sSEARCH_STRING_KEY, sSearchString); }
-  
+
   private static final String sSEARCH_MATCH_CASE_KEY = "search.match.case";
   public boolean getSearchMatchCase() { return getBoolean(sSEARCH_MATCH_CASE_KEY, false); }
   public void setSearchMatchCase(boolean bMatchCase) { setBoolean(sSEARCH_MATCH_CASE_KEY, bMatchCase); }
-  
+
   private static final String sDATABASE_SCHEME_KEY = "database.scheme";
   private static final String sDATABASE_SCHEME = "sqlserver";
   public static final String sORACLE_DATABASE_SCHEME = "oracle";
@@ -347,7 +353,7 @@ public class UserProperties extends Properties
   public static final String sACCESS_DATABASE_USER = "Admin";
   public String getDatabaseScheme() { return getString(sDATABASE_SCHEME_KEY,sDATABASE_SCHEME); }
   public void setDatabaseScheme(String sDatabaseScheme) { setString(sDATABASE_SCHEME_KEY, sDatabaseScheme); }
-  
+
   private static final String sDATABASE_HOST_KEY = "database.host";
   private static final String sDATABASE_HOST = "dbserver.enterag.ch";
   public String getDatabaseHost() { return getString(sDATABASE_HOST_KEY,sDATABASE_HOST); }
@@ -358,7 +364,7 @@ public class UserProperties extends Properties
   public static final String sORACLE_DATABASE_NAME = "orcl";
   public String getDatabaseName(String sScheme) { return getString(sDATABASE_NAME_KEY,sScheme.equals(sORACLE_DATABASE_SCHEME)?sORACLE_DATABASE_NAME:sDATABASE_NAME); }
   public void setDatabaseName(String sDatabaseName) { setString(sDATABASE_NAME_KEY, sDatabaseName); }
-  
+
   private static final String sDATABASE_OPTION_KEY = "database.option";
   public int getDatabaseOption() { return getInt(sDATABASE_OPTION_KEY, 0); }
   public void setDatabaseOption(int iDatabaseOption) { setInt(sDATABASE_OPTION_KEY,iDatabaseOption); }
@@ -368,7 +374,7 @@ public class UserProperties extends Properties
   public File getDatabaseFolder()
   {
     _il.enter();
-    File fileDbFolder = new File(SiardGui.getDefaultDataDirectory().getAbsolutePath() + 
+    File fileDbFolder = new File(SiardGui.getDefaultDataDirectory().getAbsolutePath() +
         File.separator+sDATABASE_FOLDER);
     fileDbFolder = getFile(sDATABASE_FOLDER_KEY, fileDbFolder);
     fileDbFolder.mkdirs();
@@ -388,7 +394,7 @@ public class UserProperties extends Properties
   private static final String sTEXT_EDITOR_KEY = "installed.texteditor";
   private static final File fileWINDOWS_EDITOR = new File("notepad.exe");
   private static final File fileLINUX_EDITOR = new File("gedit");
-  private static final File fileTEXT_EDITOR = new File("texteditor"); 
+  private static final File fileTEXT_EDITOR = new File("texteditor");
   public File getTextEditor()
   {
   	_il.enter();
@@ -401,11 +407,11 @@ public class UserProperties extends Properties
   	return  fileTextEditor;
  	} /* getTextEditor */
   public void setTextEditor(File fileTextEditor) { setFile(sTEXT_EDITOR_KEY,fileTextEditor); }
-  
+
   private static final String sBIN_EDITOR_KEY = "installed.bineditor";
   private static final String sHXD_FILE = "hxd"+File.separator+"HxD.exe";
   private static final File fileLINUX_BINEDITOR = new File("ghex");
-  private static final File fileBIN_EDITOR = new File("bineditor"); 
+  private static final File fileBIN_EDITOR = new File("bineditor");
   public File getBinEditor()
   {
   	_il.enter();
@@ -425,11 +431,11 @@ public class UserProperties extends Properties
   	return  fileBinEditor;
  	}
   public void setBinEditor(File fileBinEditor) { setFile(sBIN_EDITOR_KEY,fileBinEditor); }
-  
+
   private static final String sSPLASH_MS_KEY = "splash.ms";
   public int getSplashMs(int iDefault) { return getInt(sSPLASH_MS_KEY,iDefault); }
   public void setSplashMs(int iSplashMs) { setInt(sSPLASH_MS_KEY, iSplashMs); }
-  
+
   private static final String sLOGIN_TIMEOUT_SECONDS_KEY ="login.timeout.seconds";
   public int getLoginTimeoutSeconds() { return getInt(sLOGIN_TIMEOUT_SECONDS_KEY,SiardConnection.iDEFAULT_LOGIN_TIMEOUT_SECONDS); }
   public void setLoginTimeoutSeconds(int iLoginTimeoutSeconds) { setInt(sLOGIN_TIMEOUT_SECONDS_KEY,iLoginTimeoutSeconds); }
@@ -442,7 +448,7 @@ public class UserProperties extends Properties
   private static final int iCOLUMN_WIDTH = 10;
   public int getColumnWidth() { return getInt(sCOLUMN_WIDTH_KEY,iCOLUMN_WIDTH); }
   public void setColumnWidth(int iColumnWidth) { setInt(sCOLUMN_WIDTH_KEY,iColumnWidth); }
-  
+
   private static final String sFILE_CHOOSER_NATIVE = "file.chooser.native";
   public boolean getFileChooserNative(boolean bDefault) { return getBoolean(sFILE_CHOOSER_NATIVE, bDefault); }
   public void setFileChooserNative(boolean bFileChooserNative) { setBoolean(sFILE_CHOOSER_NATIVE, bFileChooserNative); }
@@ -461,13 +467,13 @@ public class UserProperties extends Properties
     _il.exit(fileConfigFolder);
     return fileConfigFolder;
   } /* getConfigFolder */
-  
+
   private static final String sLOBS_FOLDER_KEY = "lobs.folder";
   private static final String sLOBS_FOLDER = "lobs";
   public File getLobsFolder()
   {
     _il.enter();
-    File fileLobsFolder = new File(SiardGui.getDefaultDataDirectory().getAbsolutePath() + 
+    File fileLobsFolder = new File(SiardGui.getDefaultDataDirectory().getAbsolutePath() +
         File.separator+sLOBS_FOLDER);
     fileLobsFolder = getFile(sLOBS_FOLDER_KEY, fileLobsFolder);
     fileLobsFolder.getParentFile().mkdirs();
@@ -478,41 +484,47 @@ public class UserProperties extends Properties
   {
     setFile(sLOBS_FOLDER_KEY, fileLobsFolder);
   } /* setLobsFolder */
-  
+
   private static final String sMETADATA_FOLDER = "md";
   private static final String sMETADATA_IMPORT_KEY = "metadata.import";
   public File getImportMetadataFolder()
   {
     _il.enter();
-    File fileImportMetadataFolder = new File(SiardGui.getDefaultDataDirectory().getAbsolutePath() + 
+    File fileImportMetadataFolder = new File(SiardGui.getDefaultDataDirectory().getAbsolutePath() +
         File.separator+sMETADATA_FOLDER);
     fileImportMetadataFolder = getFile(sMETADATA_IMPORT_KEY, fileImportMetadataFolder);
-    fileImportMetadataFolder.getParentFile().mkdirs();
+
+//    fileImportMetadataFolder.getParentFile().mkdirs(); /* IntraDIGM */
+    fileImportMetadataFolder.mkdirs(); /* IntraDIGM */
+
     _il.exit(fileImportMetadataFolder);
     return fileImportMetadataFolder;
   } /* getImportMetadataFolder */
   public void setImportMetadataFolder(File fileImportMetadataFolder)
   {
     setFile(sMETADATA_IMPORT_KEY, fileImportMetadataFolder);
-  } /* setImportMetadataFolder */    
-  
+  } /* setImportMetadataFolder */
+
   private static final String sMETADATA_EXPORT_KEY = "metadata.export";
   public File getExportMetadataFolder()
   {
     _il.enter();
-    File fileExportMetadataFolder = new File(SiardGui.getDefaultDataDirectory().getAbsolutePath() + 
+    File fileExportMetadataFolder = new File(SiardGui.getDefaultDataDirectory().getAbsolutePath() +
         File.separator+sMETADATA_FOLDER);
     fileExportMetadataFolder = getFile(sMETADATA_EXPORT_KEY, fileExportMetadataFolder);
-    fileExportMetadataFolder.getParentFile().mkdirs();
+
+//    fileExportMetadataFolder.getParentFile().mkdirs(); /* IntraDIGM */
+    fileExportMetadataFolder.mkdirs(); /* IntraDIGM */
+
     _il.exit(fileExportMetadataFolder);
     return fileExportMetadataFolder;
   } /* getExportMetadataFolder */
   public void setExportMetadataFolder(File fileExportMetadataFolder)
   {
     setFile(sMETADATA_IMPORT_KEY, fileExportMetadataFolder);
-  } /* setExportMetadataFolder */    
-  
-  
+  } /* setExportMetadataFolder */
+
+
   private static final String sXSL_FILE_KEY = "xsl.file";
   private static final String sXSL_FILE = "metadata.xsl";
   public File getXslFile()
@@ -539,7 +551,7 @@ public class UserProperties extends Properties
     _il.exit(sMapping);
     return sMapping;
   } /* getSchemaMapping */
-  
+
   /*------------------------------------------------------------------*/
   /** set a schema mapping (schema \t mapped schema).
    * @param iIndex index of the schema mapping.
@@ -553,11 +565,11 @@ public class UserProperties extends Properties
     else
       _up.remove(sSCHEMA_MAPPING_KEY+String.valueOf(iIndex));
   } /* setSchemaMapping */
-  
+
   private static String sMRU_FILE_KEY = "mru.file.entry";
   /*------------------------------------------------------------------*/
   /** get one file of the the list of most recently used files.
-   @param iIndex Index of the connection to be returned. 
+   @param iIndex Index of the connection to be returned.
    @return file path as string or empty string if not found.
    */
   public String getMruFile(int iIndex)
@@ -567,10 +579,10 @@ public class UserProperties extends Properties
     _il.exit(sFile);
   	return sFile;
   } /* getMruFile */
-  
+
   /*------------------------------------------------------------------*/
   /** sets one file of the the list of most recently used files.
-   @param iIndex Index of the connection to be set. 
+   @param iIndex Index of the connection to be set.
    @param sFile file path as string.
    */
   public void setMruFile(int iIndex, String sFile)
@@ -578,7 +590,7 @@ public class UserProperties extends Properties
   	_il.enter(String.valueOf(iIndex),sFile);
   	if (iIndex >= 0 && iIndex < (MruFile.iNUM_FILES + 1))
 		  _up.setProperty(sMRU_FILE_KEY+String.valueOf(iIndex), sFile);
-  	else 
+  	else
    		_il.event("Invalid index: \""+iIndex+"\"!");
   	_il.exit();
   } /* setMruFile */
@@ -591,12 +603,12 @@ public class UserProperties extends Properties
   {
     return sMRU_DATABASE_KEY + (bDownload?sMRU_DATABASE_DIRECTION_DOWN:sMRU_DATABASE_DIRECTION_UP)+sMRU_DATABASE_ENTRY+String.valueOf(iIndex);
   } /* getMruConnectionKey */
-  
+
   /*------------------------------------------------------------------*/
   /** get one connection of the the list of most recently used connections
    @param bDownload true for download connections, false for upload connections.
-   @param iIndex Index of the connection to be returned 
-   @return Connection as string of format [JDBC URL]\t[DatabaseUser] 
+   @param iIndex Index of the connection to be returned
+   @return Connection as string of format [JDBC URL]\t[DatabaseUser]
      or empty string if not found
    */
   public String getMruConnection(boolean bDownload, int iIndex)
@@ -613,11 +625,11 @@ public class UserProperties extends Properties
   	_il.exit(sConnection);
   	return sConnection;
   } /* getMruConnection */
-  
+
   /*------------------------------------------------------------------*/
   /** sets one connection of the the list of most recently used connections
    @param bDownload true for download connections, false for upload connections.
-   @param iIndex Index of the connection to be set 
+   @param iIndex Index of the connection to be set
    @param sConnection connection ([JDBC URL]\t[DatabaseUser].
    */
   public void setMruConnection(boolean bDownload, int iIndex, String sConnection)
@@ -625,7 +637,7 @@ public class UserProperties extends Properties
   	_il.enter(String.valueOf(iIndex),sConnection);
   	if (iIndex >= 0 && iIndex < MruConnection.iNUM_CONNECTIONS+1)
   		_up.setProperty(getMruConnectionKey(bDownload,iIndex), sConnection);
-  	else 
+  	else
    		_il.event("Invalid index: \""+iIndex+"\"!");
   	_il.exit();
   } /* setMruConnection */

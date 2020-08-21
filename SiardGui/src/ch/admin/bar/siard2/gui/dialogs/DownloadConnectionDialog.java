@@ -19,6 +19,8 @@ import org.apache.log4j.Logger;
 
 import ch.admin.bar.siard2.api.primary.FileDownloadModel;
 import ch.admin.bar.siard2.gui.SiardBundle;
+import ch.enterag.utils.fx.FxSizes;
+import javafx.geometry.Rectangle2D;
 import javafx.stage.Stage;
 
 /*====================================================================*/
@@ -77,6 +79,10 @@ public class DownloadConnectionDialog
 	LOG.info("DownloadConnectionDialog call!");
     DownloadConnectionDialog dcd = new DownloadConnectionDialog(stageOwner, sConnectionUrl, sDbUser);
     LOG.info("DownloadConnectionDialog before dcd.showAndWait()");
+
+    Rectangle2D rectScreen = FxSizes.getScreenBounds(); /* IntraDIGM */
+    dcd.setWidth(rectScreen.getWidth() * 0.4); /* IntraDIGM */
+
     dcd.showAndWait();
     LOG.info("DownloadConnectionDialog after dcd.showAndWait()");
     return dcd;

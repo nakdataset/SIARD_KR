@@ -24,6 +24,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
@@ -168,7 +169,10 @@ public class OptionDialog
     SiardBundle sb = SiardBundle.getSiardBundle();
     UserProperties up = UserProperties.getUserProperties();
     VBox vbox = new VBox();
-    vbox.setPadding(new Insets(dOUTER_PADDING));
+
+//    vbox.setPadding(new Insets(dOUTER_PADDING)); /* IntraDIGM */
+    vbox.setPadding(new Insets(dOUTER_PADDING * 2, dOUTER_PADDING, 0, dOUTER_PADDING)); /* IntraDIGM */
+
     vbox.setSpacing(dVSPACING);
     vbox.setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
 
@@ -236,7 +240,10 @@ public class OptionDialog
     // 최창근 수정 - 가로, 세로 스크롤 제거를 위한 넓이, 높이 값 수정
     /* scene */
 //    Scene scene = new Scene(vbox, vbox.getMinWidth()+10.0, vbox.getMinHeight()+10.0);
-    Scene scene = new Scene(vbox, vbox.getMinWidth()+20.0, vbox.getMinHeight()+20.0);
+
+//    Scene scene = new Scene(vbox, vbox.getMinWidth()+20.0, vbox.getMinHeight()+20.0); /* IntraDIGM */
+    Scene scene = new Scene(vbox); /* IntraDIGM */
+
     setScene(scene);
   } /* constructor */
 
@@ -248,6 +255,12 @@ public class OptionDialog
   public static OptionDialog showOptionDialog(Stage stageOwner)
   {
     OptionDialog od = new OptionDialog(stageOwner);
+
+    /* IntraDIGM ==============================*/
+    Rectangle2D rectScreen = FxSizes.getScreenBounds();
+	od.setWidth(rectScreen.getWidth() * 0.4);
+	od.setResizable(false);
+	/* ============================== IntraDIGM */
 
     od.showAndWait();
     return od;

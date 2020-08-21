@@ -77,6 +77,10 @@ public class FindDialog
     _btnOk = new Button(sOk);
     _btnOk.setDefaultButton(true);
     _btnOk.setOnAction(this);
+
+    // 20200821 최창근 수정 - 해당 로직 넣으니 find가 안되서 다시 주석처리 함
+//    _btnOk.setDisable(true); /* IntraDIGM */
+
     hbox.getChildren().add(_btnOk);
     _btnCancel = new Button(sCancel);
     _btnCancel.setCancelButton(true); // associate it with ESC key
@@ -151,7 +155,10 @@ public class FindDialog
 
     // 최창근 수정 - margin 값 수정
 //    vbox.setPadding(new Insets(dINNER_PADDING));
-    vbox.setPadding(new Insets(dOUTER_PADDING));
+
+//    vbox.setPadding(new Insets(dOUTER_PADDING));/* IntraDIGM */
+    vbox.setPadding(new Insets(dOUTER_PADDING*2,dOUTER_PADDING,0,dOUTER_PADDING)); /* IntraDIGM */
+
     vbox.setSpacing(dVSPACING);
     vbox.setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
     String sFindStringLabel = sb.getFindStringLabel();
@@ -182,7 +189,10 @@ public class FindDialog
     // 최창근 수정 - 가로, 세로 스크롤 제거를 위한 넓이, 높이 값 수정
     /* scene */
     // Scene scene = new Scene(vbox, vbox.getMinWidth()+10.0, vbox.getMinHeight()+10.0);
-    Scene scene = new Scene(vbox, vbox.getMinWidth()+20.0, vbox.getMinHeight()+20.0);
+
+//    Scene scene = new Scene(vbox, vbox.getMinWidth()+20.0, vbox.getMinHeight()+20.0); /* IntraDIGM */
+    Scene scene = new Scene(vbox); /* IntraDIGM */
+
     setScene(scene);
   } /* constructor */
 
@@ -197,6 +207,7 @@ public class FindDialog
     String sFindString, boolean bMatchCase)
   {
     FindDialog fd = new FindDialog(stageOwner,sFindString,bMatchCase);
+    fd.setResizable(false); /* IntraDIGM */
     fd.showAndWait();
     return fd;
   } /* showFindDialog */

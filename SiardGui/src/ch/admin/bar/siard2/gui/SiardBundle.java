@@ -513,4 +513,21 @@ public class SiardBundle extends FxBundle
   public String getTableColumnName(String value) {
 	  return getProperty("history.column." + value);
   }
+
+  /* Menu */ /* IntraDIGM */
+  public String getMenuFileDownloadStory() { return getProperty("menu.file.downloadstory"); }
+  public String getMenuFileUploadStory() { return getProperty("menu.file.uploadstory"); }
+  /* ToolTip */ /* IntraDIGM */
+  public String getToolTipDownload() { return getProperty("tooltip.download"); }
+  public String getToolTipUpload() { return getProperty("tooltip.upload"); }
+  public String getToolTipOpen() { return getProperty("tooltip.open"); }
+  public String getToolTipSave() { return getProperty("tooltip.save"); }
+  public String getToolTipClose() { return getProperty("tooltip.close"); }
+  public String getToolTipFind() { return getProperty("tooltip.find"); }
+  public String getToolTipFindNext() { return getProperty("tooltip.find.next"); }
+  public String getToolTipSearch() { return getProperty("tooltip.search"); }
+  public String getToolTipSearchNext() { return getProperty("tooltip.search.next"); }
+  public String getToolTipOptions() { return getProperty("tooltip.options"); }
+  public String getToolTipInfo() { return getProperty("tooltip.info"); }
+
 } /* SiardBundle */

@@ -186,6 +186,27 @@ public abstract class LoadDialog extends ScrollableDialog implements EventHandle
     boolean bMetaDataOnly, boolean bViewsAsTables);
 
   /*------------------------------------------------------------------*/
+  /* IntraDIGM ========================*/
+  /**
+   * create the HBox with an progress bar.
+   *
+   * @return HBox with an progress bar.
+   */
+  private HBox createHBoxProgress()
+  {
+  	/* progressbar */
+  	_pb = new ProgressBar(1.0);
+  	/* HBox for progress */
+  	HBox hbox = new HBox();
+  	hbox.setPadding(new Insets(dINNER_PADDING));
+  	hbox.setSpacing(dHSPACING);
+  	hbox.setAlignment(Pos.CENTER);
+  	hbox.getChildren().add(_pb);
+  	return hbox;
+  } /* createHBoxProgress */
+  /* ======================== IntraDIGM */
+
+  /*------------------------------------------------------------------*/
   /** create the main VBox of the dialog
    * containing title area, text area, progress bar, separator and OK and Cancel buttons.
    * @param conn database connection.
@@ -200,7 +221,10 @@ public abstract class LoadDialog extends ScrollableDialog implements EventHandle
     /* VBox for title area, text area, progress bar, message, separator and OK and Cancel buttons */
 	LOG.info("createVBoxDialog");
     VBox vbox = new VBox();
-    vbox.setPadding(new Insets(dOUTER_PADDING));
+
+//    vbox.setPadding(new Insets(dOUTER_PADDING)); /* IntraDIGM */
+    vbox.setPadding(new Insets(dOUTER_PADDING*2,dOUTER_PADDING,0,dOUTER_PADDING)); /* IntraDIGM */
+
     vbox.setSpacing(dVSPACING);
     vbox.setAlignment(Pos.TOP_LEFT);
     vbox.setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);

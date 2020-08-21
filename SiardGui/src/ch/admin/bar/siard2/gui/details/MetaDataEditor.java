@@ -249,15 +249,18 @@ public class MetaDataEditor
     {
       if (SiardGui.getSiardGui().getArchive().isValid())
       {
-        RecordExtract re = (RecordExtract)_oMetaData;
-        RecordExtract reLastChild = null;
-        try { reLastChild = re.getRecordExtract(re.getRecordExtracts()-1); }
-        catch(IOException ie) { _il.exception(ie); }
-        sValue = String.valueOf(re.getOffset());
-        if (re.getRecordExtracts() > 1)
-          sValue = sValue + "-" +String.valueOf(reLastChild.getOffset());
-        if (re.getDelta() > 1)
-          sValue = sValue + " ("+String.valueOf(reLastChild.getDelta())+")";
+		RecordExtract re = (RecordExtract) _oMetaData;
+		RecordExtract reLastChild = null;
+		try {
+			reLastChild = re.getRecordExtract(re.getRecordExtracts() - 1);
+		} catch (IOException ie) {
+			_il.exception(ie);
+		}
+		sValue = String.valueOf(re.getOffset() + 1); /* IntraDIGM */
+		if (re.getRecordExtracts() > 1)
+			sValue = sValue + " - " + String.valueOf(reLastChild.getOffset() + 1); /* IntraDIGM */
+		if (re.getDelta() > 1)
+			sValue = sValue + " (" + String.valueOf(reLastChild.getDelta()) + ")";
       }
       else
         sValue = SiardBundle.getSiardBundle().getTableNoPrimaryData();
@@ -323,7 +326,8 @@ public class MetaDataEditor
   {
     LOG.info("displayButtons");
     HBox hbox = new HBox();
-    hbox.setPadding(new Insets(dINNER_PADDING));
+//    hbox.setPadding(new Insets(dINNER_PADDING));
+    hbox.setPadding(new Insets(10,0,0,0)); /* IntraDIGM */
     hbox.setSpacing(dHSPACING);
 
     _btnReset = new Button(_sb.getEditMetaDataReset());
