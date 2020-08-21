@@ -40,10 +40,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-public class ChooseTableDialog extends ScrollableDialog implements EventHandler<ActionEvent> {
+public class TableDialog extends ScrollableDialog implements EventHandler<ActionEvent> {
 
 	// 최창근 추가 - 로그
-	private static final Logger LOG = Logger.getLogger(ChooseTableDialog.class);
+	private static final Logger LOG = Logger.getLogger(TableDialog.class);
 
 	/** result will be 1 for default, 0 otherwise */
 	public static final int iRESULT_CANCELED = 0;
@@ -71,7 +71,7 @@ public class ChooseTableDialog extends ScrollableDialog implements EventHandler<
 
 	private Stage stageOwner;
 
-	private ChooseTableDialog(Stage stageOwner, DownloadConnectionDialog dcd) throws Exception{
+	private TableDialog(Stage stageOwner, DownloadConnectionDialog dcd) throws Exception{
 		super(stageOwner, "테이블 선택 테스트");
 
 		this.dcd = dcd;
@@ -396,11 +396,11 @@ public class ChooseTableDialog extends ScrollableDialog implements EventHandler<
 	 *
 	 * @param stageOwner owner window.
 	 */
-	public static ChooseTableDialog showChooseTableDialog(Stage stageOwner, DownloadConnectionDialog dcd) throws Exception{
+	public static TableDialog showChooseTableDialog(Stage stageOwner, DownloadConnectionDialog dcd) throws Exception{
 		LOG.info("showChooseTableDialog");
-		ChooseTableDialog ctd = new ChooseTableDialog(stageOwner, dcd);
-		ctd.showAndWait(); // until it is closed
-		return ctd;
+		TableDialog td = new TableDialog(stageOwner, dcd);
+		td.showAndWait(); // until it is closed
+		return td;
 	} /* showInfoDialog */
 
 }

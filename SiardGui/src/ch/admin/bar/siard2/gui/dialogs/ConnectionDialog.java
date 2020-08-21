@@ -234,11 +234,6 @@ public abstract class ConnectionDialog extends ScrollableDialog{
         	_iResult = iRESULT_SUCCESS;
         	LOG.info("1 _iResult " + _iResult);
 
-        	//TODO 최창근 추가 - 테이블 선택 dialog를 띄워야함
-//        	ChooseTableDialog ctd = ChooseTableDialog.showChooseTableDialog(_stageOwner);
-//        	_iResult = ctd.getResult();
-//        	LOG.info("2 _iResult " + _iResult);
-
         	close();
 
         }else {
