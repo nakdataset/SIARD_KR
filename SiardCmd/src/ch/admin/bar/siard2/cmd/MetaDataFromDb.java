@@ -1504,9 +1504,9 @@ public class MetaDataFromDb
       			String parmName = (String) st.nextElement();
       			if(parmName != null && !parmName.isEmpty()) {
       				if(index == 0) { //스키마명
-      					schemaName = parmName.trim().toLowerCase();
+      					schemaName = parmName.trim();
       				} else if(index == 1) {//테이블명
-      					tableName = parmName.trim().toLowerCase();
+      					tableName = parmName.trim();
       				}
       			} else {
       				throw new IOException("스키마 또는 테이블 정보가 없습니다. 테이블(t) 파라미터값 입력 형식은 \"schema_name.table_name\"입니다. \n테이블:"+str + "\n스키마 및 테이블에 대한 전체 다운로드 시에서는 \"all\"을 입력해주세요.\n특정 스키마에 대한 전체 테이블 다운로드 시에는 \"schema_name.*\"으로 입력해주세요.");

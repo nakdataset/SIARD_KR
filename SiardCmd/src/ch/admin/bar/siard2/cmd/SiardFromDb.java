@@ -261,12 +261,14 @@ public class SiardFromDb
     		while (st.hasMoreElements())
     		{
     			String tableName = (String) st.nextElement();
-    		  //schema.table -> 2개가 나와야함.
-    			checkArgumentValue(tableName, 2);
+    			if(!"all".equals(tableName)) {
+    				//schema.table -> 2개가 나와야함.
+    				checkArgumentValue(tableName, 2);
+    			}
     			_tableList.add(tableName.trim());
     		}
       }
-      
+
       if (sTableList == null)
       {
         System.out.println("테이블(-t=\"schema.table\")은 필수 입력입니다.");
@@ -274,7 +276,7 @@ public class SiardFromDb
         System.out.println(" - 특정 스키마에 대한 모든 테이블을 다운로드 할 경우에는 -t=\"schema.*\"을 입력해주세요.");
         _iReturn = iRETURN_ERROR;
       }
-      
+
       if (sSiardFile != null)
       	_fileSiard = new File(sSiardFile);
       if (sExportXml != null)
@@ -441,7 +443,7 @@ public class SiardFromDb
 
   //argument value값 체크
   private void checkArgumentValue(String value, int checkInt) {
-  	String valueTitle = (checkInt == 2 ? "테이블" : "파일 컬럼");
+		String valueTitle = (checkInt == 2 ? "테이블" : "파일 컬럼");
 		if(value.split("[.]").length != checkInt) {
 			System.out.println(valueTitle + "은 (-fc=\"schema.table.column\") 형식으로 입력해야합니다.");
 			System.out.println(" - 관련 " + valueTitle + " = " + value);
