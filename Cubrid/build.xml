@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- build.xml =========================================================
+ANT build file of EnterUtils
+Application: EnterUtils
+Description: ANT build file of EnterUtils
+Platform   : JAVA, ANT
+========================================================================
+Copyright  : 2016, Enter AG, Rüti ZH, Switzerland
+Created    : 09.05.2016, Hartwig Thomas
+==================================================================== -->
+<project basedir="." default="build" name="cubrid">
+	<!--
+		build properties contain local settings. They must reside in
+	    the same folder as this build.xml. Use build.properties.template
+	    as a guide for creating the local copy.
+  	-->
+	<property name="debuglevel" value="source,lines,vars" />
+	<property name="target" value="1.8" />
+	<property name="source" value="1.8" />
+
+	<!-- the main folders of the project -->
+	<property name="dirsrc" value="src" />
+	<property name="dirtmp" value="tmp" />
+	<property name="dirdist" value="dist" />
+
+	<!-- delete build folders -->
+	<property name="dirbuild" value="build" />
+	<property name="dirbuildclasses" value="${dirbuild}/classes" />
+	<target name="clean">
+		<echo message="${ant.project.name}: clean" />
+		<delete dir="${dirbuildclasses}" />
+		<delete dir="${dirtmp}" />
+		<delete dir="${dirdist}" />
+	</target>
+
+	<!-- create build folders -->
+	<target name="init" depends="clean">
+		<echo message="${ant.project.name}: init" />
+		<mkdir dir="${dirbuild}" />
+		<mkdir dir="${dirbuildclasses}" />
+		<mkdir dir="${dirtmp}" />
+		<mkdir dir="${dirdist}" />
+	</target>
+
+	<!-- build the EnterUtils classes -->
+	<target name="build" depends="init">
+		<echo message="${ant.project.name}: build" />
+		<!-- without this, the package-info class is not generated! -->
+		<touch>
+			<fileset dir="${dirsrc}" includes="**/*.*" />
+		</touch>
+		<javac debug="true" debuglevel="${debuglevel}" includeantruntime="false" bootclasspath="${java8rtjar}" source="${source}" target="${target}" srcdir="${dirsrc}" destdir="${dirbuildclasses}">
+		</javac>
+	</target>
+
+	<!-- create the JAR file containing all classes -->
+	<property name="jarfile" value="${ant.project.name}.jar" />
+	<target name="jar" depends="build">
+		<echo message="${ant.project.name}: jar" />
+		<jar jarfile="${dirdist}/${jarfile}">
+			<fileset dir="${dirbuildclasses}">
+				<include name="**/*.class" />
+				<include name="**/res/*.*" />
+			</fileset>
+		</jar>
+	</target>
+
+</project>
