@@ -14,7 +14,7 @@ public class FileDownloadModel {
 
 		private String sourceFile;
 		private String targetFile;
-		private String sourceFilePath;
+		private String sourceFileRootPath;
 		private String targetFilePath;
 
 		private String schemaName;
@@ -22,7 +22,7 @@ public class FileDownloadModel {
 		private String columnType;
 		private String columnName;
 
-		private List<String> chooseColumnList;
+		private List<FileDownloadModel> chooseColumnList;
 
 		public FileDownloadModel() {
 
@@ -108,14 +108,12 @@ public class FileDownloadModel {
 			this.targetFile = targetFile;
 		}
 
-		public String getSourceFilePath()
-		{
-			return sourceFilePath;
+		public String getSourceFileRootPath() {
+			return sourceFileRootPath;
 		}
 
-		public void setSourceFilePath(String sourceFilePath)
-		{
-			this.sourceFilePath = sourceFilePath;
+		public void setSourceFileRootPath(String sourceFileRootPath) {
+			this.sourceFileRootPath = sourceFileRootPath;
 		}
 
 		public String getTargetFilePath()
@@ -168,12 +166,12 @@ public class FileDownloadModel {
 			this.columnName = columnName;
 		}
 
-		public List<String> getChooseColumnList()
+		public List<FileDownloadModel> getChooseColumnList()
 		{
 			return chooseColumnList;
 		}
 
-		public void setChooseColumnList(List<String> chooseColumnList)
+		public void setChooseColumnList(List<FileDownloadModel> chooseColumnList)
 		{
 			this.chooseColumnList = chooseColumnList;
 		}
@@ -181,7 +179,7 @@ public class FileDownloadModel {
 		@Override
 		public String toString() {
 			return "FileDownloadModel [sftpFlag=" + sftpFlag + ", fileCopyFlag=" + fileCopyFlag + ", host=" + host + ", user=" + user + ", password=" + password + ", port=" + port + ", sourceFile=" + sourceFile + ", targetFile=" + targetFile
-				+ ", sourceFilePath=" + sourceFilePath + ", targetFilePath=" + targetFilePath + ", schemaName=" + schemaName + ", tableName=" + tableName + ", columnType=" + columnType + ", columnName=" + columnName + ", chooseColumnList="
+				+ ", sourceFilePath=" + sourceFileRootPath + ", targetFilePath=" + targetFilePath + ", schemaName=" + schemaName + ", tableName=" + tableName + ", columnType=" + columnType + ", columnName=" + columnName + ", chooseColumnList="
 				+ chooseColumnList + "]";
 		}
 
