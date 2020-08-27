@@ -514,16 +514,34 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 				//테이블 컬럼 선택값이 null이면 continue
 				if(fileDownloadModel == null) continue;
 
-				//선택한 컬럼 리스트에 존재하지 않으면 continue
-				if(!fileDownloadModel.getChooseColumnList().contains(mc.getName())) continue;
+//				//선택한 컬럼 리스트에 존재하지 않으면 continue
+//				if(!chooseColumnList.contains(mc.getName())) continue;
+
+				String sourceFileRootPath = "";
+				boolean chooseColumnFlag = false;
+				for (int i = 0; i < fileDownloadModel.getChooseColumnList().size(); i++) {
+					if(mc.getName().equals(fileDownloadModel.getChooseColumnList().get(i).getColumnName())) {
+						chooseColumnFlag = true;
+						sourceFileRootPath = fileDownloadModel.getChooseColumnList().get(i).getSourceFileRootPath();
+						if(sourceFileRootPath == null) sourceFileRootPath = "";
+
+						break;
+					}
+				}
+
+			  //선택한 컬럼 리스트에 존재하지 않으면 continue
+				if(!chooseColumnFlag) continue;
 
 				//TODO 테스트 용 로그
 				System.out.println();
 				System.out.println("현재컬럼 => " + mc.getName());
 				System.out.println("선택컬럼 => " + fileDownloadModel.getChooseColumnList().toString());
-				System.out.println("존재여부 => " + fileDownloadModel.getChooseColumnList().contains(mc.getName()));
+				System.out.println("rootPath => " + sourceFileRootPath);
+				System.out.println("존재여부 => " + chooseColumnFlag);
 
-				final String SOURCE_FILE = oValue.toString();
+				final String SOURCE_FILE = sourceFileRootPath +  oValue.toString();
+
+				System.out.println("SOURCE_FILE => " + SOURCE_FILE);
 
 				if(fileDownloadModel.isSftpFlag()) {
 					try {
@@ -582,7 +600,8 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 						}
 
 						FileUtils fileUtis = new FileUtils();
-						fileUtis.copy(fileDownloadModel.getSourceFilePath() + File.separator + SOURCE_FILE, targetFilePath + File.separator);
+//						fileUtis.copy(fileDownloadModel.getSourceFilePath() + File.separator + SOURCE_FILE, targetFilePath + File.separator);
+						fileUtis.copy(SOURCE_FILE, targetFilePath + File.separator);
 					} catch (Exception e) {
 					}
 
