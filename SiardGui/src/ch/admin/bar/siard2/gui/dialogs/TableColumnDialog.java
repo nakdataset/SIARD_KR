@@ -40,6 +40,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -54,6 +55,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 /* ==================================================================== */
 /**
@@ -88,9 +90,9 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 	private TextField _tfSFTPUser;
 	private PasswordField _tfSFTPPassword;
 
-	private VBox _vboxFileCopy;
+//	private VBox _vboxFileCopy;
+//	private Label _lblSourceFilePath;
 	private Button _btnSourceFileBrowser;
-	private Label _lblSourceFilePath;
 	private PastingTextField _tfSourceFilePath;
 
 	private Button _btnTargetFileBrowser;
@@ -188,12 +190,15 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 
 	public void setColumnListByChooseColumn() {
 		int size = _tvColumnList.getItems().size();
-		List<String> chooseColumnList = new ArrayList<String>();
+		List<FileDownloadModel> chooseColumnList = new ArrayList<FileDownloadModel>();
 
 		for (int i = 0; i < size; i++) {
 			if (_tvColumnList.getItems().get(i).getChooseColumnFlag()) {
-				chooseColumnList.add(_tvColumnList.getItems().get(i).getColumnName());
-//				chooseColumnList.add(_tvColumnList.getItems().get(i).getColumnType() + "." + _tvColumnList.getItems().get(i).getColumnName());
+				FileDownloadModel chooseColumnFdm = new FileDownloadModel();
+				chooseColumnFdm.setColumnName(_tvColumnList.getItems().get(i).getColumnName());
+				chooseColumnFdm.setSourceFileRootPath(_tvColumnList.getItems().get(i).getSourceFileRootPath());
+				chooseColumnList.add(chooseColumnFdm);
+//				chooseColumnList.add(_tvColumnList.getItems().get(i).getColumnName());
 			}
 		}
 		LOG.info(chooseColumnList.toString());
@@ -210,11 +215,10 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		fileDownloadModel.setPassword(_tfSFTPPassword.getText());
 		fileDownloadModel.setPort(Integer.parseInt(_tfSFTPPort.getText()));
 
-		fileDownloadModel.setSourceFilePath(_tfSourceFilePath.getText());
+//		fileDownloadModel.setSourceFilePath(_tfSourceFilePath.getText());
 		fileDownloadModel.setTargetFilePath(_tfTargetFilePath.getText());
 
 		fileDownloadModel.setChooseColumnList(chooseColumnList);
-
 	}
 
 	/*------------------------------------------------------------------*/
@@ -279,12 +283,12 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		_vboxSFTPConnection = createVBoxSFTPConnection();
 		vbox.getChildren().add(_vboxSFTPConnection);
 
-		_vboxFileCopy = createVBoxFileCopy();
-		_vboxFileCopy.setVisible(false);
-		_vboxFileCopy.setManaged(false);
-		vbox.getChildren().add(_vboxFileCopy);
+//		_vboxFileCopy = createVBoxFileCopy();
+//		_vboxFileCopy.setVisible(false);
+//		_vboxFileCopy.setManaged(false);
+//		vbox.getChildren().add(_vboxFileCopy);
 
-		vbox.getChildren().add(new Separator());
+//		vbox.getChildren().add(new Separator());
 
 		Label lblSFTPTargetFilePath = createLabel("Target FilePath :", _tfTargetFilePath);
 		_tfTargetFilePath = new PastingTextField("");
@@ -299,7 +303,8 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		HBox hboxSFTPTargetFilePath = createHBox(lblSFTPTargetFilePath, _tfTargetFilePath, _btnTargetFileBrowser);
 		vbox.getChildren().add(hboxSFTPTargetFilePath);
 
-		getMaxLabelPrefWidth(_lblSourceFilePath, lblSFTPTargetFilePath);
+//		getMaxLabelPrefWidth(_lblSourceFilePath, lblSFTPTargetFilePath);
+		getMaxLabelPrefWidth(lblSFTPTargetFilePath);
 
 		return vbox;
 	} /* createHBoxFileConnection */
@@ -380,9 +385,12 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 
 		getMaxLabelPrefWidth(lblSFTPHost, lblSFTPPort, lblSFTPUser, lblSFTPPassword);
 
+		vbox.getChildren().add(new Separator());
+
 		return vbox;
 	}
 
+	/*
 	private VBox createVBoxFileCopy() {
 		SiardBundle sb = SiardBundle.getSiardBundle();
 
@@ -407,6 +415,7 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 
 		return vbox;
 	}
+	*/
 
 	private class ToggleChangeListener implements ChangeListener<Toggle> {
 		@Override
@@ -416,15 +425,15 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 				_vboxSFTPConnection.setManaged(true);
 				_vboxSFTPConnection.setVisible(true);
 
-				_vboxFileCopy.setManaged(false);
-				_vboxFileCopy.setVisible(false);
+//				_vboxFileCopy.setManaged(false);
+//				_vboxFileCopy.setVisible(false);
 
 			} else if (rb == _rbFileCopy) {
 				_vboxSFTPConnection.setManaged(false);
 				_vboxSFTPConnection.setVisible(false);
 
-				_vboxFileCopy.setManaged(true);
-				_vboxFileCopy.setVisible(true);
+//				_vboxFileCopy.setManaged(true);
+//				_vboxFileCopy.setVisible(true);
 			}
 
 		}
@@ -567,23 +576,49 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		hBoxTableView.setSpacing(dHSPACING);
 
 		_tvColumnList = new TableView<ColumnModel>();
+		_tvColumnList.setMinWidth(500.0d); //width 설정
+
+		Callback<TableColumn<ColumnModel, String>, TableCell<ColumnModel, String>> cellFactory = (TableColumn<ColumnModel, String> param) -> new EditingCell();
 
 		// TODO 최창근 추가 - 스키마,테이블,선택 properties에서 key=value로 관리(다국어 지원을 위한)
 		TableColumn<ColumnModel, String> columnName = new TableColumn<ColumnModel, String>("컬럼명");
 		TableColumn<ColumnModel, String> columnType = new TableColumn<ColumnModel, String>("컬럼타입");
+		TableColumn<ColumnModel, String> sourceFileRootPath = new TableColumn<ColumnModel, String>("root path");
 		TableColumn<ColumnModel, Boolean> chooseColumnFlag = new TableColumn<ColumnModel, Boolean>("선택");
 
 		columnName.setCellValueFactory(new PropertyValueFactory<ColumnModel, String>("columnName"));
 		columnType.setCellValueFactory(new PropertyValueFactory<ColumnModel, String>("columnType"));
+		//람다 표현식(문제시 아래 주석처리한 문장으로 교제)
+		sourceFileRootPath.setCellValueFactory(cellData -> cellData.getValue().sourceFileRootPath);
+//		sourceFileRootPath.setCellValueFactory(new PropertyValueFactory<ColumnModel, String>("sourceFileRootPath"));
+		sourceFileRootPath.setCellFactory(cellFactory);
+		//람다 표현식(문제시 아래 주석처리한 문장으로 교제)
+		sourceFileRootPath.setOnEditCommit(
+            (TableColumn.CellEditEvent<ColumnModel, String> t) -> {
+        		t.getTableView().getItems()
+        		.get(t.getTablePosition().getRow())
+        		.setSourceFileRootPath(t.getNewValue());
+            }
+        );
+//		sourceFileRootPath.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<ColumnModel,String>>() {
+//			@Override
+//			public void handle(TableColumn.CellEditEvent<ColumnModel,String> t) {
+//				t.getTableView().getItems()
+//        		.get(t.getTablePosition().getRow())
+//        		.setSourceFileRootPath(t.getNewValue());
+//			}
+//		});
 		chooseColumnFlag.setCellValueFactory(new PropertyValueFactory<ColumnModel, Boolean>("chooseColumnFlag"));
 		chooseColumnFlag.setCellFactory(CheckBoxTableCell.forTableColumn(chooseColumnFlag));
 
-		columnName.prefWidthProperty().bind(_tvColumnList.widthProperty().multiply(0.4));
-		columnType.prefWidthProperty().bind(_tvColumnList.widthProperty().multiply(0.4));
+		columnName.prefWidthProperty().bind(_tvColumnList.widthProperty().multiply(0.2));
+		columnType.prefWidthProperty().bind(_tvColumnList.widthProperty().multiply(0.2));
+		sourceFileRootPath.prefWidthProperty().bind(_tvColumnList.widthProperty().multiply(0.4));
 		chooseColumnFlag.prefWidthProperty().bind(_tvColumnList.widthProperty().multiply(0.2));
 
 		_tvColumnList.getColumns().add(columnName);
 		_tvColumnList.getColumns().add(columnType);
+		_tvColumnList.getColumns().add(sourceFileRootPath);
 		_tvColumnList.getColumns().add(chooseColumnFlag);
 		_tvColumnList.setEditable(true);
 
@@ -600,7 +635,7 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 
 			ResultSet rs = conn.getMetaData().getColumns(null, tableModel.getSchemaName(), tableModel.getTableName(), "%");
 			while (rs.next()) {
-				_tvColumnList.getItems().add(new ColumnModel(tableModel.getSchemaName(), tableModel.getTableName(), rs.getString("COLUMN_NAME"), rs.getString("TYPE_NAME"), false));
+				_tvColumnList.getItems().add(new ColumnModel(tableModel.getSchemaName(), tableModel.getTableName(), rs.getString("COLUMN_NAME"), rs.getString("TYPE_NAME"), null, false));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -684,5 +719,77 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		tcd.showAndWait(); // until it is closed
 		return tcd;
 	} /* showInfoDialog */
+
+
+	/**
+	 * 테이블 컬럼 에디트 셀 설정
+	 * @Type    : EditingCell
+	 * @Date    : 2020. 8. 25
+	 * @Version : 1.0
+	 */
+	class EditingCell extends TableCell<ColumnModel, String> {
+
+	    private TextField textField;
+
+	    private EditingCell() {
+	    }
+
+	    @Override
+	    public void startEdit() {
+	        if (!isEmpty()) {
+	            super.startEdit();
+	            createTextField();
+	            setText(null);
+	            setGraphic(textField);
+	            textField.selectAll();
+	        }
+	    }
+
+	    @Override
+	    public void cancelEdit() {
+	        super.cancelEdit();
+
+	        setText(getItem());
+	        setGraphic(null);
+	    }
+
+	    @Override
+	    public void updateItem(String item, boolean empty) {
+	        super.updateItem(item, empty);
+
+	        if (empty) {
+	            setText(item);
+	            setGraphic(null);
+	        } else {
+	            if (isEditing()) {
+	                if (textField != null) {
+	                    textField.setText(getString());
+//	                    setGraphic(null);
+	                }
+	                setText(null);
+	                setGraphic(textField);
+	            } else {
+	                setText(getString());
+	                setGraphic(null);
+	            }
+	        }
+	    }
+
+	    private void createTextField() {
+	        textField = new TextField(getString());
+	        textField.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
+	        textField.setOnAction((e) -> commitEdit(textField.getText()));
+	        textField.focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+	            if (!newValue) {
+	                System.out.println("Commiting " + textField.getText());
+	                commitEdit(textField.getText());
+	            }
+	        });
+	    }
+
+	    private String getString() {
+	        return getItem() == null ? "" : getItem();
+	    }
+	}/* class EditingCell */
 
 } /* class InfoDialog */

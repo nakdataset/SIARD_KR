@@ -401,8 +401,8 @@ public class ValueDialog
   public static void displayValue(Stage stageOwner, Cell cell, int iMaxInlineSize)
     throws IOException
   {
-    String sLocation = "["+String.valueOf(cell.getParentRecord().getRecord())+"]:" +
-      cell.getMetaColumn().getName();
+    String sLocation = "["+String.valueOf(cell.getParentRecord().getRecord() + 1)+"]:" +
+      cell.getMetaColumn().getName(); /* IntraDIGM */
     displayValue(stageOwner, sLocation, cell, iMaxInlineSize);
   } /* showValueDialog */
 

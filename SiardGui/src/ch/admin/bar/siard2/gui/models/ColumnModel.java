@@ -8,21 +8,24 @@ public class ColumnModel extends TableModel
 {
 	public SimpleStringProperty	columnName;
 	public SimpleStringProperty	columnType;
+	public SimpleStringProperty	sourceFileRootPath;
 	public BooleanProperty chooseColumnFlag;
 
-	public ColumnModel(String columnName, String columnType, boolean chooseColumnFlag) {
+	public ColumnModel(String columnName, String columnType, String sourceFileRootPath, boolean chooseColumnFlag) {
 		this.columnName = new SimpleStringProperty(columnName);
 		this.columnType = new SimpleStringProperty(columnType);
+		this.sourceFileRootPath = new SimpleStringProperty(sourceFileRootPath);
 		this.chooseColumnFlag = new SimpleBooleanProperty(chooseColumnFlag);
 	}
 
-	public ColumnModel(String schemaName, String tableName, String columnName, String columnType, boolean chooseColumnFlag) {
+	public ColumnModel(String schemaName, String tableName, String columnName, String columnType, String sourceFileRootPath, boolean chooseColumnFlag) {
 		// super
 		setSchemaName(schemaName);
 		setTableName(tableName);
 
 		this.columnName = new SimpleStringProperty(columnName);
 		this.columnType = new SimpleStringProperty(columnType);
+		this.sourceFileRootPath = new SimpleStringProperty(sourceFileRootPath);
 		this.chooseColumnFlag = new SimpleBooleanProperty(chooseColumnFlag);
 	}
 
@@ -37,6 +40,12 @@ public class ColumnModel extends TableModel
 	}
 	public void setColumnType(SimpleStringProperty columnType) {
 		this.columnType = columnType;
+	}
+	public String getSourceFileRootPath() {
+		return sourceFileRootPath.get();
+	}
+	public void setSourceFileRootPath(String sourceFileRootPath) {
+		this.sourceFileRootPath.set(sourceFileRootPath);
 	}
 	public boolean getChooseColumnFlag() {
 		return chooseColumnFlag.get();
