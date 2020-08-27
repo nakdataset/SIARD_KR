@@ -90,11 +90,15 @@ public class UploadDownloadAction {
 		Connection conn = null;
 		DownloadConnectionDialog dcd = DownloadConnectionDialog.showDownloadConnectionDialog(stage, sConnectionUrl, sDbUser);
 
+		LOG.info("dcd.getResult() == DownloadConnectionDialog.iRESULT_SUCCESS ? " + (dcd.getResult() == DownloadConnectionDialog.iRESULT_SUCCESS));
 		if(dcd.getResult() == DownloadConnectionDialog.iRESULT_SUCCESS) {
 			try {
+				LOG.info("try before call");
 				TableDialog.showChooseTableDialog(stage, dcd);
+				LOG.info("try after call");
 			}catch(Exception e) {
-				e.printStackTrace();
+				LOG.info("try after call exception");
+				// e.printStackTrace();
 			}
 		}
 
@@ -141,6 +145,17 @@ public class UploadDownloadAction {
 				LOG.info("sConnectionUrl " + sConnectionUrl);
 				LOG.info("sDbUser " + sDbUser);
 				dcd = DownloadConnectionDialog.showDownloadConnectionDialog(stage, sConnectionUrl, sDbUser);
+
+				if(dcd.getResult() == DownloadConnectionDialog.iRESULT_SUCCESS) {
+					try {
+						LOG.info("try before call");
+						TableDialog.showChooseTableDialog(stage, dcd);
+						LOG.info("try after call");
+					}catch(Exception e) {
+						LOG.info("try after call exception");
+						// e.printStackTrace();
+					}
+				}
 			}
 		}
 
