@@ -96,6 +96,7 @@ public class SiardFromDb
   private List<String> _tableList = new ArrayList<>();
   //2020.08.10 - siardCmd 파일 컬럼 목록 변수
   private List<String> _fileColumnList = new ArrayList<>();
+  private List<FileDownloadModel> _fileDownloadModelList = new ArrayList<>();
   //2020.08.11 - siardCmd 파일 다운로드 정보 입력
   private String _sAtchTargetFilePath = null; //첨부파일 타겟 경로
 //  private String _sAtchSourceFilePath = null; //첨부파일 소스 경로(root경로)
@@ -148,12 +149,14 @@ public class SiardFromDb
     System.out.println("    - 전체 스키마 및 테이블 다운로드 : ex) -t=\"all\"");
     System.out.println("    - 특정 스키마에 대한 전체 테이블 다운로드 : ex) -t=\"schema1.*\"");
     System.out.println("    - 특정 테이블 다운로드 : ex) -t=\"schema1.table1,schema1.table2,schema2.table1\"");
-    System.out.println("  -fc : 첨부파일의 경로가 포함된 컬럼명 입력 (입력 형식은 '테이블명.컬럼명')");
-    System.out.println("    - ex) -fc=\"table1.filePath\"");
+    System.out.println("  -fc : 첨부파일의 경로가 포함된 컬럼명 입력 (입력 형식은 '스키마명.테이블명.컬럼명')");
+    System.out.println("    - ex) -fc=\"schema1.table1.filePathColumn\"");
+    System.out.println("    * sourceFile의 rootPath가 별도 존재하는경우  (입력 형식은 '스키마명.테이블명.컬럼명:rootPath 경로')");
+    System.out.println("    - ex) -fc=\"schema1.table1.filePathColumn:/sourceFileRootPath\"");
     System.out.println("  -tfp : 첨부파일의 target file path를 입력(다운로드 받을 경로)");
     System.out.println("    - ex) -tfp=\"/siardCmd/attachFile/\"");
-    System.out.println("  -sfp : 첨부파일의 source file path를 입력(다운로드 대상(root) 경로)");
-    System.out.println("    - ex) -sfp=\"/data/attachFile/\"");
+//    System.out.println("  -sfp : 첨부파일의 source file path를 입력(다운로드 대상(root) 경로)");
+//    System.out.println("    - ex) -sfp=\"/data/attachFile/\"");
     System.out.println("  -host : sftp 접속 host IP");
     System.out.println("    - ex) -host=\"127.0.0.1\"");
     System.out.println("  -port : sftp 접속 port (입력을 안하거나 잘못된 값(숫자가 아닌 값)으로 입력한 경우 sftp기본 포트(22)로 진행)");
@@ -377,15 +380,16 @@ public class SiardFromDb
   				while (st.hasMoreElements())
   				{
   					String columnName = (String) st.nextElement();
+  					String[] columnArr = columnName.split(":");
+  					
   					//schema.table.column -> 3개가 나와야함.
-  					checkArgumentValue(columnName, 3);
+  					checkArgumentValue(columnArr[0], 3);
   					_fileColumnList.add(columnName.trim());
   				}
 
     			//2020.08.11 - siardCmd 파라미터로 받은 sftp 입력값 체크
     			if (_sAtchTargetFilePath == null) {
-    				System.out.println("파일 다운로드 처리시 target file path(-tfp=\"target file path\")는 필수 입력입니다.");
-    				_iReturn = iRETURN_ERROR;
+    				_sAtchTargetFilePath = "";
     			}
 //    			if (_fileCopyFlag && _sAtchSourceFilePath == null) {
 //    				System.out.println("file copy 방식의 파일 다운로드 처리시 source file path(-sfp=\"source file path\")는 필수 입력입니다.");
@@ -546,9 +550,6 @@ public class SiardFromDb
 	          		fileModel.setFileCopyFlag(_fileCopyFlag);
 	          		fileModel.setSftpFlag(_sftpFlag);
 
-	          		//파일 컬럼 세팅
-	          		List<FileDownloadModel> rFileColumnList = new ArrayList<FileDownloadModel>();
-	          		FileDownloadModel fdm = new FileDownloadModel();
 	          		for (int i = 0; i < _tableList.size(); i++)	{
 	          			String table_schemaTable = _tableList.get(i);
 	          			fileModel.setSchemaName(_tableList.get(i).substring(0, table_schemaTable.lastIndexOf(".")));
@@ -556,15 +557,36 @@ public class SiardFromDb
 
 	          			//각 테이블 별로 파일 컬럼 리스트를 세팅
 	          			for (int j = 0; j < _fileColumnList.size(); j++) {
-	          				String column_schemaTable = _fileColumnList.get(j).substring(0, _fileColumnList.get(j).lastIndexOf("."));
-	          				String columnName = _fileColumnList.get(j).substring(_fileColumnList.get(j).lastIndexOf(".")+1);
+	          				String columnValFull = _fileColumnList.get(j);
+	          				//columnName, rootPath 구분(:)
+	          				String[] columnArr = columnValFull.split(":");
+
+	          				//파일 컬럼 세팅
+	          				String column_schemaTable = columnValFull.substring(0, columnArr[0].lastIndexOf("."));
+	          				String columnAndRootPath = columnValFull.substring(columnArr[0].lastIndexOf(".")+1);
+	          				
 	          				if(table_schemaTable.equals(column_schemaTable)) {
-	          					//TODO : rootPath 넣어야함.
-	          					fdm.setColumnName(columnName);
-	          					rFileColumnList.add(fdm);
+	          					FileDownloadModel fdm = new FileDownloadModel();
+	          					StringTokenizer st = new StringTokenizer(columnAndRootPath, ":");
+
+	          					int columnIdx = 0;
+	            				while (st.hasMoreElements())
+	            				{
+	            					String columnVal = (String) st.nextElement();
+	            					
+	            					if(columnIdx == 0) {
+	            						fdm.setColumnName(columnVal.trim()); //컬럼
+	            					} else if(columnIdx == 1) {
+	            						fdm.setSourceFileRootPath(columnVal.trim()); //root path
+	            					}
+	            					
+	            					columnIdx++;
+	            				}
+	            				_fileDownloadModelList.add(fdm);
 	          				}
 	          			}
-	          			fileModel.setChooseColumnList(rFileColumnList);
+	          			
+	          			fileModel.setChooseColumnList(_fileDownloadModelList);
 	          			chooseColumnMap.put(table_schemaTable, fileModel);
 	          		}
 	          	}

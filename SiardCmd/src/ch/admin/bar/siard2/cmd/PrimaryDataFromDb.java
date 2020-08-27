@@ -598,10 +598,9 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 						if("".equals(targetFilePath.trim())) {
 							targetFilePath = _archive.getFile().getParent();
 						}
-
 						FileUtils fileUtis = new FileUtils();
 //						fileUtis.copy(fileDownloadModel.getSourceFilePath() + File.separator + SOURCE_FILE, targetFilePath + File.separator);
-						fileUtis.copy(SOURCE_FILE, targetFilePath + File.separator);
+						fileUtis.copy(SOURCE_FILE, targetFilePath + File.separator + SOURCE_FILE.substring(0, SOURCE_FILE.lastIndexOf("/") + 1));
 					} catch (Exception e) {
 					}
 
