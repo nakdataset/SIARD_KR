@@ -93,12 +93,12 @@ public class SiardFromDb
   private File _fileSiard = null;
   private File _fileExportXml = null;
   //2020.07.28 - siardCmd 테이블 목록 변수
-  private ArrayList<String> _tableList = new ArrayList<>();
+  private List<String> _tableList = new ArrayList<>();
   //2020.08.10 - siardCmd 파일 컬럼 목록 변수
-  private ArrayList<String> _fileColumnList = new ArrayList<>();
+  private List<String> _fileColumnList = new ArrayList<>();
   //2020.08.11 - siardCmd 파일 다운로드 정보 입력
   private String _sAtchTargetFilePath = null; //첨부파일 타겟 경로
-  private String _sAtchSourceFilePath = null; //첨부파일 소스 경로(root경로)
+//  private String _sAtchSourceFilePath = null; //첨부파일 소스 경로(root경로)
   private String _sSftpHost = null; //sftp IP
   private String _sSftpPort = "22"; //sftp port(default)
   private String _sSftpUser = null; //sftp id
@@ -228,7 +228,7 @@ public class SiardFromDb
     /* siard Target File Path (예시 : fp="/siardCmd/file/") (2020.08.11 - 신규 추가)*/
     _sAtchTargetFilePath = args.getOption("tfp");
     /* siard Source File Path (예시 : fp="/siardCmd/file/") (2020.08.11 - 신규 추가)*/
-    _sAtchSourceFilePath = args.getOption("sfp");
+//    _sAtchSourceFilePath = args.getOption("sfp");
     /* siard sftp host ip (2020.08.11 - 신규 추가)*/
     _sSftpHost = args.getOption("host");
     /* siard sftp host port (2020.08.11 - 신규 추가)*/
@@ -387,10 +387,10 @@ public class SiardFromDb
     				System.out.println("파일 다운로드 처리시 target file path(-tfp=\"target file path\")는 필수 입력입니다.");
     				_iReturn = iRETURN_ERROR;
     			}
-    			if (_fileCopyFlag && _sAtchSourceFilePath == null) {
-    				System.out.println("file copy 방식의 파일 다운로드 처리시 source file path(-sfp=\"source file path\")는 필수 입력입니다.");
-    				_iReturn = iRETURN_ERROR;
-    			}
+//    			if (_fileCopyFlag && _sAtchSourceFilePath == null) {
+//    				System.out.println("file copy 방식의 파일 다운로드 처리시 source file path(-sfp=\"source file path\")는 필수 입력입니다.");
+//    				_iReturn = iRETURN_ERROR;
+//    			}
     			if (_sftpFlag && _sSftpHost == null) {
     				System.out.println("sftp 방식의 파일 다운로드 처리시 host ip(-host=\"host ip\")는 필수 입력입니다.");
     				_iReturn = iRETURN_ERROR;
@@ -538,7 +538,7 @@ public class SiardFromDb
 	          	if(_fileCopyFlag || _sftpFlag) {
 	          		FileDownloadModel fileModel = new FileDownloadModel();
 	          		fileModel.setTargetFilePath(_sAtchTargetFilePath);
-	          		fileModel.setSourceFilePath(_sAtchSourceFilePath);
+//	          		fileModel.setSourceFilePath(_sAtchSourceFilePath);
 	          		fileModel.setHost(_sSftpHost);
 	          		fileModel.setPort(Integer.parseInt(_sSftpPort));
 	          		fileModel.setUser(_sSftpUser);
@@ -547,8 +547,8 @@ public class SiardFromDb
 	          		fileModel.setSftpFlag(_sftpFlag);
 
 	          		//파일 컬럼 세팅
-	          		List<String> rFileColumnList = new ArrayList<String>();
-
+	          		List<FileDownloadModel> rFileColumnList = new ArrayList<FileDownloadModel>();
+	          		FileDownloadModel fdm = new FileDownloadModel();
 	          		for (int i = 0; i < _tableList.size(); i++)	{
 	          			String table_schemaTable = _tableList.get(i);
 	          			fileModel.setSchemaName(_tableList.get(i).substring(0, table_schemaTable.lastIndexOf(".")));
@@ -559,7 +559,9 @@ public class SiardFromDb
 	          				String column_schemaTable = _fileColumnList.get(j).substring(0, _fileColumnList.get(j).lastIndexOf("."));
 	          				String columnName = _fileColumnList.get(j).substring(_fileColumnList.get(j).lastIndexOf(".")+1);
 	          				if(table_schemaTable.equals(column_schemaTable)) {
-	          					rFileColumnList.add(columnName);
+	          					//TODO : rootPath 넣어야함.
+	          					fdm.setColumnName(columnName);
+	          					rFileColumnList.add(fdm);
 	          				}
 	          			}
 	          			fileModel.setChooseColumnList(rFileColumnList);
