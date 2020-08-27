@@ -179,7 +179,7 @@ public class FileDownloadModel {
 		@Override
 		public String toString() {
 			return "FileDownloadModel [sftpFlag=" + sftpFlag + ", fileCopyFlag=" + fileCopyFlag + ", host=" + host + ", user=" + user + ", password=" + password + ", port=" + port + ", sourceFile=" + sourceFile + ", targetFile=" + targetFile
-				+ ", sourceFilePath=" + sourceFileRootPath + ", targetFilePath=" + targetFilePath + ", schemaName=" + schemaName + ", tableName=" + tableName + ", columnType=" + columnType + ", columnName=" + columnName + ", chooseColumnList="
+				+ ", sourceFileRootPath=" + sourceFileRootPath + ", targetFilePath=" + targetFilePath + ", schemaName=" + schemaName + ", tableName=" + tableName + ", columnType=" + columnType + ", columnName=" + columnName + ", chooseColumnList="
 				+ chooseColumnList + "]";
 		}
 
