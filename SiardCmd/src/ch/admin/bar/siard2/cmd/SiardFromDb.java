@@ -155,7 +155,7 @@ public class SiardFromDb
     System.out.println("    - ex) -fc=\"schema1.table1.filePathColumn:/sourceFileRootPath\"");
     System.out.println("  -tfp : 첨부파일의 target file path를 입력(다운로드 받을 경로)");
     System.out.println("    - ex) -tfp=\"/siardCmd/attachFile/\"");
-    System.out.println("    * 입력을 안할 경우 siard 파일 경로(-s=<siard file>)와 동일한 경로에 다운로드 함.");
+    System.out.println("    * 입력을 안할 경우 siard 파일 경로(-s=<siard file>)와 동일한 경로에 다운로드 함. ");
     System.out.println("  -host : sftp 접속 host IP");
     System.out.println("    - ex) -host=\"127.0.0.1\"");
     System.out.println("  -port : sftp 접속 port (입력을 안하거나 잘못된 값(숫자가 아닌 값)으로 입력한 경우 sftp기본 포트(22)로 진행)");
