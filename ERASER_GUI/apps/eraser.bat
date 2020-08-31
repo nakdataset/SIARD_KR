@@ -1,0 +1,1 @@
+java -cp .\;.\lib\jcalendar-1.4.jar;.\lib\jcalendar-1.4.jar;.\lib\jdatepicker-1.3.4.jar;.\lib\jgoodies-common-1.2.0.jar;.\lib\jgoodies-looks-2.4.1.jar;.\lib\junit-4.6.jar;.\lib\ojdbc8.jar;.\lib\JDBC-10.1.2.7694-cubrid.jar;.\lib\tibero6-jdbc-14.jar;.\lib\commons-codec-1.13.jar -Dfile.encoding=UTF-8 com.firstinfo.eraser.gui.EraserLogin

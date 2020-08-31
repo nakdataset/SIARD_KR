@@ -1,0 +1,113 @@
+<project name="eraser_gui" default="make-jar" xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+<description></description>
+
+	<property name="bin" 			location="./bin" />
+	<property name="debuglevel" value="source,lines,vars" />
+	<property name="target" value="1.8" />
+	<property name="source" value="1.8" />
+	<property name="dirsrc" value="src" />
+	<property name="dirtmp" value="tmp" />
+	<property name="dirdist" value="dist" />
+	<property name="dirlib" value="apps/lib" />
+	<property name="direraser" value="com/firstinfo/eraser" />
+
+	<!-- 현재 시간 얻기 -->
+	<tstamp>
+		<format property="filetime" pattern="yyyyMMdd_HHmm" />
+	</tstamp>
+	
+	<!-- delete build folders -->
+	<property name="dirbuild" value="build" />
+	<property name="dirbuildclasses" value="${dirbuild}/classes" />
+	<property name="dirbuildtests" value="${dirbuild}/tests" />
+	<target name="clean">
+		<echo message="${ant.project.name}: clean" />
+		<delete dir="${dirbuildclasses}" />
+		<delete dir="${dirbuildtests}" />
+		<delete dir="${dirtmp}" />
+		<delete dir="${dirdist}" />
+	</target>
+	
+	<!-- create build folders -->
+	<target name="init" depends="clean">
+		<echo message="${ant.project.name}: init" />
+		<mkdir dir="${dirbuildclasses}" />
+		<mkdir dir="${dirbuildtests}" />
+		<mkdir dir="${dirtmp}" />
+		<mkdir dir="${dirdist}" />
+	</target>
+
+	<!-- build the SiardGui classes -->
+	<property name="dirbuilderaser" value="${dirbuildclasses}/${direraser}" />
+	<property name="dirbuildres" value="${dirbuilderaser}/res" />
+	<property name="jarfile" value="${ant.project.name}.jar" />
+	
+	<!-- jcalendar jar -->
+	<property name="jcalendar" value="jcalendar-1.4.jar" />
+	<property name="cpjcalendar" value="${dirlib}/${jcalendar}" />
+	<!-- jdatepicker jar -->
+	<property name="jdatepicker" value="jdatepicker-1.3.4.jar" />
+	<property name="cpjdatepicker" value="${dirlib}/${jdatepicker}" />
+	<!-- jgoodies-common jar -->
+	<property name="jgoodies" value="jgoodies-common-1.2.0.jar" />
+	<property name="cpjgoodies" value="${dirlib}/${jgoodies}" />
+	<!-- jgoodies-looks jar -->
+	<property name="jgoodieslooks" value="jgoodies-looks-2.4.1.jar" />
+	<property name="cpjgoodieslooks" value="${dirlib}/${jgoodieslooks}" />
+	<!-- junit jar -->
+	<property name="junit" value="junit-4.6.jar" />
+	<property name="cpjunit" value="${dirlib}/${junit}" />
+	<!-- ojdbc8 jar -->
+	<property name="ojdbc" value="ojdbc8.jar" />
+	<property name="cpojdbc" value="${dirlib}/${ojdbc}" />
+	<!-- jdbc cubrid jar -->
+	<property name="jdbccubrid" value="JDBC-10.1.2.7694-cubrid.jar" />
+	<property name="cpjdbccubrid" value="${dirlib}/${ojdbccubrid}" />
+	<!-- jdbc tibero jar -->
+	<property name="jdbctibero" value="tibero6-jdbc-14.jar" />
+	<property name="cpjdbctibero" value="${dirlib}/${jdbctibero}" />
+	<!-- codec jar -->
+	<property name="codec" value="commons-codec-1.13.jar" />
+	<property name="cpcodec" value="${dirlib}/${codec}" />
+	<!-- mysql-connector jar -->
+	<property name="mysqlconnector" value="mysql-connector-java-8.0.11.jar" />
+	<property name="cpmysqlconnector" value="${dirlib}/${mysqlconnector}" />
+	
+	<!-- check if mainfest and local build properties are available -->
+	<property name="filemanifest" value="${dirsrc}/META-INF/MANIFEST.MF" />
+	<property name="filerevoldproperties" value="${dirtmp}/revold.properties" />
+	<property name="filegithead" value=".git/HEAD" />
+	<property name="filebranchproperties" value="${dirtmp}/branch.properties" />
+
+	<target name="make-jar" depends="init">
+		<echo message="${ant.project.name}: build" />
+		<!-- without this, the package-info class is not generated! -->
+		<touch>
+			<fileset dir="${dirsrc}" includes="**/*.*" />
+		</touch>
+		<javac debug="true" debuglevel="${debuglevel}" includeantruntime="false" bootclasspath="${java8rtjar}" source="${source}" target="${target}" encoding="UTF-8" srcdir="${dirsrc}" destdir="${dirbuildclasses}">
+			<classpath>
+				<pathelement path="${cpjcalendar}" />
+				<pathelement path="${cpjdatepicker}" />
+				<pathelement path="${cpjgoodies}" />
+				<pathelement path="${cpjgoodieslooks}" />
+				<pathelement path="${cpjunit}" />
+				<pathelement path="${cpojdbc}" />
+				<pathelement path="${cpjdbccubrid}" />
+				<pathelement path="${cpjdbctibero}" />
+				<pathelement path="${cpcodec}" />
+				<pathelement path="${cpmysqlconnector}" />
+			</classpath>
+		</javac>
+
+		<echo message="${ant.project.name}: jar" />
+		<jar jarfile="${dirlib}/${jarfile}" manifest="${filemanifest}">
+			<fileset dir="${dirbuildclasses}">
+				<include name="**/*.class" />
+			</fileset>
+		</jar>
+
+	</target>
+		
+</project>

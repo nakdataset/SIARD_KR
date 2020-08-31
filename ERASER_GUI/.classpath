@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="apps/lib/commons-codec-1.13.jar"/>
+	<classpathentry kind="lib" path="apps/lib/jcalendar-1.4.jar"/>
+	<classpathentry kind="lib" path="apps/lib/JDBC-10.1.2.7694-cubrid.jar"/>
+	<classpathentry kind="lib" path="apps/lib/jgoodies-common-1.2.0.jar"/>
+	<classpathentry kind="lib" path="apps/lib/jgoodies-looks-2.4.1.jar"/>
+	<classpathentry kind="lib" path="apps/lib/junit-4.6.jar"/>
+	<classpathentry kind="lib" path="apps/lib/ojdbc8.jar"/>
+	<classpathentry kind="lib" path="apps/lib/tibero6-jdbc-14.jar"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="apps"/>
+	<classpathentry kind="lib" path="apps/lib/mysql-connector-java-8.0.11.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

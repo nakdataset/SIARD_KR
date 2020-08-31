@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Created-By: Hartwig Thomas, Enter AG, Rüti ZH, Switzerland
+Specification-Title: ERASER Suite
+Specification-Version: 2.1
+Specification-Vendor: Swiss Federal Archives, Berne, Switzerland
+Implementation-Title: ERASER Suite
+Implementation-Version: 2.1.112
+Implementation-Vendor: Swiss Federal Archives, Berne, Switzerland
+Built-By: Hartwig Thomas, Enter AG, Rüti ZH, Switzerland
+Built-Date: 24. Jul 2019
+Main-Class: com.firstinfo.eraser.gui.EraserLogin
+Class-Path: jcalendar-1.4.jar
+  jdatepicker-1.3.4.jar
+  jgoodies-common-1.2.0.jar
+  jgoodies-looks-2.4.1.jar
+  junit-4.6.jar
+  ojdbc8.jar
+  JDBC-10.1.2.7694-cubrid.jar
+  tibero6-jdbc-14.jar
+  commons-codec-1.13.jar

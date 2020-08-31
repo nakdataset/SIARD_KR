@@ -1,0 +1,18 @@
+<project name="eraser_gui" default="make-jar">
+
+<description></description>
+
+	<property name="bin" 			location="./bin" />
+	<property name="install" 		location="C:" />
+
+	<!-- 현재 시간 얻기 -->
+	<tstamp>
+		<format property="filetime" pattern="yyyyMMdd_HHmm" />
+	</tstamp>
+
+	<target name="make-jar">
+		<echo>Make ERASER_GUI.jar</echo>
+		<zip destfile="${bin}/ERASER_GUI.zip"><fileset dir="${bin}"></fileset></zip>
+	</target>
+		
+</project>
