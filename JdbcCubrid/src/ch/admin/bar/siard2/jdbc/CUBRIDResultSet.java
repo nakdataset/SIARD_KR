@@ -10,22 +10,40 @@ Created    : 31.10.2016, Simon Jutz
 ======================================================================*/
 package ch.admin.bar.siard2.jdbc;
 
-import java.io.*;
-import java.sql.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.sql.Blob;
+import java.sql.Clob;
+import java.sql.Connection;
+import java.sql.NClob;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
+import java.sql.SQLXML;
+import java.sql.Statement;
+import java.sql.Types;
 
-import javax.xml.datatype.*;
-import javax.xml.parsers.*;
+import javax.xml.datatype.Duration;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.*;
-import org.xml.sax.*;
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.io.*;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
-import ch.enterag.utils.*;
-import ch.enterag.utils.jdbc.*;
-import cubrid.jdbc.driver.*;
-import ch.enterag.sqlparser.*;
-import ch.enterag.sqlparser.identifier.*;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.io.WKBReader;
+
+import ch.enterag.sqlparser.Interval;
+import ch.enterag.sqlparser.SqlLiterals;
+import ch.enterag.sqlparser.identifier.QualifiedId;
+import ch.enterag.utils.SU;
+import ch.enterag.utils.jdbc.BaseResultSet;
 
 /* =============================================================================== */
 /**

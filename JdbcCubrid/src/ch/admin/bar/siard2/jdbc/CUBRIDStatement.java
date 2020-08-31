@@ -10,9 +10,15 @@ Created    : 26.10.2016, Simon Jutz
 ======================================================================*/
 package ch.admin.bar.siard2.jdbc;
 
-import java.sql.*;
-import ch.enterag.utils.jdbc.*;
-import ch.enterag.sqlparser.identifier.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import ch.enterag.sqlparser.identifier.Identifier;
+import ch.enterag.sqlparser.identifier.QualifiedId;
+import ch.enterag.utils.jdbc.BaseDatabaseMetaData;
+import ch.enterag.utils.jdbc.BaseStatement;
 
 /* =============================================================================== */
 /**
@@ -151,15 +157,14 @@ public class CUBRIDStatement extends BaseStatement implements Statement
 	{
 	    String sNative = getConnection().nativeSQL(sql);
 	    String sPrimaryColumn = null; //addPrimaryColumn();
-	    if (sPrimaryColumn != null)
-	    {
-	      int i = sNative.indexOf(_conn.getTableWithoutPrimaryKey().format());
-	      i = sNative.substring(0,i).lastIndexOf("FROM");
-	      for (i--; Character.isWhitespace(sNative.charAt(i-1)); i--) {}
-	      String sSelect = sNative.substring(0,i);
-	      String sFrom = sNative.substring(i);
-	      sNative = sSelect + ",\r\n" +sPrimaryColumn+sFrom;
-	    }
+//	    if (sPrimaryColumn != null) {
+//	    	int i = sNative.indexOf(_conn.getTableWithoutPrimaryKey().format());
+//	    	i = sNative.substring(0,i).lastIndexOf("FROM");
+//	    	for (i--; Character.isWhitespace(sNative.charAt(i-1)); i--) {}
+//	    	String sSelect = sNative.substring(0,i);
+//	    	String sFrom = sNative.substring(i);
+//	    	sNative = sSelect + ",\r\n" +sPrimaryColumn+sFrom;
+//	    }
 	    
 	    CUBRIDResultSet rs;
 	    if (sNative.indexOf("FROM \"_db_stored_procedure\"") >=0) {

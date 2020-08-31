@@ -41,10 +41,9 @@ Created    : 09.05.2016, Hartwig Thomas
 	<property name="cpjdbcbase" value="${dirlib}/${jarjdbcbase}" />
 	<property name="cpjdbcbase-test" value="${dirlib}/${jarjdbcbase};${dirlib}/${jarjdbcbasetest}" />
 	<!-- CUBRID JDBC jars -->
-	<property name="jarcubrid_jdbc" value="cubrid_jdbc.jar" />
-	<property name="jarcubridjdbc" value="jdbccubrid.jar" />
+	<property name="jarcubrid" value="cubrid.jar" />
 	<property name="jarjts" value="jts-1.14.jar" />
-	<property name="cpcubridjdbc" value="${dirlib}/${jarcubrid_jdbc};${dirlib}/${jarcubridjdbc};${dirlib}/${jarjts}" />
+	<property name="cpcubridjdbc" value="${dirlib}/${jarcubrid};${dirlib}/${jarjts}" />
 	<!-- junit -->
 	<property name="jarhamcrest" value="hamcrest-core-1.3.jar" />
 	<property name="jarjunit4" value="junit-4.12.jar" />
@@ -67,6 +66,15 @@ Created    : 09.05.2016, Hartwig Thomas
 		<mkdir dir="${dirbuildclasses}" />
 		<mkdir dir="${dirtmp}" />
 		<mkdir dir="${dirdist}" />
+		<!-- TODO: get most recently released version of enterutils.jar -->
+		<copy file="../EnterUtilities/dist/enterutils.jar" todir="${dirlib}" failonerror="false" />
+		<!-- TODO: get most recently released version of sqlparser.jar -->
+		<copy file="../SqlParser/dist/sqlparser.jar" todir="${dirlib}" failonerror="false" />
+		<!-- TODO: get most recently released version of jdbcbase.jar and jdbcbase-test.jar -->
+		<copy file="../JdbcBase/dist/jdbcbase.jar" todir="${dirlib}" failonerror="false" />
+		<copy file="../JdbcBase/dist/jdbcbase-test.jar" todir="${dirlib}" failonerror="false" />
+		<!-- TODO: get most recently released version of cubrid.jar -->
+		<copy file="../Cubrid/dist/cubrid.jar" todir="${dirlib}" failonerror="false" />
 	</target>
 
 	<!-- check if mainfest and local build properties are available -->
@@ -132,6 +140,8 @@ Created    : 09.05.2016, Hartwig Thomas
 		<!-- TODO: get most recently released version of jdbcbase.jar and jdbcbase-test.jar -->
 		<copy file="../JdbcBase/dist/jdbcbase.jar" todir="${dirlib}" failonerror="false" />
 		<copy file="../JdbcBase/dist/jdbcbase-test.jar" todir="${dirlib}" failonerror="false" />
+		<!-- TODO: get most recently released version of cubrid.jar -->
+		<copy file="../Cubrid/dist/cubrid.jar" todir="${dirlib}" failonerror="false" />
 		<!-- stage all changes -->
 		<echo message="${ant.project.name}: git add -A" />
 		<exec executable="${git}" output="${fileadd}" failonerror="true">

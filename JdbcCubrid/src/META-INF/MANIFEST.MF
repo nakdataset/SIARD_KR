@@ -4,7 +4,7 @@ Specification-Title: JDBC
 Specification-Version: 4
 Specification-Vendor: Enter AG, Rüti ZH, Switzerland
 Implementation-Title: CUBRID JDBC Wrapper
-Implementation-Version: 2.1.74
+Implementation-Version: 2.1.78
 Implementation-Vendor: Enter AG, Rüti ZH, Switzerland
 Built-Date: 16. Jul 2020
 Class-Path: cubrid_jdbc.jar
