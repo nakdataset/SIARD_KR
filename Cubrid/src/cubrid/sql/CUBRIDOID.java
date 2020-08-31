@@ -31,7 +31,7 @@
 package cubrid.sql;
 
 /**
- * Title:        CUBRID JDBC Drivers
+ * Title:        CUBRID JDBC Driver
  * Description:
  * @version 2.0
  */
@@ -50,7 +50,6 @@ import cubrid.jdbc.jci.UError;
 import cubrid.jdbc.jci.UErrorCode;
 import cubrid.jdbc.jci.UJCIUtil;
 import cubrid.jdbc.jci.UStatement;
-
 
 public class CUBRIDOID {
 	private CUBRIDConnection cur_con;
