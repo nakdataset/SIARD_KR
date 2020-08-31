@@ -50,6 +50,7 @@ public class MainMenuBar
   private Menu _menuFile = null;
   private MenuItem _miDownload = null;
   private Menu _menuDownloadMru = null;
+  private MenuItem _miDownloadStory = null; /* IntraDIGM */
   private MenuItem _miOpen = null;
   private Menu _menuOpenMru = null;
   private MenuItem _miSave = null;
@@ -57,6 +58,7 @@ public class MainMenuBar
   private MenuItem _miAugmentMetaData = null; // import meta data
   private MenuItem _miUpload = null;
   private Menu _menuUploadMru= null;
+  private MenuItem _miUploadStory = null; /* IntraDIGM */
   private MenuItem _miClose = null;
   private MenuItem _miExit = null;
   private Menu _menuEdit = null;
@@ -76,14 +78,6 @@ public class MainMenuBar
   private Menu _menuHelp = null;
   private MenuItem _miHelp = null;
   private MenuItem _miInfo = null;
-
-  // 최창근 추가 - 내역 버튼 추가
-  private Menu _menuHistory = null;
-  private MenuItem _miDownloadHistory = null;
-  private MenuItem _miUploadHistory = null;
-
-  private MenuItem _miDownloadStory = null; /* IntraDIGM */
-  private MenuItem _miUploadStory = null; /* IntraDIGM */
 
   /*==================================================================*/
   private class ToggleChangeListener
@@ -150,6 +144,8 @@ public class MainMenuBar
       MruConnection.Connection connMru = (MruConnection.Connection)mi.getUserData();
       sg.download(connMru._sUrl, connMru._sDbUser);
     }
+	else if (mi == _miDownloadStory) /* IntraDIGM */
+		sg.history("0001");
     else if (mi == _miOpen)
       sg.openArchive();
     else if (mi.getParentMenu() == _menuOpenMru)
@@ -167,7 +163,9 @@ public class MainMenuBar
       MruConnection.Connection connMru = (MruConnection.Connection)mi.getUserData();
       sg.upload(connMru._sUrl, connMru._sDbUser);
     }
-    else if (mi == _miClose)
+	else if (mi == _miUploadStory) /* IntraDIGM */
+		sg.history("0002");
+	else if (mi == _miClose)
       sg.closeArchive();
     else if (mi == _miExit)
       sg.exit();
@@ -198,25 +196,6 @@ public class MainMenuBar
       sg.help();
     else if (mi == _miInfo)
       sg.info(); // display Info dialog
-
-    // 최창근 추가 - 사용자 이벤트 내역 버튼 이벤트처리
-    else if (mi == _miDownloadHistory) {
-      sg.history("0001");
-    }
-    else if (mi == _miUploadHistory) {
-      sg.history("0002");
-    }
-
-    /* IntraDIGM */
-    else if (mi == _miDownloadStory) {
-    	sg.history("0001");
-//    	sg.openDownloadStory();
-    }
-    /* IntraDIGM */
-    else if (mi == _miUploadStory) {
-    	sg.history("0002");
-//    	sg.openUploadStory();
-    }
 
   } /* handle */
 
@@ -274,10 +253,7 @@ public class MainMenuBar
     _miHelp.setDisable(false);
     _miInfo.setDisable(false);
 
-    _miDownloadStory.setDisable(false); /* IntraDIGM */
-    _miUploadStory.setDisable(false); /* IntraDIGM */
     MainToolBar.getMainToolBar().restrict(); /* IntraDIGM */
-
   } /* restrict */
 
   /*------------------------------------------------------------------*/
@@ -289,8 +265,10 @@ public class MainMenuBar
     _menuFile.setText(sb.getMenuFile());
     _miDownload.setText(sb.getMenuFileDownload());
     _menuDownloadMru.setText(sb.getMenuFileDownloadMru());
+	_miDownloadStory.setText(sb.getMenuFileDownloadStory()); /* IntraDIGM */
     _miUpload.setText(sb.getMenuFileUpload());
     _menuUploadMru.setText(sb.getMenuFileUploadMru());
+	_miUploadStory.setText(sb.getMenuFileUploadStory()); /* IntraDIGM */
     _miOpen.setText(sb.getMenuFileOpen());
     _menuOpenMru.setText(sb.getMenuFileOpenMru());
     _miSave.setText(sb.getMenuFileSave());
@@ -321,15 +299,6 @@ public class MainMenuBar
     _menuHelp.setText(sb.getMenuHelp());
     _miHelp.setText(sb.getMenuHelpHelp());
     _miInfo.setText(sb.getMenuHelpInfo());
-
-    // 최창근 추가 - 내역메뉴명, 다운르도, 업로드, 버튼명
-    _menuHistory.setText(sb.getMenuHistory());
-    _miDownloadHistory.setText(sb.getMenuHistoryDownload());
-    _miUploadHistory.setText(sb.getMenuHistoryUpload());
-
-    _miDownloadStory.setText(sb.getMenuFileDownloadStory()); /* IntraDIGM */
-    _miUploadStory.setText(sb.getMenuFileUploadStory()); /* IntraDIGM */
-
   } /* refreshLanguage */
 
   /*------------------------------------------------------------------*/
@@ -389,8 +358,6 @@ public class MainMenuBar
   {
     super();
 
-    LOG.info("");
-
     _menuFile = new Menu();
 
     _miDownload = createMenuItem();
@@ -400,12 +367,19 @@ public class MainMenuBar
     setConnectionMru(true);
     _menuFile.getItems().add(_menuDownloadMru);
 
+	_miDownloadStory = createMenuItem(); /* IntraDIGM */
+	_menuFile.getItems().add(_miDownloadStory);
+    
+    _menuFile.getItems().add(new SeparatorMenuItem());
     _miUpload = createMenuItem();
     _menuFile.getItems().add(_miUpload);
 
     _menuUploadMru = new Menu();
     setConnectionMru(false);
     _menuFile.getItems().add(_menuUploadMru);
+    
+	_miUploadStory = createMenuItem(); /* IntraDIGM */
+	_menuFile.getItems().add(_miUploadStory);
 
     _menuFile.getItems().add(new SeparatorMenuItem());
 
@@ -479,23 +453,6 @@ public class MainMenuBar
     _menuEdit.getItems().add(_miSearchNext);
 
     getMenus().add(_menuEdit);
-
-
-
-    // 최창근 추가 - 내역 메뉴, 다운로드 버튼 추가
-    _menuHistory = new Menu();
-    _miDownloadHistory = createMenuItem();
-    _menuHistory.getItems().add(_miDownloadHistory);
-    _miUploadHistory = createMenuItem();
-    _menuHistory.getItems().add(_miUploadHistory);
-    getMenus().add(_menuHistory);
-
-
-    _miDownloadStory = createMenuItem(); /* IntraDIGM */
-	_menuFile.getItems().add(_miDownloadStory);
-	_miUploadStory = createMenuItem(); /* IntraDIGM */
-	_menuFile.getItems().add(_miUploadStory);
-
 
     _menuTools = new Menu();
 

@@ -243,7 +243,7 @@ public class RecordExtractTableView
     for (Iterator<TableColumn<List<Object>,?>> iterColumn = getColumns().iterator(); iterColumn.hasNext(); )
     {
       ObjectListTableColumn oltc = (ObjectListTableColumn)iterColumn.next();
-      double dPreferredColumnWidth = UserProperties.getUserProperties().getColumnWidth();
+      double dPreferredColumnWidth = (double) UserProperties.getUserProperties().getColumnWidth();
       oltc.setMinWidth(FxSizes.fromEms(sMIN_COLUMN_WIDTH));
       oltc.setPrefWidth(FxSizes.fromEms(dPreferredColumnWidth));
       oltc.setMaxWidth(FxSizes.fromEms(dPreferredColumnWidth*dPreferredColumnWidth/sMIN_COLUMN_WIDTH));

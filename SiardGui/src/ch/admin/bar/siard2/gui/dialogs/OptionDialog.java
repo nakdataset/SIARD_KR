@@ -1,12 +1,11 @@
-/*======================================================================
-OptionDialog display options for modification.
-Application : Siard2
-Description : OptionDialog display options for modification.
-Platform    : Java 7, JavaFX 2.2
-------------------------------------------------------------------------
-Copyright  : 2017, Enter AG, Rüti ZH, Switzerland
-Created    : 16.08.2017, Hartwig Thomas
-======================================================================*/
+/*
+ * ====================================================================== OptionDialog display
+ * options for modification. Application : Siard2 Description : OptionDialog display options for
+ * modification. Platform : Java 7, JavaFX 2.2
+ * ------------------------------------------------------------------------ Copyright : 2017, Enter
+ * AG, Rüti ZH, Switzerland Created : 16.08.2017, Hartwig Thomas
+ * ======================================================================
+ */
 package ch.admin.bar.siard2.gui.dialogs;
 
 import java.io.File;
@@ -27,243 +26,267 @@ import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Separator;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-/*====================================================================*/
-/** OptionDialog display options for modification.
+/* ==================================================================== */
+/**
+ * OptionDialog display options for modification.
+ * 
  * @author Hartwig Thomas
  */
 public class OptionDialog
-  extends ScrollableDialog
-  implements EventHandler<ActionEvent>
+	extends ScrollableDialog
+	implements EventHandler<ActionEvent>
 {
 
-  // 최창근 추가 - 로그
-  private static final Logger LOG = Logger.getLogger(OptionDialog.class);
+	// 최창근 추가 - 로그
+	private static final Logger LOG = Logger.getLogger(OptionDialog.class);
 
-  // limits for column width
-  private static final int iMIN_COLUMN_WIDTH = 4;
-  private static final int iMAX_COLUMN_WIDTH = 80;
+	// limits for column width
+	private static final int iMIN_COLUMN_WIDTH = 4;
+	private static final int iMAX_COLUMN_WIDTH = 80;
 
-  private boolean _bCanceled = true;  // just closing with the close button is canceling
-  public boolean isCanceled() { return _bCanceled; }
-  private OptionVBox<Integer> _ovbLoginTimeout = null;
-  private OptionVBox<Integer> _ovbQueryTimeout = null;
-  private OptionVBox<Integer> _ovbColumnWidth = null;
-  private OptionVBox<Boolean> _ovbFileChooserNative = null;
-  private OptionVBox<File> _ovbTextEditor = null;
-  private OptionVBox<File> _ovbBinaryEditor = null;
-  private OptionVBox<File> _ovbXslFile = null;
-  private OptionVBox<File> _ovbLobsFolder = null;
-  private Button _btnDefault = null;
-  private Button _btnCancel = null;
+	private boolean _bCanceled = true; // just closing with the close button is canceling
 
-  /*------------------------------------------------------------------*/
-  /** handle the action of one of the buttons.
-   * @param action event.
-   */
-  @Override
-  public void handle(ActionEvent ae)
-  {
-    if (ae.getSource() == _btnDefault)
-    {
-      UserProperties up = UserProperties.getUserProperties();
-      int iLoginTimeout = _ovbLoginTimeout.getValue().intValue();
-      if (iLoginTimeout < 0)
-        iLoginTimeout = 0;
-      up.setLoginTimeoutSeconds(iLoginTimeout);
-      int iQueryTimeout = _ovbQueryTimeout.getValue().intValue();
-      if (iQueryTimeout < 0)
-        iQueryTimeout = 0;
-      up.setQueryTimeoutSeconds(iQueryTimeout);
-      int iColumnWidth = _ovbColumnWidth.getValue().intValue();
-      if (iColumnWidth < iMIN_COLUMN_WIDTH)
-        iColumnWidth = iMIN_COLUMN_WIDTH;
-      if (iColumnWidth > iMAX_COLUMN_WIDTH)
-        iColumnWidth = iMAX_COLUMN_WIDTH;
-      up.setColumnWidth(iColumnWidth);
-      boolean bFileChooserNative = _ovbFileChooserNative.getValue().booleanValue();
-      System.setProperty(FS.sUSE_NATIVE_PROPERTY, String.valueOf(bFileChooserNative));
-      File fileTextEditor = _ovbTextEditor.getValue();
-      if ((fileTextEditor != null) &&
-          fileTextEditor.exists() &&
-          fileTextEditor.isFile())
-        up.setTextEditor(fileTextEditor);
-      File fileBinaryEditor = _ovbBinaryEditor.getValue();
-      if ((fileBinaryEditor != null) &&
-          fileBinaryEditor.exists() &&
-          fileBinaryEditor.isFile())
-        up.setBinEditor(fileBinaryEditor);
-      File fileXslFile = _ovbXslFile.getValue();
-      if ((fileXslFile != null) &&
-          fileXslFile.exists() &&
-          fileXslFile.isFile())
-        up.setXslFile(fileXslFile);
-      File fileLobsFolder = _ovbLobsFolder.getValue();
-      if ((fileLobsFolder != null) && (fileLobsFolder.exists() && fileLobsFolder.isDirectory()))
-        up.setLobsFolder(fileLobsFolder);
-      _bCanceled = false;
-    }
-    close();
-  } /* handle */
+	public boolean isCanceled()
+	{
+		return _bCanceled;
+	}
 
-  /*------------------------------------------------------------------*/
-  /** compute the maximum text width of the given strings.
-   * @param as strings.
-   * @return maximum text width.
-   */
-  private double getMaxWidth(String[] as)
-  {
-    double dWidth = 0.0;
-    for (int i = 0; i < as.length; i++)
-    {
-      if (dWidth < FxSizes.getTextWidth(as[i]))
-        dWidth = FxSizes.getTextWidth(as[i]);
-    }
-    return dWidth;
-  } /* getMaxWidth */
+	private OptionVBox<Integer> _ovbLoginTimeout = null;
+	private OptionVBox<Integer> _ovbQueryTimeout = null;
+	private OptionVBox<Integer> _ovbColumnWidth = null;
+	private OptionVBox<Boolean> _ovbFileChooserNative = null;
+	private OptionVBox<File> _ovbTextEditor = null;
+	private OptionVBox<File> _ovbBinaryEditor = null;
+	private OptionVBox<File> _ovbXslFile = null;
+	private OptionVBox<File> _ovbLobsFolder = null;
+	private Button _btnDefault = null;
+	private Button _btnCancel = null;
 
-  /*------------------------------------------------------------------*/
-  /** create the HBox with the OK button.
-   * @return HBox with OK button.
-   */
-  private HBox createHBoxButtons()
-  {
-    SiardBundle sb = SiardBundle.getSiardBundle();
-    /* ok button */
-    // label is needed for tooltip on disabled button
-    _btnDefault = new Button(sb.getOk());
-    _btnDefault.setDefaultButton(true);
-    _btnDefault.setOnAction(this);
-    if (!SiardGui.isRunningInstalled())
-      _btnDefault.setTooltip(new Tooltip(sb.getOptionNotstoredTooltip()));
-    // double dMinWidth = _btnDefault.getLayoutBounds().getWidth();
-    /* cancel button */
-    _btnCancel = new Button(sb.getCancel());
-    _btnCancel.setCancelButton(true);
-    _btnCancel.setOnAction(this);
-    // dMinWidth += dHSPACING + _btnCancel.getLayoutBounds().getWidth();
-    /* HBox for buttons */
-    HBox hboxButton = new HBox();
-    hboxButton.setPadding(new Insets(dINNER_PADDING));
-    hboxButton.setSpacing(dHSPACING);
-    hboxButton.setAlignment(Pos.TOP_RIGHT);
-    hboxButton.getChildren().add(_btnDefault);
-    hboxButton.getChildren().add(_btnCancel);
-    HBox.setMargin(_btnDefault, new Insets(dOUTER_PADDING));
-    HBox.setMargin(_btnCancel, new Insets(dOUTER_PADDING));
-    // hboxButton.setMinWidth(dMinWidth);
-    return hboxButton;
-  } /* createHBoxButtons */
+	/*------------------------------------------------------------------*/
+	/**
+	 * handle the action of one of the buttons.
+	 * 
+	 * @param action event.
+	 */
+	@Override
+	public void handle(ActionEvent ae)
+	{
+		if (ae.getSource() == _btnDefault) {
+			UserProperties up = UserProperties.getUserProperties();
+			int iLoginTimeout = _ovbLoginTimeout.getValue().intValue();
+			if (iLoginTimeout < 0)
+				iLoginTimeout = 0;
+			up.setLoginTimeoutSeconds(iLoginTimeout);
+			int iQueryTimeout = _ovbQueryTimeout.getValue().intValue();
+			if (iQueryTimeout < 0)
+				iQueryTimeout = 0;
+			up.setQueryTimeoutSeconds(iQueryTimeout);
+			int iColumnWidth = _ovbColumnWidth.getValue().intValue();
+			if (iColumnWidth < iMIN_COLUMN_WIDTH)
+				iColumnWidth = iMIN_COLUMN_WIDTH;
+			if (iColumnWidth > iMAX_COLUMN_WIDTH)
+				iColumnWidth = iMAX_COLUMN_WIDTH;
+			up.setColumnWidth(iColumnWidth);
+			boolean bFileChooserNative = _ovbFileChooserNative.getValue().booleanValue();
+			System.setProperty(FS.sUSE_NATIVE_PROPERTY, String.valueOf(bFileChooserNative));
+			File fileTextEditor = _ovbTextEditor.getValue();
+			if ((fileTextEditor != null) &&
+				fileTextEditor.exists() &&
+				fileTextEditor.isFile())
+				up.setTextEditor(fileTextEditor);
+			File fileBinaryEditor = _ovbBinaryEditor.getValue();
+			if ((fileBinaryEditor != null) &&
+				fileBinaryEditor.exists() &&
+				fileBinaryEditor.isFile())
+				up.setBinEditor(fileBinaryEditor);
+			File fileXslFile = _ovbXslFile.getValue();
+			if ((fileXslFile != null) &&
+				fileXslFile.exists() &&
+				fileXslFile.isFile())
+				up.setXslFile(fileXslFile);
+			File fileLobsFolder = _ovbLobsFolder.getValue();
+			if ((fileLobsFolder != null) && (fileLobsFolder.exists() && fileLobsFolder.isDirectory()))
+				up.setLobsFolder(fileLobsFolder);
+			_bCanceled = false;
+		}
+		close();
+	} /* handle */
 
-  /*------------------------------------------------------------------*/
-  /** create the dialog pane containing the option editors and
-   * the ok and cancel button.
-   * @return
-   */
-  private VBox createVBoxDialog()
-  {
-    SiardBundle sb = SiardBundle.getSiardBundle();
-    UserProperties up = UserProperties.getUserProperties();
-    VBox vbox = new VBox();
+	/*------------------------------------------------------------------*/
+	/**
+	 * compute the maximum text width of the given strings.
+	 * 
+	 * @param as strings.
+	 * @return maximum text width.
+	 */
+	private double getMaxWidth(String[] as)
+	{
+		double dWidth = 0.0;
+		for (int i = 0; i < as.length; i++) {
+			if (dWidth < FxSizes.getTextWidth(as[i]))
+				dWidth = FxSizes.getTextWidth(as[i]);
+		}
+		return dWidth;
+	} /* getMaxWidth */
 
-//    vbox.setPadding(new Insets(dOUTER_PADDING)); /* IntraDIGM */
-    vbox.setPadding(new Insets(dOUTER_PADDING * 2, dOUTER_PADDING, 0, dOUTER_PADDING)); /* IntraDIGM */
+	/*------------------------------------------------------------------*/
+	/**
+	 * create the HBox with the OK button.
+	 * 
+	 * @return HBox with OK button.
+	 */
+	private HBox createHBoxButtons()
+	{
+		SiardBundle sb = SiardBundle.getSiardBundle();
+		/* ok button */
+		// label is needed for tooltip on disabled button
+		_btnDefault = new Button(sb.getOk());
+		_btnDefault.setDefaultButton(true);
+		_btnDefault.setOnAction(this);
+		if (!SiardGui.isRunningInstalled())
+			_btnDefault.setTooltip(new Tooltip(sb.getOptionNotstoredTooltip()));
+		// double dMinWidth = _btnDefault.getLayoutBounds().getWidth();
+		/* cancel button */
+		_btnCancel = new Button(sb.getCancel());
+		_btnCancel.setCancelButton(true);
+		_btnCancel.setOnAction(this);
+		// dMinWidth += dHSPACING + _btnCancel.getLayoutBounds().getWidth();
+		/* HBox for buttons */
+		HBox hboxButton = new HBox();
+		hboxButton.setPadding(new Insets(dINNER_PADDING));
+		hboxButton.setSpacing(dHSPACING);
+		hboxButton.setAlignment(Pos.TOP_RIGHT);
+		hboxButton.getChildren().add(_btnDefault);
+		hboxButton.getChildren().add(_btnCancel);
+		//HBox.setMargin(_btnDefault, new Insets(dOUTER_PADDING));
+		//HBox.setMargin(_btnCancel, new Insets(dOUTER_PADDING));
+		// hboxButton.setMinWidth(dMinWidth);
+		return hboxButton;
+	} /* createHBoxButtons */
 
-    vbox.setSpacing(dVSPACING);
-    vbox.setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
+	/*------------------------------------------------------------------*/
+	/**
+	 * create the dialog pane containing the option editors and the ok and cancel button.
+	 * 
+	 * @return
+	 */
+	private VBox createVBoxDialog()
+	{
+		SiardBundle sb = SiardBundle.getSiardBundle();
+		UserProperties up = UserProperties.getUserProperties();
+		VBox vbox = new VBox();
 
-    String sLoginTimeoutLabel = sb.getOptionLoginTimeoutLabel();
-    String sQueryTimeoutLabel = sb.getOptionQueryTimeoutLabel();
-    String sColumnWidthLabel = sb.getOptionColumnWidthLabel();
-    String sFileChooserNativeLabel = sb.getOptionFileChooserNativeLabel();
-    String sTextEditorLabel = sb.getOptionTextEditorLabel();
-    String sBinaryEditorLabel = sb.getOptionBinaryEditorLabel();
-    String sXslFileLabel = sb.getOptionXslFileLabel();
-    String sLobsFolderLabel = sb.getOptionLobsFolderLabel();
-    double dLabelWidth = getMaxWidth(new String[]
-      {
-          sLoginTimeoutLabel,
-          sQueryTimeoutLabel,
-          sColumnWidthLabel,
-          sFileChooserNativeLabel,
-          sTextEditorLabel,
-          sBinaryEditorLabel,
-          sXslFileLabel,
-          sLobsFolderLabel,
-      })+2.0;
-    _ovbLoginTimeout = new OptionVBox<Integer>(this,sb.getOptionLoginTimeoutExplanation(),
-      sLoginTimeoutLabel,dLabelWidth,Integer.class,Integer.valueOf(up.getLoginTimeoutSeconds()));
-    vbox.getChildren().add(_ovbLoginTimeout);
-    _ovbQueryTimeout = new OptionVBox<Integer>(this,sb.getOptionQueryTimeoutExplanation(),
-      sQueryTimeoutLabel,dLabelWidth,Integer.class,Integer.valueOf(up.getQueryTimeoutSeconds()));
-    vbox.getChildren().add(_ovbQueryTimeout);
-    _ovbColumnWidth = new OptionVBox<Integer>(this,sb.getOptionColumnWidthExplanation(),
-      sColumnWidthLabel,dLabelWidth,Integer.class,Integer.valueOf(up.getColumnWidth()));
-    vbox.getChildren().add(_ovbColumnWidth);
-    _ovbFileChooserNative = new OptionVBox<Boolean>(this,sb.getOptionFileChooserNativeExplanation(),
-      sFileChooserNativeLabel,dLabelWidth,Boolean.class,Boolean.valueOf(Boolean.valueOf(System.getProperty(FS.sUSE_NATIVE_PROPERTY))));
-    vbox.getChildren().add(_ovbFileChooserNative);
-    _ovbTextEditor = new OptionVBox<File>(this,sb.getOptionTextEditorExplanation(),
-      sTextEditorLabel,dLabelWidth,File.class,up.getTextEditor());
-    vbox.getChildren().add(_ovbTextEditor);
-    _ovbBinaryEditor = new OptionVBox<File>(this,sb.getOptionBinaryEditorExplanation(),
-      sBinaryEditorLabel,dLabelWidth,File.class,up.getBinEditor());
-    vbox.getChildren().add(_ovbBinaryEditor);
-    _ovbXslFile = new OptionVBox<File>(this,sb.getOptionXslFileExplanation(),
-      sXslFileLabel,dLabelWidth,File.class,up.getXslFile());
-    vbox.getChildren().add(_ovbXslFile);
-    _ovbLobsFolder = new OptionVBox<File>(this,sb.getOptionLobsFolderExplanation(),
-      sLobsFolderLabel,dLabelWidth,File.class,up.getLobsFolder());
+		// vbox.setPadding(new Insets(dOUTER_PADDING)); /* IntraDIGM */
+		vbox.setPadding(new Insets(dOUTER_PADDING * 2, dOUTER_PADDING, 0, dOUTER_PADDING)); /* IntraDIGM */
 
-    vbox.getChildren().add(_ovbLobsFolder);
-    vbox.getChildren().add(createHBoxButtons());
+		vbox.setSpacing(dVSPACING);
+		vbox.setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
 
-    vbox.setMinWidth(FxSizes.getNodeWidth(vbox));
-    vbox.setMinHeight(FxSizes.getNodeHeight(vbox));
+		String sLoginTimeoutLabel = sb.getOptionLoginTimeoutLabel();
+		String sQueryTimeoutLabel = sb.getOptionQueryTimeoutLabel();
+		String sColumnWidthLabel = sb.getOptionColumnWidthLabel();
+		String sFileChooserNativeLabel = sb.getOptionFileChooserNativeLabel();
+		String sTextEditorLabel = sb.getOptionTextEditorLabel();
+		String sBinaryEditorLabel = sb.getOptionBinaryEditorLabel();
+		String sXslFileLabel = sb.getOptionXslFileLabel();
+		String sLobsFolderLabel = sb.getOptionLobsFolderLabel();
+		double dLabelWidth = getMaxWidth(new String[] {
+			sLoginTimeoutLabel,
+			sQueryTimeoutLabel,
+			sColumnWidthLabel,
+			sFileChooserNativeLabel,
+			sTextEditorLabel,
+			sBinaryEditorLabel,
+			sXslFileLabel,
+			sLobsFolderLabel,
+		}) + 2.0;
+		_ovbLoginTimeout = new OptionVBox<Integer>(this, sb.getOptionLoginTimeoutExplanation(),
+			sLoginTimeoutLabel, dLabelWidth, Integer.class, Integer.valueOf(up.getLoginTimeoutSeconds()));
+		vbox.getChildren().add(_ovbLoginTimeout);
+		vbox.getChildren().add(new Separator());
+		_ovbQueryTimeout = new OptionVBox<Integer>(this, sb.getOptionQueryTimeoutExplanation(),
+			sQueryTimeoutLabel, dLabelWidth, Integer.class, Integer.valueOf(up.getQueryTimeoutSeconds()));
+		vbox.getChildren().add(_ovbQueryTimeout);
+		vbox.getChildren().add(new Separator());
+		_ovbColumnWidth = new OptionVBox<Integer>(this, sb.getOptionColumnWidthExplanation(),
+			sColumnWidthLabel, dLabelWidth, Integer.class, Integer.valueOf(up.getColumnWidth()));
+		vbox.getChildren().add(_ovbColumnWidth);
+		vbox.getChildren().add(new Separator());
+		_ovbFileChooserNative = new OptionVBox<Boolean>(this, sb.getOptionFileChooserNativeExplanation(),
+			sFileChooserNativeLabel, dLabelWidth, Boolean.class, Boolean.valueOf(Boolean.valueOf(System.getProperty(FS.sUSE_NATIVE_PROPERTY))));
+		vbox.getChildren().add(_ovbFileChooserNative);
+		vbox.getChildren().add(new Separator());
+		_ovbTextEditor = new OptionVBox<File>(this, sb.getOptionTextEditorExplanation(),
+			sTextEditorLabel, dLabelWidth, File.class, up.getTextEditor());
+		vbox.getChildren().add(_ovbTextEditor);
+		vbox.getChildren().add(new Separator());
+		_ovbBinaryEditor = new OptionVBox<File>(this, sb.getOptionBinaryEditorExplanation(),
+			sBinaryEditorLabel, dLabelWidth, File.class, up.getBinEditor());
+		vbox.getChildren().add(_ovbBinaryEditor);
+		vbox.getChildren().add(new Separator());
+		_ovbXslFile = new OptionVBox<File>(this, sb.getOptionXslFileExplanation(),
+			sXslFileLabel, dLabelWidth, File.class, up.getXslFile());
+		vbox.getChildren().add(_ovbXslFile);
+		vbox.getChildren().add(new Separator());
+		_ovbLobsFolder = new OptionVBox<File>(this, sb.getOptionLobsFolderExplanation(),
+			sLobsFolderLabel, dLabelWidth, File.class, up.getLobsFolder());
 
-    return vbox;
-  } /* createVBoxDialog */
+		vbox.getChildren().add(_ovbLobsFolder);
+		vbox.getChildren().add(new Separator());
+		vbox.getChildren().add(createHBoxButtons());
 
-  /*------------------------------------------------------------------*/
-  /** create the option dialog.
-   * @param stageOwner owner stage.
-   */
-  private OptionDialog(Stage stageOwner)
-  {
-    super(stageOwner,SiardBundle.getSiardBundle().getOptionTitle());
-    VBox vbox = createVBoxDialog();
+		vbox.setMinWidth(FxSizes.getNodeWidth(vbox));
+		vbox.setMinHeight(FxSizes.getNodeHeight(vbox));
 
-    // 최창근 수정 - 가로, 세로 스크롤 제거를 위한 넓이, 높이 값 수정
-    /* scene */
-//    Scene scene = new Scene(vbox, vbox.getMinWidth()+10.0, vbox.getMinHeight()+10.0);
+		return vbox;
+	} /* createVBoxDialog */
 
-//    Scene scene = new Scene(vbox, vbox.getMinWidth()+20.0, vbox.getMinHeight()+20.0); /* IntraDIGM */
-    Scene scene = new Scene(vbox); /* IntraDIGM */
+	/*------------------------------------------------------------------*/
+	/**
+	 * create the option dialog.
+	 * 
+	 * @param stageOwner owner stage.
+	 */
+	private OptionDialog(Stage stageOwner)
+	{
+		super(stageOwner, SiardBundle.getSiardBundle().getOptionTitle());
+		VBox vbox = createVBoxDialog();
 
-    setScene(scene);
-  } /* constructor */
+		// 최창근 수정 - 가로, 세로 스크롤 제거를 위한 넓이, 높이 값 수정
+		/* scene */
+		// Scene scene = new Scene(vbox, vbox.getMinWidth()+10.0, vbox.getMinHeight()+10.0);
 
-  /*------------------------------------------------------------------*/
-  /** shows the option dialog.
-   * @param stageOwner owner window.
-   * @return option dialog with results.
-   */
-  public static OptionDialog showOptionDialog(Stage stageOwner)
-  {
-    OptionDialog od = new OptionDialog(stageOwner);
+		// Scene scene = new Scene(vbox, vbox.getMinWidth()+20.0, vbox.getMinHeight()+20.0); /* IntraDIGM */
+		Scene scene = new Scene(vbox); /* IntraDIGM */
 
-    /* IntraDIGM ==============================*/
-    Rectangle2D rectScreen = FxSizes.getScreenBounds();
-	od.setWidth(rectScreen.getWidth() * 0.4);
-	od.setResizable(false);
-	/* ============================== IntraDIGM */
+		setScene(scene);
+	} /* constructor */
 
-    od.showAndWait();
-    return od;
-  } /* showOptionDialog */
+	/*------------------------------------------------------------------*/
+	/**
+	 * shows the option dialog.
+	 * 
+	 * @param stageOwner owner window.
+	 * @return option dialog with results.
+	 */
+	public static OptionDialog showOptionDialog(Stage stageOwner)
+	{
+		OptionDialog od = new OptionDialog(stageOwner);
+
+		/* IntraDIGM ============================== */
+		Rectangle2D rectScreen = FxSizes.getScreenBounds();
+		od.setWidth(rectScreen.getWidth() * 0.4);
+		od.setResizable(false);
+		/* ============================== IntraDIGM */
+
+		od.showAndWait();
+		return od;
+	} /* showOptionDialog */
 
 } /* OptionDialog */

@@ -180,28 +180,35 @@ public class SiardGui extends Application
 	/**
 	 * logPerformance prints memory and stop watches.
 	 */
-	public void logPerformance() {
-		Runtime rt = Runtime.getRuntime();
-		_il.info(
-			"GUI: Used Memory: " + StopWatch.formatLong(rt.totalMemory() - rt.freeMemory()) +
-				", Free Memory: " + StopWatch.formatLong(rt.freeMemory()) +
-				", Open: " + swOpen.formatMs() +
-				", Valid: " + ((ArchiveImpl) getArchive())._swValid.formatMs());
-	} /* logPerformance */
+  public void logPerformance()
+  {
+    Runtime rt = Runtime.getRuntime();
+    
+    if (_archive == null)
+      _il.info(
+        "GUI: Used Memory: "+StopWatch.formatLong(rt.totalMemory() - rt.freeMemory())+
+        ", Free Memory: "+StopWatch.formatLong(rt.freeMemory())+
+        ", Open: "+swOpen.formatMs());
+    else
+      _il.info(
+        "GUI: Used Memory: "+StopWatch.formatLong(rt.totalMemory() - rt.freeMemory())+
+        ", Free Memory: "+StopWatch.formatLong(rt.freeMemory())+
+        ", Open: "+swOpen.formatMs()+
+        ", Valid: "+((ArchiveImpl)getArchive())._swValid.formatMs());
+  } /* logPerformance */
 
 	/*------------------------------------------------------------------*/
 	/** setTitle sets the title with file name and change indicator */
-	public void setTitle() {
-		// String sTitle = getClass().getSimpleName() + " " + sVERSION;
-		// if (_archive != null)
-		// {
-		// sTitle = sTitle + ": " + _archive.getFile().getName();
-		// if (!_archive.isMetaDataUnchanged())
-		// sTitle = sTitle + "*";
-		// }
-		// _stage.setTitle(sTitle);
-
-		_stage.setTitle("SIARD_KR 1.1");
+  public void setTitle()
+  {
+    String sTitle = getClass().getSimpleName() + " " + sVERSION;
+    if (_archive != null)
+    {
+      sTitle = sTitle + ": " + _archive.getFile().getName();
+      if (!_archive.isMetaDataUnchanged())
+        sTitle = sTitle + "*";
+    }
+    _stage.setTitle(sTitle);
 	} /* setTitle */
 
 	private Cursor _cursor = Cursor.DEFAULT;
@@ -355,8 +362,6 @@ public class SiardGui extends Application
 			_stage.setWidth(up.getStageWidth(0.7 * rectScreen.getWidth()));
 			_stage.setHeight(up.getStageHeight(0.7 * rectScreen.getHeight()));
 		}
-		_stage.setWidth(1024);
-		_stage.setHeight(768);
 
 		System.setProperty(FS.sUSE_NATIVE_PROPERTY, String.valueOf(up.getFileChooserNative(true)));
 		_il.exit(up);

@@ -113,8 +113,8 @@ public class MB
 
     /* width of title and text */
     Text txtPrompt = new Text(sPrompt);
-    if (txtPrompt.getLayoutBounds().getWidth() > FxSizes.getScreenBounds().getWidth()/2.0)
-      txtPrompt.setWrappingWidth(FxSizes.getScreenBounds().getWidth()/2.0);
+		if (txtPrompt.getLayoutBounds().getWidth() > FxSizes.getScreenBounds().getWidth() / 2.5) /* IntraDIGM */
+			txtPrompt.setWrappingWidth(FxSizes.getScreenBounds().getWidth() / 2.5); /* IntraDIGM */
     else
       txtPrompt.setWrappingWidth(txtPrompt.getLayoutBounds().getWidth());
 

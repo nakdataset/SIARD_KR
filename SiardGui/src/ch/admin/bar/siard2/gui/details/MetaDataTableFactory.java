@@ -61,7 +61,7 @@ public abstract class MetaDataTableFactory
     for (int iSchema = 0; iSchema < md.getMetaSchemas(); iSchema++)
     {
       MetaSchema ms = md.getMetaSchema(iSchema);
-      List<Object> listRow = Arrays.asList((Object)iSchema,
+			List<Object> listRow = Arrays.asList((Object)(iSchema + 1),
         ms.getName(), ms.getMetaTables());
       LOG.info("(Object)iSchema " + (Object)iSchema);
       LOG.info("ms.getName() " + ms.getName());
@@ -87,7 +87,7 @@ public abstract class MetaDataTableFactory
     for (int iUser = 0; iUser < md.getMetaUsers(); iUser++)
     {
       MetaUser mu = md.getMetaUser(iUser);
-      List<Object> listRow = Arrays.asList((Object)iUser,
+			List<Object> listRow = Arrays.asList((Object)(iUser + 1),
         mu.getName());
       oltv.getItems().add(listRow);
     }
@@ -111,7 +111,7 @@ public abstract class MetaDataTableFactory
     for (int iRole = 0; iRole < md.getMetaRoles(); iRole++)
     {
       MetaRole mr = md.getMetaRole(iRole);
-      List<Object> listRow = Arrays.asList((Object)iRole,
+			List<Object> listRow = Arrays.asList((Object)(iRole + 1),
         mr.getName(),mr.getAdmin());
       oltv.getItems().add(listRow);
     }
@@ -137,7 +137,7 @@ public abstract class MetaDataTableFactory
     for (int iPrivilege = 0; iPrivilege < md.getMetaPrivileges(); iPrivilege++)
     {
       MetaPrivilege mp = md.getMetaPrivilege(iPrivilege);
-      List<Object> listRow = Arrays.asList((Object)iPrivilege,
+			List<Object> listRow = Arrays.asList((Object)(iPrivilege + 1),
         mp.getType(),mp.getObject(),mp.getGrantor(),mp.getGrantee());
       oltv.getItems().add(listRow);
     }
@@ -162,7 +162,7 @@ public abstract class MetaDataTableFactory
     for (int iType = 0; iType < ms.getMetaTypes(); iType++)
     {
       MetaType mt = ms.getMetaType(iType);
-      List<Object> listRow = Arrays.asList((Object)iType,
+			List<Object> listRow = Arrays.asList((Object)(iType + 1),
         mt.getName(),mt.getCategory(),mt.getMetaAttributes());
       oltv.getItems().add(listRow);
     }
@@ -187,7 +187,7 @@ public abstract class MetaDataTableFactory
     for (int iTable = 0; iTable < ms.getMetaTables(); iTable++)
     {
       MetaTable mt = ms.getMetaTable(iTable);
-      List<Object> listRow = Arrays.asList((Object)iTable,
+			List<Object> listRow = Arrays.asList((Object)(iTable + 1),
         mt.getName(),mt.getMetaColumns(),mt.getRows());
       oltv.getItems().add(listRow);
     }
@@ -212,7 +212,7 @@ public abstract class MetaDataTableFactory
     for (int iView = 0; iView < ms.getMetaViews(); iView++)
     {
       MetaView mv = ms.getMetaView(iView);
-      List<Object> listRow = Arrays.asList((Object)iView,
+			List<Object> listRow = Arrays.asList((Object)(iView + 1),
         mv.getName(),mv.getMetaColumns(),mv.getRows());
       oltv.getItems().add(listRow);
     }
@@ -239,7 +239,7 @@ public abstract class MetaDataTableFactory
     for (int iRoutine = 0; iRoutine < ms.getMetaRoutines(); iRoutine++)
     {
       MetaRoutine mr = ms.getMetaRoutine(iRoutine);
-      List<Object> listRow = Arrays.asList((Object)iRoutine,
+			List<Object> listRow = Arrays.asList((Object)(iRoutine + 1),
         mr.getName(),mr.getSpecificName(),mr.getCharacteristic(),mr.getReturnType(),mr.getMetaParameters());
       oltv.getItems().add(listRow);
     }
@@ -270,7 +270,7 @@ public abstract class MetaDataTableFactory
         QualifiedId qiType = new QualifiedId(null,ma.getTypeSchema(),ma.getTypeName());
         sType = qiType.format();
       }
-      List<Object> listRow = Arrays.asList((Object)ma.getPosition(),
+			List<Object> listRow = Arrays.asList((Object) ma.getPosition(),
         ma.getName(),sType,ma.getCardinality() > 0?ma.getCardinality():null);
       oltv.getItems().add(listRow);
     }
@@ -304,7 +304,7 @@ public abstract class MetaDataTableFactory
           QualifiedId qiType = new QualifiedId(null,mc.getTypeSchema(),mc.getTypeName());
           sType = qiType.format();
         }
-        List<Object> listRow = Arrays.asList((Object)mc.getPosition(),
+				List<Object> listRow = Arrays.asList((Object) mc.getPosition(),
           mc.getName(),sType,mc.getCardinality() > 0?mc.getCardinality():null);
         oltv.getItems().add(listRow);
       }
@@ -340,7 +340,7 @@ public abstract class MetaDataTableFactory
           QualifiedId qiType = new QualifiedId(null,mc.getTypeSchema(),mc.getTypeName());
           sType = qiType.format();
         }
-        List<Object> listRow = Arrays.asList((Object)mc.getPosition(),
+				List<Object> listRow = Arrays.asList((Object) mc.getPosition(),
           mc.getName(),sType,mc.getCardinality() > 0?mc.getCardinality():null);
         oltv.getItems().add(listRow);
       }
@@ -373,7 +373,7 @@ public abstract class MetaDataTableFactory
           sColumns = sColumns + ",";
         sColumns = sColumns + muk.getColumn(i);
       }
-      List<Object> listRow = Arrays.asList((Object)iCandidateKey,
+			List<Object> listRow = Arrays.asList((Object)(iCandidateKey + 1),
         muk.getName(),sColumns);
       oltv.getItems().add(listRow);
     }
@@ -412,7 +412,7 @@ public abstract class MetaDataTableFactory
         sColumns = sColumns + mfk.getColumn(i);
         sReferencedColumns = sReferencedColumns + mfk.getReferenced(i);
       }
-      List<Object> listRow = Arrays.asList((Object)iForeignKey,
+			List<Object> listRow = Arrays.asList((Object)(iForeignKey + 1),
         mfk.getName(),sColumns,mfk.getReferencedSchema(),mfk.getReferencedTable(),sReferencedColumns);
       oltv.getItems().add(listRow);
     }
@@ -444,7 +444,7 @@ public abstract class MetaDataTableFactory
         QualifiedId qiType = new QualifiedId(null,mp.getTypeSchema(),mp.getTypeName());
         sType = qiType.format();
       }
-      List<Object> listRow = Arrays.asList((Object)mp.getPosition(),
+			List<Object> listRow = Arrays.asList((Object) mp.getPosition(),
         mp.getName(), mp.getMode(), sType, mp.getCardinality() > 0?mp.getCardinality():null);
       oltv.getItems().add(listRow);
     }
@@ -478,7 +478,7 @@ public abstract class MetaDataTableFactory
           QualifiedId qiType = new QualifiedId(null,mf.getTypeSchema(),mf.getTypeName());
           sType = qiType.format();
         }
-        List<Object> listRow = Arrays.asList((Object)mf.getPosition(),
+				List<Object> listRow = Arrays.asList((Object) mf.getPosition(),
           mf.getName(),sType,mf.getCardinality() > 0?mf.getCardinality():null);
         oltv.getItems().add(listRow);
       }
@@ -514,7 +514,7 @@ public abstract class MetaDataTableFactory
           QualifiedId qiType = new QualifiedId(null,mfChild.getTypeSchema(),mfChild.getTypeName());
           sType = qiType.format();
         }
-        List<Object> listRow = Arrays.asList((Object)mf.getPosition(),
+				List<Object> listRow = Arrays.asList((Object) mf.getPosition(),
           mfChild.getName(),sType,mfChild.getCardinality() > 0?mfChild.getCardinality():null);
         oltv.getItems().add(listRow);
       }

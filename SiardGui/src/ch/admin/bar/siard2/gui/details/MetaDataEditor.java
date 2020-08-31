@@ -118,7 +118,7 @@ public class MetaDataEditor
         String sKey = iterProperty.next();
         if (sKey.startsWith("label."))
         {
-          String sValue = sb.getProperty(sKey);
+          String sValue = (String) sb.getProperty(sKey);
           if (dLabelWidth < FxSizes.getTextWidth(sValue))
             dLabelWidth = FxSizes.getTextWidth(sValue);
         }
@@ -341,8 +341,8 @@ public class MetaDataEditor
     _btnApply.setDisable(true);
     hbox.getChildren().add(_btnApply);
 
-    HBox.setMargin(_btnApply, new Insets(dOUTER_PADDING));
-    HBox.setMargin(_btnReset, new Insets(dOUTER_PADDING));
+		//HBox.setMargin(_btnApply, new Insets(dOUTER_PADDING));
+		//HBox.setMargin(_btnReset, new Insets(dOUTER_PADDING));
 
     if (dPropertyWidth < FxSizes.getNodeWidth(hbox)) {
     	dPropertyWidth = FxSizes.getNodeWidth(hbox);
@@ -453,7 +453,7 @@ public class MetaDataEditor
     else if (_oMetaData instanceof MetaView)
     {
       displayProperty(MetaView.class,"Name",false,false,false);
-      displayProperty(MetaView.class,"QueryOriginal",false,true,false);
+      displayProperty(MetaView.class, "QueryOriginal", true, true, false); /* IntraDIGM */
       displayProperty(MetaView.class,"Query",true,true,false);
       displayProperty(MetaView.class,"Rows",false,false,false);
       displayProperty(MetaView.class,"Description",true,true,false);
@@ -487,28 +487,29 @@ public class MetaDataEditor
       displayProperty(MetaColumn.class,"Name",false,false,false);
       displayProperty(MetaColumn.class,"Position",false,false,false);
       boolean bEditable = false;
-      try
-      {
-        boolean bInvalid = !mc.getParentMetaTable().getParentMetaSchema().getParentMetaData().getArchive().isValid();
-        if (bInvalid)
-        {
-          int iPreType = mc.getPreType();
-          boolean bLob =
-             (iPreType == Types.BINARY) ||
-             (iPreType == Types.VARBINARY) ||
-             (iPreType == Types.BLOB) ||
-             (iPreType == Types.CHAR) ||
-             (iPreType == Types.VARCHAR) ||
-             (iPreType == Types.CLOB) ||
-             (iPreType == Types.NCHAR) ||
-             (iPreType == Types.NVARCHAR) ||
-             (iPreType == Types.NCLOB) ||
-             (iPreType == Types.SQLXML);
-          if (bLob)
-            bEditable = true;
-        }
-      }
-      catch(IOException ie) {}
+			try {
+				MetaTable metaTable = mc.getParentMetaTable(); /* IntraDIGM */
+				if (metaTable != null) {
+					boolean bInvalid = !mc.getParentMetaTable().getParentMetaSchema().getParentMetaData().getArchive().isValid();
+					if (bInvalid) {
+						int iPreType = mc.getPreType();
+						boolean bLob =
+							(iPreType == Types.BINARY) ||
+								(iPreType == Types.VARBINARY) ||
+								(iPreType == Types.BLOB) ||
+								(iPreType == Types.CHAR) ||
+								(iPreType == Types.VARCHAR) ||
+								(iPreType == Types.CLOB) ||
+								(iPreType == Types.NCHAR) ||
+								(iPreType == Types.NVARCHAR) ||
+								(iPreType == Types.NCLOB) ||
+								(iPreType == Types.SQLXML);
+						if (bLob)
+							bEditable = true;
+					}
+				}
+			} catch (IOException ie) {
+			}
       displayProperty(MetaColumn.class,"LobFolder",bEditable,false,false);
       displayProperty(MetaColumn.class,"MimeType",bEditable,false,false);
       displayProperty(MetaColumn.class,"Type",false,false,false);

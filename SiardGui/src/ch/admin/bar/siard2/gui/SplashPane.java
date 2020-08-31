@@ -36,7 +36,7 @@ public class SplashPane
     lblMain.setFont(Font.font(null, FontWeight.SEMI_BOLD, 2.3*dDefaultSize));
     lblMain.setLayoutX(0.37*dImageWidth);
     lblMain.setLayoutY(0.09*dImageHeight);
-    //getChildren().add(lblMain);
+    getChildren().add(lblMain);
   } /* constructor */
 
   /*------------------------------------------------------------------*/
