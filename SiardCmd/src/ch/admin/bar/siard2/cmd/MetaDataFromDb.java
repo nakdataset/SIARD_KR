@@ -783,15 +783,23 @@ public class MetaDataFromDb
   {
   	String sTypeName = rs.getString("TYPE_NAME");
 
-  	//2020.07.29 - json 타입에 대한 처리 (json => clob)
+  	int iDataType = rs.getInt("DATA_TYPE");
+  	long lColumnSize = rs.getLong("COLUMN_SIZE");
+  	int iDecimalDigits = rs.getInt("DECIMAL_DIGITS");
+  	//2020.07.29 - json(mysql) 타입에 대한 처리 (json => clob)
   	//Types에 정의되어 있지 않은 타입(json 등)은 아래 데이터가 null이므로, 디폴트 값을 지정함.
-  	int iDataType = Types.CLOB;
-  	long lColumnSize = 65535;
-  	int iDecimalDigits = 0;
-  	if(!"json".equals(sTypeName)) {
-  		iDataType = rs.getInt("DATA_TYPE");
-  		lColumnSize = rs.getLong("COLUMN_SIZE");
-  		iDecimalDigits = rs.getInt("DECIMAL_DIGITS");
+  	if("json".equals(sTypeName.toLowerCase())) {
+  		iDataType = Types.CLOB;
+  		lColumnSize = 65535;
+  		iDecimalDigits = 0;
+  		mc.setTypeOriginal(sTypeName); //원본타입 세팅
+  	}
+  	
+    //2020.09.01 - urowid(oracle) 타입에 대한 처리 (urowid => varchar)
+  	//UROWID[(size)] -> 테이블 내의 행의 고유 주소를 가지는 64 문자 타입으로 최대크기이자 디폴트인 4000바이트
+  	if("urowid".equals(sTypeName.toLowerCase())) {
+  		iDataType = Types.VARCHAR;
+  		mc.setTypeOriginal(sTypeName); //원본타입 세팅
   	}
 
     MetaSchema ms = null;
@@ -848,13 +856,6 @@ public class MetaDataFromDb
       }
       else
         throw new SQLException("Invalid ARRAY constructor for column "+mc.getName()+" of table "+qiParent.format()+"!");
-    }
-    //데이터타입이 null(0) 인 경우 처리 로직 추가.
-    else if (iDataType == Types.NULL)
-    {
-    	//2020.07.28 - Types에 정의되어 있지 않은 타입(json 등)의 경우 null(0)으로 들어옴. clob로 전환되도록 함.
-		iDataType = Types.CLOB;
-		mc.setPreType(iDataType, lColumnSize, iDecimalDigits);
     }
     else
     {
