@@ -539,7 +539,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 				System.out.println("rootPath => " + sourceFileRootPath);
 				System.out.println("존재여부 => " + chooseColumnFlag);
 
-				final String SOURCE_FILE = sourceFileRootPath +  oValue.toString();
+				final String SOURCE_FILE = sourceFileRootPath + File.separator +  oValue.toString();
 
 				System.out.println("SOURCE_FILE => " + SOURCE_FILE);
 
