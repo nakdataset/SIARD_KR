@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<jsmoothproject>
+<JVMSearchPath>registry</JVMSearchPath>
+<JVMSearchPath>javahome</JVMSearchPath>
+<JVMSearchPath>jrepath</JVMSearchPath>
+<JVMSearchPath>jdkpath</JVMSearchPath>
+<JVMSearchPath>exepath</JVMSearchPath>
+<JVMSearchPath>jview</JVMSearchPath>
+<arguments></arguments>
+<classPath>..\..\..\ERASER_GUI\apps\lib\JDBC-10.1.2.7694-cubrid.jar</classPath>
+<classPath>..\..\..\ERASER_GUI\apps\lib\commons-codec-1.13.jar</classPath>
+<classPath>..\..\..\ERASER_GUI\apps\lib\jcalendar-1.4.jar</classPath>
+<classPath>..\..\..\ERASER_GUI\apps\lib\jgoodies-common-1.2.0.jar</classPath>
+<classPath>..\..\..\ERASER_GUI\apps\lib\jgoodies-looks-2.4.1.jar</classPath>
+<classPath>..\..\..\ERASER_GUI\apps\lib\junit-4.6.jar</classPath>
+<classPath>..\..\..\ERASER_GUI\apps\lib\mysql-connector-java-8.0.11.jar</classPath>
+<classPath>..\..\..\ERASER_GUI\apps\lib\ojdbc8.jar</classPath>
+<classPath>..\..\..\ERASER_GUI\apps\lib\tibero6-jdbc-14.jar</classPath>
+<embeddedJar>true</embeddedJar>
+<executableName>ÇàÁ¤Á¤º¸µ¥ÀÌÅÍ¼¼Æ® Ã³ºÐµµ±¸_debug.exe</executableName>
+<initialMemoryHeap>-1</initialMemoryHeap>
+<jarLocation>apps\lib\eraser_gui.jar</jarLocation>
+<javaProperties>
+<name>file.encoding</name>
+<value>UTF-8</value>
+</javaProperties>
+<mainClassName>com.firstinfo.eraser.gui.EraserLogin</mainClassName>
+<maximumMemoryHeap>-1</maximumMemoryHeap>
+<maximumVersion></maximumVersion>
+<minimumVersion></minimumVersion>
+<skeletonName>Windowed Wrapper</skeletonName>
+<skeletonProperties>
+<key>Message</key>
+<value>Java has not been found on your computer. Do you want to download it?</value>
+</skeletonProperties>
+<skeletonProperties>
+<key>URL</key>
+<value>http://www.java.com</value>
+</skeletonProperties>
+<skeletonProperties>
+<key>SingleProcess</key>
+<value>1</value>
+</skeletonProperties>
+<skeletonProperties>
+<key>SingleInstance</key>
+<value>0</value>
+</skeletonProperties>
+<skeletonProperties>
+<key>JniSmooth</key>
+<value>0</value>
+</skeletonProperties>
+<skeletonProperties>
+<key>Debug</key>
+<value>1</value>
+</skeletonProperties>
+</jsmoothproject>
