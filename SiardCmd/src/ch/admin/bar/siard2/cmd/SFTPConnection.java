@@ -48,10 +48,9 @@ public class SFTPConnection{
 			channelSftp.stat(fileDownloadModel.getSourceFile()); // => No such file
 		}catch(Exception e) {
 			try {
+				System.out.println("No Such File ! -> " + fileDownloadModel.getSourceFile());
 				disConnection();
-			}catch(Exception ee) {
-
-			}
+			}catch(Exception ee) {}
 			return;
 		}
 
