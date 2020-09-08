@@ -8,9 +8,7 @@ import java.nio.channels.FileChannel;
 
 public class FileUtils {
 
-	//원본 파일 사이즈
 	public long sourceFileSize;
-	// 파일 다운로드 수행 시간
 	public long executeTime;
 
 	public void copy(String sourceFile, String targetFilePath) {
