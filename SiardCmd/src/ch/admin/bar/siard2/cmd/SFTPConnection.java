@@ -24,7 +24,6 @@ public class SFTPConnection{
 
 	// 원본 파일 사이즈
 	public long sourceFileSize;
-	// 파일 다운로드 수행 시간
 	public long executeTime;
 
 	public SFTPConnection(String host, String user, String password, int port) {

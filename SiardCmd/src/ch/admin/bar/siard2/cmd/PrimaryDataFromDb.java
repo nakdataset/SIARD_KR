@@ -534,6 +534,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 
 				//20200904 - 파일 경로의 데이터가 null인경우 제외 추가 by.pks
         if(!chooseColumnFlag || oValue == null) continue;
+        
 
 				//TODO 테스트 용 로그
 //				System.out.println();

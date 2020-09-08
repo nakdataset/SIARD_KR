@@ -8,6 +8,7 @@ import java.nio.channels.FileChannel;
 
 public class FileUtils {
 
+	//원본 파일 사이즈
 	public long sourceFileSize;
 	public long executeTime;
 
