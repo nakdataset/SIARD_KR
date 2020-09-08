@@ -8,6 +8,11 @@ import java.nio.channels.FileChannel;
 
 public class FileUtils {
 
+	//원본 파일 사이즈
+
+	public long sourceFileSize;
+	public long executeTime;
+
 	public void copy(String sourceFile, String targetFilePath) {
 		File sourceFileObj = new File(sourceFile);
 		File targetFilePathObj = new File(targetFilePath);
@@ -27,6 +32,9 @@ public class FileUtils {
 		FileChannel fcout = null;
 
 		try {
+			// 시작시간
+			long startTime = System.currentTimeMillis();
+
 			fis = new FileInputStream(sourceFileObj);
 			fos = new FileOutputStream(targetFilePath + File.separator + sourceFileObj.getName());
 
@@ -36,6 +44,10 @@ public class FileUtils {
 			long size = fcin.size();
 			fcout.transferFrom(fcin, 0, size);
 
+			// 종료시간
+    	long endTime = System.currentTimeMillis();
+    	// 수행시간 = 종료시간 - 시작시간
+    	executeTime = endTime - startTime;
 		} catch (Exception e) {
 			e.printStackTrace();
 

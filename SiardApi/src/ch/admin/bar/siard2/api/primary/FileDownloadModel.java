@@ -21,6 +21,7 @@ public class FileDownloadModel {
 		private String tableName;
 		private String columnType;
 		private String columnName;
+		private boolean chooseColumnFlag; //20200904 - 선택한 컬럼 데이터 유지를 위한 변수 추가 by.pks 
 
 		private List<FileDownloadModel> chooseColumnList;
 
@@ -176,10 +177,18 @@ public class FileDownloadModel {
 			this.chooseColumnList = chooseColumnList;
 		}
 
+		public boolean isChooseColumnFlag() {
+			return chooseColumnFlag;
+		}
+
+		public void setChooseColumnFlag(boolean chooseColumnFlag) {
+			this.chooseColumnFlag = chooseColumnFlag;
+		}
+
 		@Override
 		public String toString() {
 			return "FileDownloadModel [sftpFlag=" + sftpFlag + ", fileCopyFlag=" + fileCopyFlag + ", host=" + host + ", user=" + user + ", password=" + password + ", port=" + port + ", sourceFile=" + sourceFile + ", targetFile=" + targetFile
-				+ ", sourceFileRootPath=" + sourceFileRootPath + ", targetFilePath=" + targetFilePath + ", schemaName=" + schemaName + ", tableName=" + tableName + ", columnType=" + columnType + ", columnName=" + columnName + ", chooseColumnList="
+				+ ", sourceFileRootPath=" + sourceFileRootPath + ", targetFilePath=" + targetFilePath + ", schemaName=" + schemaName + ", tableName=" + tableName + ", columnType=" + columnType + ", columnName=" + columnName + ", chooseColumnFlag=" + chooseColumnFlag + ", chooseColumnList="
 				+ chooseColumnList + "]";
 		}
 

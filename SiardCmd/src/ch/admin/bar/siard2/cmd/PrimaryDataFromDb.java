@@ -27,9 +27,12 @@ import java.sql.Struct;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.xml.datatype.Duration;
@@ -190,7 +193,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
    * @throws IOException if an I/O error occurred.
    * @throws SQLException if a database error occurred.
    */
-  private void getRecord(ResultSet rs, Record record)
+  private void getRecord(ResultSet rs, Record record, Map<String, Long> map)
     throws IOException, SQLException
   {
     ResultSetMetaData rsmd = rs.getMetaData();
@@ -529,19 +532,21 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 					}
 				}
 
-			  //선택한 컬럼 리스트에 존재하지 않으면 continue
-				if(!chooseColumnFlag) continue;
+				//20200904 - 파일 경로의 데이터가 null인경우 제외 추가 by.pks
+        if(!chooseColumnFlag || oValue == null) continue;
+        
 
 				//TODO 테스트 용 로그
-				System.out.println();
-				System.out.println("현재컬럼 => " + mc.getName());
-				System.out.println("선택컬럼 => " + fileDownloadModel.getChooseColumnList().toString());
-				System.out.println("rootPath => " + sourceFileRootPath);
-				System.out.println("존재여부 => " + chooseColumnFlag);
+//				System.out.println();
+//				System.out.println("현재컬럼 => " + mc.getName());
+//				System.out.println("선택컬럼 => " + fileDownloadModel.getChooseColumnList().toString());
+//				System.out.println("rootPath => " + sourceFileRootPath);
+//				System.out.println("존재여부 => " + chooseColumnFlag);
 
-				final String SOURCE_FILE = sourceFileRootPath + File.separator +  oValue.toString();
+//				final String SOURCE_FILE = sourceFileRootPath + File.separator +  oValue.toString();
+				final String SOURCE_FILE = sourceFileRootPath + oValue.toString();
 
-				System.out.println("SOURCE_FILE => " + SOURCE_FILE);
+//				System.out.println("SOURCE_FILE => " + SOURCE_FILE);
 
 				if(fileDownloadModel.isSftpFlag()) {
 					try {
@@ -558,6 +563,10 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 
 						SFTPConnection sftpConnection = new SFTPConnection(fileDownloadModel.getHost(), fileDownloadModel.getUser(), fileDownloadModel.getPassword(), fileDownloadModel.getPort());
 						sftpConnection.download(model);
+
+						map.put("sourceFileSize", map.get("sourceFileSize") + sftpConnection.sourceFileSize);
+						map.put("executeTime", map.get("executeTime") + sftpConnection.executeTime);
+						map.put("fileCount", map.get("fileCount") + 1);
 
 					} catch (Exception e) {
 					}
@@ -601,6 +610,11 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 						FileUtils fileUtis = new FileUtils();
 //						fileUtis.copy(fileDownloadModel.getSourceFilePath() + File.separator + SOURCE_FILE, targetFilePath + File.separator);
 						fileUtis.copy(SOURCE_FILE, targetFilePath + File.separator + SOURCE_FILE.substring(0, SOURCE_FILE.lastIndexOf("/") + 1));
+
+						map.put("sourceFileSize", map.get("sourceFileSize") + fileUtis.sourceFileSize);
+						map.put("executeTime", map.get("executeTime") + fileUtis.executeTime);
+						map.put("fileCount", map.get("fileCount") + 1);
+
 					} catch (Exception e) {
 					}
 
@@ -666,12 +680,19 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
     StopWatch sw = StopWatch.getInstance();
   	sw.start();
   	long lBytesStart = rr.getByteCount();
+
+  	Map<String, Long> map = new HashMap<String, Long>();
+  	map.put("sourceFileSize", (long) 0);
+		map.put("executeTime", (long) 0);
+		map.put("fileCount", (long) 0);
+
     while(rs.next() && (!cancelRequested()))
     {
     	swCreate.start();
       Record record = rr.create();
       swCreate.stop();
       swGet.start();
+
       /***
       if (qiTable.getName().equals("Products") && (lRecord >=4) && (lRecord <= 5))
       {
@@ -680,7 +701,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
         System.out.println("start: "+String.valueOf(mc.getMetaFields()));
       }
       ***/
-      getRecord(rs,record);
+      getRecord(rs,record, map);
       /***
       if (qiTable.getName().equals("Products") && (lRecord >=4) && (lRecord <= 5))
       {
@@ -721,18 +742,34 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
       incDownloaded();
     }
 
+/*
 		String hms = String.format("%2d:%02d:%02d",
 									downtimesum.toHours(),
 									downtimesum.toMinutes(),
 									(downtimesum.toMillis() / 1000));
-//		StopWatch sftpSw = StopWatch.getInstance();
 		float downavg = 0.0f;
 		if(this.downcount > 0)
 		{
 			downavg = ((this.downsizesum / 1000) / this.downcount);
+			파일사이즈 / 1000 / 파일갯수
 		}
-		System.out.println("다운로드 총 파일 크기 " + (this.downsizesum / 1000)
-					+ "kB,  평균 다운로드 속도 (" +  downavg + " kB/s), 다운로드 시간 " + hms);
+    System.out.println("    다운로드 총 파일 크기 " + (this.downsizesum / 1000) + "kB,  평균 다운로드 속도 (" +  downavg + " kB/s), 다운로드 시간 " + hms);
+*/
+    /**
+     * 다운로드 총 파일 크기 (KB/S)
+     * 평균 다운로드 속도 (KB/s)
+     * 다운로드 시간
+     * */
+    DecimalFormat formatter = new DecimalFormat("###,###");
+
+    /* 파일크기, 수행시간, 파일 수 체크 */
+    if(map.get("sourceFileSize") > 0
+    		&& map.get("executeTime") > 0
+    		&& map.get("fileCount") > 0) {
+    	System.out.println("    다운로드 총 파일 크기 " + formatter.format((map.get("sourceFileSize")/1024)) + "KB,  "
+    			+ "평균 다운로드 속도 (" + formatter.format(((map.get("sourceFileSize") / map.get("executeTime")) / map.get("fileCount"))) + " KB/s), "
+    			+ "다운로드 시간 " + formatter.format(map.get("executeTime")/1000) + "s");
+    }
 
     System.out.println("    Record "+String.valueOf(lRecord)+" ("+sw.formatRate(rr.getByteCount()-lBytesStart,sw.stop())+" kB/s)");
     System.out.println("    Total: "+StopWatch.formatLong(lRecord)+" records ("+StopWatch.formatLong(rr.getByteCount())+" bytes in "+sw.formatMs()+" ms)");
