@@ -22,6 +22,11 @@ public class SFTPConnection{
 	private Channel channel;
 	private ChannelSftp channelSftp;
 
+	// 원본 파일 사이즈
+	public long sourceFileSize;
+	// 파일 다운로드 수행 시간
+	public long executeTime;
+
 	public SFTPConnection(String host, String user, String password, int port) {
 		super();
 		this.host = host;
@@ -31,15 +36,12 @@ public class SFTPConnection{
 	}
 
 	public void download(FileDownloadModel fileDownloadModel){
-		long startTime = 0;
-		long estimatedTime = 0;
-		startTime = System.currentTimeMillis();
 
 		try {
 			// TODO 최창근 추가 - 입력값이 잘못 되었을때 예외 메시지 출력해주기
 			initSFTPConnection(fileDownloadModel);
 		}catch(Exception e) {
-			System.out.println("SFTP 접근정보가 잘못되었습니다.");
+			System.out.println("SFTP access information is incorrect.");
 			// e.printStackTrace();
 		}
 
@@ -64,11 +66,20 @@ public class SFTPConnection{
 				targetFileObj.mkdirs();
 			}
 
+			// 시작시간
+    	long startTime = System.currentTimeMillis();
+    	System.out.println("File download - " + fileDownloadModel.getSourceFile());
+
 			channelSftp.cd(sourceFilePath);
 			channelSftp.get(fileDownloadModel.getSourceFile(), targetFileObj + File.separator + sourceFileObj.getName(), new MyProgressMonitor(), ChannelSftp.OVERWRITE);
+			sourceFileSize = channelSftp.lstat(fileDownloadModel.getSourceFile()).getSize();
 
-			System.out.println("sourceFileObj File downloaded successfully - " + fileDownloadModel.getSourceFile());
-			System.out.println("targetFileObj File downloaded successfully - " + targetFileObj.getAbsolutePath());
+			// 종료시간
+    	long endTime = System.currentTimeMillis();
+    	// 수행시간 = 종료시간 - 시작시간
+    	executeTime = endTime - startTime;
+
+			System.out.println("File downloaded successfully - " + fileDownloadModel.getSourceFile());
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -81,11 +92,10 @@ public class SFTPConnection{
 			}
 		}
 
-		estimatedTime = System.currentTimeMillis() - startTime;
-		System.out.println("execute time(ms) : " + estimatedTime);
 	}
 
 	private void initSFTPConnection(FileDownloadModel fileDownloadModel) throws Exception{
+		System.out.println();
 		System.out.println("connecting... " + host);
 
 		jsch = new JSch();
@@ -104,6 +114,7 @@ public class SFTPConnection{
 			channelSftp.disconnect();
 			channel.disconnect();
 			session.disconnect();
+			System.out.println();
 		}
 	}
 
@@ -129,7 +140,7 @@ public class SFTPConnection{
 		*/
 		@Override
 		public void end() {
-		   System.out.println("Transferring done.");
+			System.out.println("Download file end.");
 		}
 		/**
 		          * When the file starts to transfer, call the init method
