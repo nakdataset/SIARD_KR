@@ -66,6 +66,9 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 	protected TableColumnDialog tcd;
 
 	private Map<String, FileDownloadModel> chooseColumnMap;
+	
+	//20200908 - 이전 파일다운로드모델 리스트 by.pks
+	private List<FileDownloadModel> beforeFileDownloadModelList = new ArrayList<FileDownloadModel>();
 
 	private Connection conn = null;
 
@@ -322,18 +325,29 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 					_tvTableList.refresh();
 
 					FileDownloadModel beforeFileDownloadModel = null;
-					LOG.info("before tcd");
-					LOG.info("tcd " + tcd);
-					if(tcd != null) {
-						LOG.info("tcd.chooseColumnList 1 " + tcd.fileDownloadModel.getChooseColumnList().toString());
-						beforeFileDownloadModel = tcd.fileDownloadModel;
+					
+					int beforeFileDownloadModelListIndex = 0; //이전 파일다운로드모델 리스트 인덱스
+					for (FileDownloadModel fileDownloadModel : beforeFileDownloadModelList) {
+						if(_tvTableList.getItems().get(clickRowIndex).getTableName().equals(fileDownloadModel.getTableName())
+								&& _tvTableList.getItems().get(clickRowIndex).getSchemaName().equals(fileDownloadModel.getSchemaName())) {
+							//테이블, 스키마 명이 같은 모델을 담은 후 break
+							beforeFileDownloadModel = fileDownloadModel;
+							break;
+						}
+						
+						beforeFileDownloadModelListIndex++;
 					}
+					
 					tcd = TableColumnDialog.showTableColumnDialog(stageOwner, tempTableModel, beforeFileDownloadModel);
 					if(tcd.getResult() == iRESULT_SUCCESS) {
-
-						LOG.info("tcd.chooseColumnList 2 " + tcd.fileDownloadModel.getChooseColumnList().toString());
 						// map 만들어서 넣어보자 key schema.table, value columnList
 						chooseColumnMap.put(tableModel.getSchemaName() + "." +tableModel.getTableName(), tcd.fileDownloadModel);
+						
+						if(beforeFileDownloadModel != null) {
+							//기존 모델 리스트에서 제거 후 재등록
+							beforeFileDownloadModelList.remove(beforeFileDownloadModelListIndex);
+						}
+						beforeFileDownloadModelList.add(tcd.fileDownloadModel);
 					}
 					LOG.info("after tcd");
 				}
