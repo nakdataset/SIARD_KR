@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>                                                                                                                         
+	<META http-equiv="Content-Type" content="text/html; charset=utf-8">                                                            
+	<title>행정정보데이터세트 실행 결과</title>                                                                                
+	<meta charset="utf-8">                                                                                                         
+	<style>                                                                                                                        
+		    dl { margin: 0; padding: 0; }                                                                                         
+		    dt, dd { padding: 1mm; margin-top: 0; margin-bottom: 0; }                                                             
+				dt /* puts dt and dd on same line and right-adjusts dt */                                                         
+				{                                                                                                                 
+			    float: left;                                                                                                      
+			    width: 7em;                                                                                                      
+			    text-align: right;                                                                                                
+			  }                                                                                                                   
+			  dt:after { content: " : "; }                                                                                          
+			  dd:after /* handles empty values */                                                                                 
+			  {                                                                                                                   
+			    content: " "; /* nbsp */                                                                                          
+			  }                                                                                                                   
+			  /* extend header styles beyond h6 */                                                                                
+			  h1 { margin-left:  0mm; display: block; font-size: 2.0em; font-weight: bold; margin-top: 0; margin-bottom: 1em; text-align: center;}     
+			  h2 { margin-left:  5mm; display: block; font-size: 1.8em; font-weight: bold; margin-top: 0; margin-bottom: 0; }
+			  
+			  div {margin: 0px auto;}         
+/*   	    	  table { border: 1px; border-color: black; }        */
+	</style>    
+	<script type="text/javascript">	
+		function requestHistoryModelFromFx() {
+			setTimeout(function(){javaConnector.sendHistoryModelToJs()}, 100);
+	    };
+	
+	    var jsConnector = {
+	        setHistoryModel: function (historyModel) {
+	        	var json = eval(historyModel);
+	            document.getElementById('dbConUrl').innerHTML = json[0].dbConUrl;
+	            document.getElementById('dbName').innerHTML = json[0].dbName;
+	            document.getElementById('executeDiv').innerHTML = json[0].executeDiv;
+	            document.getElementById('executeDate').innerHTML = json[0].executeDate;
+	            document.getElementById('executeResult').innerHTML = json[0].executeResult;
+	            document.getElementById('schemaName').innerHTML = json[0].schemaName;
+	            document.getElementById('tableCount').innerHTML = json[0].tableCount;
+	            document.getElementById('historyDetailTable').innerHTML = json[0].historyDetailTable; 
+	        }
+	    };
+	
+	    function getJsConnector() {
+	        return jsConnector;
+	    };
+	    
+	    window.onload = requestHistoryModelFromFx;
+	</script>                                                                                                            
+</head>                                                                                                                        
+<body>                      
+<h1>행정정보데이터세트 실행 결과</h1>                                                                                                   
+<dl>                                                                                                                           
+<dt>DB 접속URL</dt>                                                                                                          
+<dd id="dbConUrl"></dd>                                                                                                                   
+<dt>DB명</dt>                                                                                                         
+<dd id="dbName"></dd>                                                                                                                 
+<dt>구분</dt>                                                                                                           
+<dd id="executeDiv"></dd>                                                                                                                      
+<dt>실행 일시</dt>                                                                                                              
+<dd id="executeDate"></dd>                                                                                                                      
+<dt>실행 결과</dt>                                                                                                      
+<dd id="executeResult"></dd>                                                                                                                      
+<dt>스키마</dt>                                                                                                      
+<dd id="schemaName"></dd>                                                                                                                      
+<dt>테이블 수</dt>                                                                                                      
+<dd id="tableCount"></dd>                                                                                                                      
+</dl>
+<div id="historyDetailTable">
+</div>

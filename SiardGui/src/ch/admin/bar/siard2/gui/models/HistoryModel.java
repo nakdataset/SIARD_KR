@@ -4,6 +4,7 @@ import java.util.Map;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.scene.control.Button;
 
 public class HistoryModel {
 
@@ -15,11 +16,12 @@ public class HistoryModel {
 	private SimpleStringProperty table_count;
 	private SimpleStringProperty execute_result;
 	private SimpleStringProperty execute_date;
+	private Button report_print;
 
 	public HistoryModel(){}
 
 	HistoryModel(SimpleIntegerProperty history_idx, SimpleStringProperty div, SimpleStringProperty db_name, SimpleStringProperty db_con_url, SimpleStringProperty schema_name, SimpleStringProperty table_count, SimpleStringProperty execute_result,
-		SimpleStringProperty execute_date) {
+		SimpleStringProperty execute_date, Button report_print) {
 		super();
 		this.history_idx = history_idx;
 		this.div = div;
@@ -29,6 +31,7 @@ public class HistoryModel {
 		this.table_count = table_count;
 		this.execute_result = execute_result;
 		this.execute_date = execute_date;
+		this.report_print = report_print;
 	}
 
 	public int getHistory_idx() {
@@ -109,11 +112,19 @@ public class HistoryModel {
 	public void setExecute_date(SimpleStringProperty execute_date) {
 		this.execute_date = execute_date;
 	}
+	
+	public Button getReport_print() {
+		return report_print;
+	}
+
+	public void setReport_print(Button report_print) {
+		this.report_print = report_print;
+	}
 
 	@Override
 	public String toString() {
 		return "HistoryModel [history_idx=" + history_idx + ", div=" + div + ", db_name=" + db_name + ", db_con_url=" + db_con_url + ", schema_name=" + schema_name + ", table_count=" + table_count + ", execute_result=" + execute_result + ", execute_date="
-			+ execute_date + "]";
+				+ execute_date + ", report_print=" + report_print + "]";
 	}
 
 	public void fromMap(Map map) {
@@ -125,6 +136,7 @@ public class HistoryModel {
 		setTable_count(getSimpleStringProperty(map, "TABLE_COUNT"));
 		setExecute_result(getSimpleStringProperty(map, "EXECUTE_RESULT"));
 		setExecute_date(getSimpleStringProperty(map, "EXECUTE_DATE"));
+		setReport_print(getButton(map, "REPORT_PRINT"));
 	}
 
 	private SimpleIntegerProperty getSimpleIntegerProperty(Map map, String key) {
@@ -137,6 +149,10 @@ public class HistoryModel {
 		Object valueObject = map.get(key);
 		SimpleStringProperty value = new SimpleStringProperty(valueObject.toString());
 		return value;
+	}
+	
+	private Button getButton(Map map, String key) {
+		return (Button) map.get(key);
 	}
 
 }

@@ -72,7 +72,7 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 	private Stage stageOwner;
 
 	private TableDialog(Stage stageOwner, DownloadConnectionDialog dcd) throws Exception{
-		super(stageOwner, "테이블 선택 테스트");
+		super(stageOwner, "대상 테이블 목록");
 
 		this.dcd = dcd;
 		this.stageOwner = stageOwner;
@@ -321,11 +321,17 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 					_tvTableList.getItems().get(clickRowIndex).setCheck(true);
 					_tvTableList.refresh();
 
+					FileDownloadModel beforeFileDownloadModel = null;
 					LOG.info("before tcd");
-					tcd = TableColumnDialog.showTableColumnDialog(stageOwner, tempTableModel);
+					LOG.info("tcd " + tcd);
+					if(tcd != null) {
+						LOG.info("tcd.chooseColumnList 1 " + tcd.fileDownloadModel.getChooseColumnList().toString());
+						beforeFileDownloadModel = tcd.fileDownloadModel;
+					}
+					tcd = TableColumnDialog.showTableColumnDialog(stageOwner, tempTableModel, beforeFileDownloadModel);
 					if(tcd.getResult() == iRESULT_SUCCESS) {
 
-						LOG.info("tcd.chooseColumnList " + tcd.fileDownloadModel.getChooseColumnList().toString());
+						LOG.info("tcd.chooseColumnList 2 " + tcd.fileDownloadModel.getChooseColumnList().toString());
 						// map 만들어서 넣어보자 key schema.table, value columnList
 						chooseColumnMap.put(tableModel.getSchemaName() + "." +tableModel.getTableName(), tcd.fileDownloadModel);
 					}

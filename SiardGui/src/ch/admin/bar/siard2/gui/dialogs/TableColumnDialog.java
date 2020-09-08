@@ -26,6 +26,8 @@ import ch.enterag.utils.fx.FxSizes;
 import ch.enterag.utils.fx.FxStyles;
 import ch.enterag.utils.fx.ScrollableDialog;
 import ch.enterag.utils.fx.dialogs.FS;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -98,11 +100,11 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 	private Button _btnTargetFileBrowser;
 	private PastingTextField _tfTargetFilePath;
 
-	private TableColumnDialog(Stage stageOwner, TableModel tableModel) {
+	private TableColumnDialog(Stage stageOwner, TableModel tableModel, FileDownloadModel beforfileDownloadModel) {
 		// super(stageOwner, SiardBundle.getSiardBundle().getInfoTitle());
 
 		// TODO text값 properties로 관리해야되지 않을까?
-		super(stageOwner, "내역 타이틀 테스트");
+		super(stageOwner, tableModel.getSchemaName() + "." + tableModel.getTableName() + " 컬럼 목록");
 
 		this.tableModel = tableModel;
 
@@ -113,6 +115,11 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 
 		if (dMinWidth < vboxDialog.getMinWidth()) {
 			dMinWidth = vboxDialog.getMinWidth();
+		}
+		
+		//20200904 - 이전 파일다운로드모델 연동 추가 by.pks
+		if(beforfileDownloadModel != null) {
+			setColumnListByBeforeChooseColumn(beforfileDownloadModel);
 		}
 
 		setMinWidth(dMinWidth);
@@ -197,13 +204,15 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 				FileDownloadModel chooseColumnFdm = new FileDownloadModel();
 				chooseColumnFdm.setColumnName(_tvColumnList.getItems().get(i).getColumnName());
 				chooseColumnFdm.setSourceFileRootPath(_tvColumnList.getItems().get(i).getSourceFileRootPath());
+				chooseColumnFdm.setChooseColumnFlag(_tvColumnList.getItems().get(i).getChooseColumnFlag());
 				chooseColumnList.add(chooseColumnFdm);
-//				chooseColumnList.add(_tvColumnList.getItems().get(i).getColumnName());
 			}
 		}
 		LOG.info(chooseColumnList.toString());
-
-		fileDownloadModel = new FileDownloadModel();
+		
+		if (fileDownloadModel == null) {
+			fileDownloadModel = new FileDownloadModel();
+		}
 		fileDownloadModel.setSchemaName(tableModel.getSchemaName());
 		fileDownloadModel.setTableName(tableModel.getTableName());
 
@@ -219,6 +228,41 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		fileDownloadModel.setTargetFilePath(_tfTargetFilePath.getText());
 
 		fileDownloadModel.setChooseColumnList(chooseColumnList);
+		
+		LOG.info("fileDownloadModel.getChooseColumnList() " + fileDownloadModel.getChooseColumnList().toString());
+	}
+	
+	//이전에 입력한 값으로 세팅
+	public void setColumnListByBeforeChooseColumn(FileDownloadModel beforfileDownloadModel) {
+		int _tvColumnListSize = _tvColumnList.getItems().size();
+		int chooseColumnListSize = beforfileDownloadModel.getChooseColumnList().size();
+		
+		for (int i = 0; i < _tvColumnListSize; i++) {
+			for(int j = 0; j < chooseColumnListSize; j++) {
+				if (_tvColumnList.getItems().get(i).getColumnName().equals(beforfileDownloadModel.getChooseColumnList().get(j).getColumnName())) {
+					System.out.println("beforfileDownloadModel.getChooseColumnList().get(j).getSourceFileRootPath() ::: " + beforfileDownloadModel.getChooseColumnList().get(j).getSourceFileRootPath());
+					System.out.println("beforfileDownloadModel.getChooseColumnList().get(j).isChooseColumnFlag() ::: " + beforfileDownloadModel.getChooseColumnList().get(j).isChooseColumnFlag());
+//				_tvColumnList.getItems().get(i).setColumnName(new SimpleStringProperty(beforfileDownloadModel.getChooseColumnList().get(i).getColumnName()));
+//				_tvColumnList.getItems().get(i).setColumnType(new SimpleStringProperty(beforfileDownloadModel.getChooseColumnList().get(i).getColumnType()));
+					_tvColumnList.getItems().get(i).setSourceFileRootPath(new SimpleStringProperty(beforfileDownloadModel.getChooseColumnList().get(j).getSourceFileRootPath()));
+					_tvColumnList.getItems().get(i).setChooseColumnFlag(new SimpleBooleanProperty(beforfileDownloadModel.getChooseColumnList().get(j).isChooseColumnFlag()));
+//				_tvColumnList.getItems().get(i).setChooseColumnFlag(new SimpleStringProperty(beforfileDownloadModel.getChooseColumnList().get(i).getcol));
+//				chooseColumnFdm.setSourceFileRootPath(_tvColumnList.getItems().get(i).getSourceFileRootPath());
+				}
+			}
+		}
+
+		System.out.println("beforfileDownloadModel.isSftpFlag() :: " + beforfileDownloadModel.isSftpFlag());
+		System.out.println("beforfileDownloadModel.isFileCopyFlag() :: " + beforfileDownloadModel.isFileCopyFlag());
+//		tableModel.setSchemaName(beforfileDownloadModel.getSchemaName());
+//		tableModel.setTableName(beforfileDownloadModel.getTableName());
+		_rbSFTP.setSelected(beforfileDownloadModel.isSftpFlag());
+		_rbFileCopy.setSelected(beforfileDownloadModel.isFileCopyFlag());
+		_tfSFTPHost.setText(beforfileDownloadModel.getHost());
+		_tfSFTPUser.setText(beforfileDownloadModel.getUser());
+		_tfSFTPPassword.setText(beforfileDownloadModel.getPassword());
+		_tfSFTPPort.setText(String.valueOf(beforfileDownloadModel.getPort()));
+		_tfTargetFilePath.setText(beforfileDownloadModel.getTargetFilePath());
 	}
 
 	/*------------------------------------------------------------------*/
@@ -420,6 +464,8 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 	private class ToggleChangeListener implements ChangeListener<Toggle> {
 		@Override
 		public void changed(ObservableValue<? extends Toggle> ovt, Toggle tOld, Toggle tNew) {
+			if(ovt.getValue() == null) return; 
+			
 			RadioButton rb = (RadioButton) ovt.getValue().getToggleGroup().getSelectedToggle();
 			if (rb == _rbSFTP) {
 				_vboxSFTPConnection.setManaged(true);
@@ -597,7 +643,7 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
             (TableColumn.CellEditEvent<ColumnModel, String> t) -> {
         		t.getTableView().getItems()
         		.get(t.getTablePosition().getRow())
-        		.setSourceFileRootPath(t.getNewValue());
+        		.setSourceFileRootPath(new SimpleStringProperty(t.getNewValue()));
             }
         );
 //		sourceFileRootPath.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<ColumnModel,String>>() {
@@ -608,6 +654,7 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 //        		.setSourceFileRootPath(t.getNewValue());
 //			}
 //		});
+		
 		chooseColumnFlag.setCellValueFactory(new PropertyValueFactory<ColumnModel, Boolean>("chooseColumnFlag"));
 		chooseColumnFlag.setCellFactory(CheckBoxTableCell.forTableColumn(chooseColumnFlag));
 
@@ -623,7 +670,7 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		_tvColumnList.setEditable(true);
 
 		// TODO text값 properties로 관리해야되지 않을까?
-		_tvColumnList.setPlaceholder(new Label("데이터 없음 1122"));
+		_tvColumnList.setPlaceholder(new Label("데이터 없음"));
 
 		SiardConnection.getSiardConnection().loadDriver(tableModel.getConnectionUrl());
 		// DriverManager.setLoginTimeout(0);
@@ -713,9 +760,9 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 	 *
 	 * @param stageOwner owner window.
 	 */
-	public static TableColumnDialog showTableColumnDialog(Stage stageOwner, TableModel tableModel) {
+	public static TableColumnDialog showTableColumnDialog(Stage stageOwner, TableModel tableModel, FileDownloadModel fileDownloadModel) {
 		LOG.info("showTableColumnDialog");
-		TableColumnDialog tcd = new TableColumnDialog(stageOwner, tableModel);
+		TableColumnDialog tcd = new TableColumnDialog(stageOwner, tableModel, fileDownloadModel);
 		tcd.showAndWait(); // until it is closed
 		return tcd;
 	} /* showInfoDialog */
@@ -775,14 +822,32 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 	        }
 	    }
 
-	    private void createTextField() {
+		private void createTextField() {
 	        textField = new TextField(getString());
 	        textField.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
 	        textField.setOnAction((e) -> commitEdit(textField.getText()));
 	        textField.focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-	            if (!newValue) {
-	                System.out.println("Commiting " + textField.getText());
+	        	if (!newValue) {
 	                commitEdit(textField.getText());
+	                
+	                boolean rootPathFlag = true;
+	                for (int i = 0; i < _tvColumnList.getColumns().size(); i++) {
+	                	//컬럼명(0), 컬럼타입(1)은 패스
+	                	if(i < 2) continue;
+	                	
+						TableColumn<ColumnModel, ?> column = _tvColumnList.getColumns().get(i);
+						
+						//filePath 입력 체크
+						if(i == 2 && (column.getCellData(getIndex()) == null || "".equals(column.getCellData(getIndex())))) {
+							rootPathFlag = false;
+						}
+						
+						if (i == 3 && column.getCellData(getIndex()) != null) {
+        					_tvColumnList.getItems().get(getIndex()).setChooseColumnFlag(new SimpleBooleanProperty(rootPathFlag));
+        				}
+					}
+	                
+	                _tvColumnList.refresh();
 	            }
 	        });
 	    }

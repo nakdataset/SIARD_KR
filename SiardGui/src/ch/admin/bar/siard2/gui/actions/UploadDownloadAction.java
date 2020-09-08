@@ -185,6 +185,11 @@ public class UploadDownloadAction {
 					if (MruFile.getMruFile().getMruFiles() > 0)
 						fileArchive = (new File(MruFile.getMruFile().getMruFile(0))).getParentFile();
 
+					//TODO 해당 파일경로 exists 체크하기
+					if(!fileArchive.exists()) {
+						fileArchive = SiardGui.getDefaultDataDirectory();
+					}
+
 					fileArchive = new File(fileArchive.getAbsolutePath() + File.separator + "*." + Archive.sSIARD_DEFAULT_EXTENSION);
 					LOG.info("2 fileArchive " + fileArchive);
 

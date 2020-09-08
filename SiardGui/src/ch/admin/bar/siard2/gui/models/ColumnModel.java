@@ -44,8 +44,8 @@ public class ColumnModel extends TableModel
 	public String getSourceFileRootPath() {
 		return sourceFileRootPath.get();
 	}
-	public void setSourceFileRootPath(String sourceFileRootPath) {
-		this.sourceFileRootPath.set(sourceFileRootPath);
+	public void setSourceFileRootPath(SimpleStringProperty sourceFileRootPath) {
+		this.sourceFileRootPath = sourceFileRootPath;
 	}
 	public boolean getChooseColumnFlag() {
 		return chooseColumnFlag.get();
