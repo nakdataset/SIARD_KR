@@ -62,7 +62,7 @@ import javafx.stage.Stage;
 /**
  * ConnectionDialog for entering data to connect to a database. Abstract base class for
  * DownloadConnectionDialog and UploadConnectionDialog.
- * 
+ *
  * @author Hartwig Thomas
  */
 public abstract class ConnectionDialog extends ScrollableDialog
@@ -312,7 +312,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
 		/*------------------------------------------------------------------*/
 		/**
 		 * if the scheme choice changed, redisplay Host/Folder and JDBC URL.
-		 * 
+		 *
 		 * @param ovs observable value.
 		 * @param sOld old string.
 		 * @param sNew new string.
@@ -385,7 +385,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
 		/*------------------------------------------------------------------*/
 		/**
 		 * if the scheme choice changed, redisplay Host/Folder and JDBC URL.
-		 * 
+		 *
 		 * @param ovs observable value.
 		 * @param sOld old string.
 		 * @param sNew new string.
@@ -484,7 +484,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
 	/**
 	 * compute the maximum pref width of the given labels and set their min and pref widths to that
 	 * value.
-	 * 
+	 *
 	 * @param aLabels labels.
 	 * @return maximum pref width.
 	 */
@@ -512,7 +512,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * compute the maximum min width of the given Panes.
-	 * 
+	 *
 	 * @param apane Panes.
 	 * @return maximum min width.
 	 */
@@ -533,7 +533,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * remove the given toggle group.
-	 * 
+	 *
 	 * @param tg toggle group to remove, or null.
 	 */
 	protected void removeToggleGroup(ToggleGroup tg)
@@ -542,14 +542,14 @@ public abstract class ConnectionDialog extends ScrollableDialog
 		if (tg != null) {
 			HBox hbox = (HBox) _tfDbName.getParent();
 			for (int iOption = 0; iOption < tg.getToggles().size(); iOption++)
-				hbox.getChildren().remove((RadioButton) tg.getToggles().get(iOption));
+				hbox.getChildren().remove(tg.getToggles().get(iOption));
 		}
 	} /* removeToggleGroup */
 
 	/*------------------------------------------------------------------*/
 	/**
 	 * create a toggle group for the given database scheme.
-	 * 
+	 *
 	 * @param sScheme database scheme.
 	 * @return toggle group, or null, if no toggle group is associated with the scheme.
 	 */
@@ -577,7 +577,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create a label for the given node.
-	 * 
+	 *
 	 * @param sLabel label text
 	 * @param nodeFor node associated with label.
 	 * @return label.
@@ -593,7 +593,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create a horizontal box with label and text
-	 * 
+	 *
 	 * @param lbl Label.
 	 * @param ptfText field for text
 	 * @param btn button for selector
@@ -619,7 +619,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create a horizontal box with label and text
-	 * 
+	 *
 	 * @param lbl Label.
 	 * @param node TextField/Checkbox
 	 * @return horizontal box.
@@ -628,7 +628,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
 	{
 		HBox hbox = new HBox();
 		lbl.setAlignment(Pos.BASELINE_RIGHT);
-		lbl.setMinHeight(FxSizes.getNodeHeight(node)); /* 2020-08-31 */		
+		lbl.setMinHeight(FxSizes.getNodeHeight(node)); /* 2020-08-31 */
 		hbox.setPadding(new Insets(dINNER_PADDING));
 		hbox.setSpacing(dHSPACING);
 		hbox.setAlignment(Pos.TOP_LEFT);
@@ -646,7 +646,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create a horizontal box with label and text and options
-	 * 
+	 *
 	 * @param lbl Label.
 	 * @param tf TextField
 	 * @param tg ToggleGroup with RadioButtons
@@ -674,7 +674,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create the VBox containing the parameters database server and database name.
-	 * 
+	 *
 	 * @return parameters VBox.
 	 */
 	private VBox createVBoxParameters()
@@ -774,7 +774,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create a text field element for the connection URL.
-	 * 
+	 *
 	 * @return text field element for connection URL.
 	 */
 	private TextField createTextFieldConnectionUrl()
@@ -793,7 +793,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create the HBox with the error message, Cancel and OK button.
-	 * 
+	 *
 	 * @return HBox with the error message, Cancel and OK button.
 	 */
 	private HBox createHBoxButtons()
@@ -831,7 +831,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create the VBox for the connection URL.
-	 * 
+	 *
 	 * @return VBox with connection URL.
 	 */
 	private VBox createVBoxConnectionUrl()
@@ -860,7 +860,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create the VBox with the connection parameters.
-	 * 
+	 *
 	 * @param sLoadMetaDataOnlyLabel label for meta data only check box.
 	 * @param sLoadMetaDataOnlyTooltip tool tip for meta data only check box.
 	 * @param sLoadOverwriteLabel label for overwrite check box.
@@ -948,7 +948,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create the main VBox of the dialog
-	 * 
+	 *
 	 * @param sLoadMetaDataOnlyLabel label for meta data only check box.
 	 * @param sLoadMetaDataOnlyTooltip tool tip for meta data only check box.
 	 * @param sLoadOverwriteLabel label for overwrite check box.
@@ -1000,7 +1000,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * display the connection dialog.
-	 * 
+	 *
 	 * @param stageOwner owner window.
 	 * @param sConnectionUrl initial value for connection (JDBC) URL or null.
 	 * @param sDbUser initial value for user of database or null.
@@ -1042,7 +1042,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
 		setScene(scene);
 
 		// TODO 최창근 추가 - 테스트 후 삭제
-		testInit();
+//		testInit();
 
 	} /* constructor DownloadConnectionDialog */
 

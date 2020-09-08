@@ -198,7 +198,7 @@ public class HistoryDetailDialog extends ScrollableDialog implements EventHandle
 		historyDetailTableView.getColumns().get(1).setVisible(false);
 
 		// TODO text값 properties로 관리해야되지 않을까?
-		historyDetailTableView.setPlaceholder(new Label("데이터 없음 1122"));
+		historyDetailTableView.setPlaceholder(new Label("데이터 없음"));
 
 		hBoxTableView.getChildren().add(historyDetailTableView);
 
