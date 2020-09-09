@@ -183,7 +183,7 @@ public class SiardGui extends Application
   public void logPerformance()
   {
     Runtime rt = Runtime.getRuntime();
-    
+
     if (_archive == null)
       _il.info(
         "GUI: Used Memory: "+StopWatch.formatLong(rt.totalMemory() - rt.freeMemory())+
@@ -1037,19 +1037,9 @@ public class SiardGui extends Application
 	// 최창근 추가 - SQLite 사용을 위한 설정 메소드
 	private static void initSQLiteSettingInit() {
 		Connection conn = SQLiteConnection.getConnection();
-		// 테이블 생성
 		try {
-			// TODO 테스트 후 삭제
+			// 테이블 생성
 			Statement stmt = conn.createStatement();
-
-			// String sql = "CREATE TABLE IF NOT EXISTS history (\n"
-			// + " idx integer PRIMARY KEY AUTOINCREMENT,\n"
-			// + " date text\n"
-			// + ");";
-
-			// String dropTableHistorySQL = "drop table History";
-			// stmt.execute(dropTableHistorySQL);
-			// System.out.println("history 테이블 삭제 완료");
 
 			String createTableHistory = "";
 			createTableHistory += "CREATE TABLE IF NOT EXISTS HISTORY(";
