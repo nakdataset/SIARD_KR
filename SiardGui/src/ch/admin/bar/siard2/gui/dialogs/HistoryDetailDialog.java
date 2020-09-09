@@ -47,55 +47,18 @@ import javafx.stage.Stage;
  */
 public class HistoryDetailDialog extends ScrollableDialog implements EventHandler<ActionEvent> {
 
-	// 최창근 추가 - 로그
 	private static final Logger LOG = Logger.getLogger(HistoryDetailDialog.class);
 
 	private String history_idx;
 
-	/**
-	 * constructor
-	 * @param stageOwner owner window.
-	 */
-//	private HistoryDetailDialog(Stage stageOwner) {
-////		super(stageOwner, SiardBundle.getSiardBundle().getInfoTitle());
-//		// TODO text값 properties로 관리해야되지 않을까?
-//		super(stageOwner, "내역 타이틀 테스트");
-//		LOG.info("HistoryDialog");
-//
-////		Label label = new Label();
-//		// TODO text값 properties로 관리해야되지 않을까?
-////		label.setText("내역_테스트중");
-//
-//		double dMinWidth = FxSizes.getTextWidth(SiardBundle.getSiardBundle().getInfoTitle()) + FxSizes.getCloseWidth() + dHSPACING;
-//		LOG.info("1 dMinWidth " + dMinWidth);
-//
-//		VBox vboxDialog = createVBoxDialog();
-//
-//		if (dMinWidth < vboxDialog.getMinWidth()) {
-//			dMinWidth = vboxDialog.getMinWidth();
-//		}
-//
-//		setMinWidth(dMinWidth);
-//		/* scene */
-//		Scene scene = new Scene(vboxDialog);
-//		setScene(scene);
-//	}
-
 	private HistoryDetailDialog(Stage stageOwner, String history_idx) {
-//		super(stageOwner, SiardBundle.getSiardBundle().getInfoTitle());
-		// TODO text값 properties로 관리해야되지 않을까?
-		super(stageOwner, "내역 타이틀 테스트");
+		super(stageOwner, SiardBundle.getSiardBundle().getHistoryDetailTitle());
 
 		this.history_idx = history_idx;
 
 		LOG.info("HistoryDialog uploadDownloadDivCode " + history_idx);
 
-//		Label label = new Label();
-		// TODO text값 properties로 관리해야되지 않을까?
-//		label.setText("내역_테스트중");
-
-		//TODO getHistoryTitle 로 변경해야함
-		double dMinWidth = FxSizes.getTextWidth(SiardBundle.getSiardBundle().getInfoTitle()) + FxSizes.getCloseWidth() + dHSPACING;
+		double dMinWidth = FxSizes.getTextWidth(SiardBundle.getSiardBundle().getHistoryDetailTitle()) + FxSizes.getCloseWidth() + dHSPACING;
 
 		VBox vboxDialog = createVBoxDialog();
 
@@ -198,7 +161,7 @@ public class HistoryDetailDialog extends ScrollableDialog implements EventHandle
 		historyDetailTableView.getColumns().get(1).setVisible(false);
 
 		// TODO text값 properties로 관리해야되지 않을까?
-		historyDetailTableView.setPlaceholder(new Label("데이터 없음"));
+		historyDetailTableView.setPlaceholder(new Label(sb.getListNoData()));
 
 		hBoxTableView.getChildren().add(historyDetailTableView);
 

@@ -101,22 +101,19 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 	private PastingTextField _tfTargetFilePath;
 
 	private TableColumnDialog(Stage stageOwner, TableModel tableModel, FileDownloadModel beforfileDownloadModel) {
-		// super(stageOwner, SiardBundle.getSiardBundle().getInfoTitle());
-
-		// TODO text값 properties로 관리해야되지 않을까?
-		super(stageOwner, tableModel.getSchemaName() + "." + tableModel.getTableName() + " 컬럼 목록");
+		super(stageOwner, SiardBundle.getSiardBundle().getTableColumnTitle(tableModel.getSchemaName(), tableModel.getTableName()));
 
 		this.tableModel = tableModel;
 
 		// TODO getColumnTitle 로 변경해야함
-		double dMinWidth = FxSizes.getTextWidth(SiardBundle.getSiardBundle().getInfoTitle()) + FxSizes.getCloseWidth() + dHSPACING;
+		double dMinWidth = FxSizes.getTextWidth(SiardBundle.getSiardBundle().getTableColumnTitle(tableModel.getSchemaName(), tableModel.getTableName())) + FxSizes.getCloseWidth() + dHSPACING;
 
 		VBox vboxDialog = createVBoxDialog();
 
 		if (dMinWidth < vboxDialog.getMinWidth()) {
 			dMinWidth = vboxDialog.getMinWidth();
 		}
-		
+
 		//20200904 - 이전 파일다운로드모델 연동 추가 by.pks
 		if(beforfileDownloadModel != null) {
 			setColumnListByBeforeChooseColumn(beforfileDownloadModel);
@@ -143,15 +140,6 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 			close();
 
 		} else if (event.getSource() == _btnDefault) {
-
-			/*
-			if (getChooseColumnCount() < 1) {
-				// TODO 최창근 추가 - 컬럼을 선택하라는 메시지 alert 추가 .properties로 메시지 관리
-				LOG.info("선택한 컬럼 없음");
-				MB.show(this, "제목", "내용", sb.getOk(), null);
-				return;
-			}
-			 */
 
 			setColumnListByChooseColumn();
 
@@ -209,7 +197,7 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 			}
 		}
 		LOG.info(chooseColumnList.toString());
-		
+
 		if (fileDownloadModel == null) {
 			fileDownloadModel = new FileDownloadModel();
 		}
@@ -228,15 +216,15 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		fileDownloadModel.setTargetFilePath(_tfTargetFilePath.getText());
 
 		fileDownloadModel.setChooseColumnList(chooseColumnList);
-		
+
 		LOG.info("fileDownloadModel.getChooseColumnList() " + fileDownloadModel.getChooseColumnList().toString());
 	}
-	
+
 	//이전에 입력한 값으로 세팅
 	public void setColumnListByBeforeChooseColumn(FileDownloadModel beforfileDownloadModel) {
 		int _tvColumnListSize = _tvColumnList.getItems().size();
 		int chooseColumnListSize = beforfileDownloadModel.getChooseColumnList().size();
-		
+
 		for (int i = 0; i < _tvColumnListSize; i++) {
 			for(int j = 0; j < chooseColumnListSize; j++) {
 				if (_tvColumnList.getItems().get(i).getColumnName().equals(beforfileDownloadModel.getChooseColumnList().get(j).getColumnName())) {
@@ -375,7 +363,7 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		hbox.setAlignment(Pos.TOP_LEFT);
 
 		_rbSFTP = new RadioButton("SFTP");
-		_rbFileCopy = new RadioButton("FileCopy");
+		_rbFileCopy = new RadioButton("File Copy");
 
 		_rbSFTP.setSelected(true);
 		_rbFileCopy.setSelected(false);
@@ -464,8 +452,8 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 	private class ToggleChangeListener implements ChangeListener<Toggle> {
 		@Override
 		public void changed(ObservableValue<? extends Toggle> ovt, Toggle tOld, Toggle tNew) {
-			if(ovt.getValue() == null) return; 
-			
+			if(ovt.getValue() == null) return;
+
 			RadioButton rb = (RadioButton) ovt.getValue().getToggleGroup().getSelectedToggle();
 			if (rb == _rbSFTP) {
 				_vboxSFTPConnection.setManaged(true);
@@ -626,11 +614,10 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 
 		Callback<TableColumn<ColumnModel, String>, TableCell<ColumnModel, String>> cellFactory = (TableColumn<ColumnModel, String> param) -> new EditingCell();
 
-		// TODO 최창근 추가 - 스키마,테이블,선택 properties에서 key=value로 관리(다국어 지원을 위한)
-		TableColumn<ColumnModel, String> columnName = new TableColumn<ColumnModel, String>("컬럼명");
-		TableColumn<ColumnModel, String> columnType = new TableColumn<ColumnModel, String>("컬럼타입");
-		TableColumn<ColumnModel, String> sourceFileRootPath = new TableColumn<ColumnModel, String>("root path");
-		TableColumn<ColumnModel, Boolean> chooseColumnFlag = new TableColumn<ColumnModel, Boolean>("선택");
+		TableColumn<ColumnModel, String> columnName = new TableColumn<ColumnModel, String>(sb.getTableColumnName());
+		TableColumn<ColumnModel, String> columnType = new TableColumn<ColumnModel, String>(sb.getTableColumnType());
+		TableColumn<ColumnModel, String> sourceFileRootPath = new TableColumn<ColumnModel, String>(sb.getTableColumnRootPath());
+		TableColumn<ColumnModel, Boolean> chooseColumnFlag = new TableColumn<ColumnModel, Boolean>(sb.getTableColumnChoose());
 
 		columnName.setCellValueFactory(new PropertyValueFactory<ColumnModel, String>("columnName"));
 		columnType.setCellValueFactory(new PropertyValueFactory<ColumnModel, String>("columnType"));
@@ -654,7 +641,7 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 //        		.setSourceFileRootPath(t.getNewValue());
 //			}
 //		});
-		
+
 		chooseColumnFlag.setCellValueFactory(new PropertyValueFactory<ColumnModel, Boolean>("chooseColumnFlag"));
 		chooseColumnFlag.setCellFactory(CheckBoxTableCell.forTableColumn(chooseColumnFlag));
 
@@ -669,8 +656,7 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		_tvColumnList.getColumns().add(chooseColumnFlag);
 		_tvColumnList.setEditable(true);
 
-		// TODO text값 properties로 관리해야되지 않을까?
-		_tvColumnList.setPlaceholder(new Label("데이터 없음"));
+		_tvColumnList.setPlaceholder(new Label(sb.getListNoData()));
 
 		SiardConnection.getSiardConnection().loadDriver(tableModel.getConnectionUrl());
 		// DriverManager.setLoginTimeout(0);
@@ -829,24 +815,24 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 	        textField.focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
 	        	if (!newValue) {
 	                commitEdit(textField.getText());
-	                
+
 	                boolean rootPathFlag = true;
 	                for (int i = 0; i < _tvColumnList.getColumns().size(); i++) {
 	                	//컬럼명(0), 컬럼타입(1)은 패스
 	                	if(i < 2) continue;
-	                	
+
 						TableColumn<ColumnModel, ?> column = _tvColumnList.getColumns().get(i);
-						
+
 						//filePath 입력 체크
 						if(i == 2 && (column.getCellData(getIndex()) == null || "".equals(column.getCellData(getIndex())))) {
 							rootPathFlag = false;
 						}
-						
+
 						if (i == 3 && column.getCellData(getIndex()) != null) {
         					_tvColumnList.getItems().get(getIndex()).setChooseColumnFlag(new SimpleBooleanProperty(rootPathFlag));
         				}
 					}
-	                
+
 	                _tvColumnList.refresh();
 	            }
 	        });
