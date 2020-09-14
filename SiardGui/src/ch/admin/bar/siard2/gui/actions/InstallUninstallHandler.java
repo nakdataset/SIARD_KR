@@ -38,7 +38,7 @@ public class InstallUninstallHandler
   private static InstallUninstallHandler _si = null;
   /** logger */
   private static IndentLogger _il = IndentLogger.getIndentLogger(InstallUninstallHandler.class.getName());
-  //최창근 추가 - 로그
+
   private static final Logger LOG = Logger.getLogger(InstallUninstallHandler.class);
 
   public static final String sDESKTOP_NAME = "SiardGui";
@@ -74,13 +74,11 @@ public class InstallUninstallHandler
     UserProperties up = UserProperties.getUserProperties();
 
     boolean bInstalled = it.getValue().booleanValue();
-    LOG.info("bInstalled " + bInstalled);
+
     if (bInstalled)
     {
       _il.event("Installation succeeded");
       String sMessage = sb.getInstallationSuccessMessage(it.getInstallationFolder());
-
-      LOG.info("sMessage " + sMessage);
 
       if (it.getDesktopResult() != 0)
         MB.show(SiardGui.getSiardGui().getStage(),
@@ -186,7 +184,6 @@ public class InstallUninstallHandler
    */
   public void install()
   {
-	LOG.info("install");
 
     _il.enter(String.valueOf(_bContinueInstall));
     _bContinueInstall = false;
@@ -208,40 +205,29 @@ public class InstallUninstallHandler
     /* get initial value for from previously installed version */
     File folderInstallation = up.getInstalledPath(null);
 
-    LOG.info("(up.getInstalledVersion(null) == null) " + (up.getInstalledVersion(null) == null));
     if (up.getInstalledVersion(null) == null)
     {
 
-      LOG.info("folderInstallation " + folderInstallation);
       /* if completely new, then set it to application folder in local home */
       if (folderInstallation == null)
       {
         _il.event("New installation!");
-        LOG.info("New installation!");
         folderInstallation = new File(SpecialFolder.getUserLocalHome(up.getApplicationName()));
       }
 
       _il.event("Initial installation folder: "+folderInstallation.getAbsolutePath());
-      LOG.info("Initial installation folder: "+folderInstallation.getAbsolutePath());
       /* now select folder where SIARD Suite is to be installed. */
       try
       {
         /* do not use native directory chooser here */
         boolean bNative = Boolean.valueOf(System.getProperty(FS.sUSE_NATIVE_PROPERTY));
         System.setProperty(FS.sUSE_NATIVE_PROPERTY, String.valueOf(false));
-        LOG.info("FS.sUSE_NATIVE_PROPERTY " + FS.sUSE_NATIVE_PROPERTY);
 
         do
         {
           folderInstallation = FS.chooseNewFolder(stage,
               sb.getInstallationSelectorTitle(), sb.getInstallationSelectorMessage(),
               sb, folderInstallation);
-
-          LOG.info("folderInstallation " + folderInstallation);
-          LOG.info("stage " + stage);
-          LOG.info("sb.getInstallationSelectorTitle() " + sb.getInstallationSelectorTitle());
-          LOG.info("sb.getInstallationSelectorMessage() " + sb.getInstallationSelectorMessage());
-          LOG.info("sb " + sb);
 
         } while ((folderInstallation != null) &&
           folderInstallation.exists() &&
@@ -255,23 +241,18 @@ public class InstallUninstallHandler
 
         /* install */
         _il.event("Selected installation folder: "+((folderInstallation == null)? "null" : folderInstallation.getAbsolutePath()));
-        LOG.info("Selected installation folder: "+((folderInstallation == null)? "null" : folderInstallation.getAbsolutePath()));
 
-        LOG.info("(folderInstallation != null) " + (folderInstallation != null));
         if (folderInstallation != null) // else DirectorySelector was cancelled
         {
           SiardGui.getSiardGui().startAction(sb.getInstallingStatus(folderInstallation));
           _il.event("Starting InstallerTask from "+
             "\""+folderSource.getAbsolutePath()+"\" to "+
             "\""+folderInstallation.getAbsolutePath()+"\".");
-          LOG.info("Starting InstallerTask from "+
-        	  "\""+folderSource.getAbsolutePath()+"\" to "+
-        	  "\""+folderInstallation.getAbsolutePath()+"\".");
+
           InstallerTask.installTask(folderSource, folderInstallation, this);
         }
         else {
         	_il.event("Selection of installation folder cancelled!");
-        	LOG.info("Selection of installation folder cancelled!");
         }
 
       }

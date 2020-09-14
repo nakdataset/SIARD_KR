@@ -86,7 +86,7 @@ public class SiardBundle extends FxBundle
   public String getMenuHelp() { return getProperty("menu.help"); }
   public String getMenuHelpHelp() { return getProperty("menu.help.help"); }
   public String getMenuHelpInfo() { return getProperty("menu.help.info"); }
-  
+
   public String getInfoTitle() { return getProperty("info.title"); }
   public String getInfoSubject() { return getProperty("info.subject"); }
   public String getInfoDescription() { return getProperty("info.description"); }
@@ -495,7 +495,6 @@ public class SiardBundle extends FxBundle
       sApplication,String.valueOf(iResult),sOut,(sErr == null)?getValueDisplayErrorSystem():sErr);
   }
 
-  // 최창근 추가 - 테이블 컬럼명을 properties에 관리 => 다국어 지원
   public String getTableColumnName(String value) {
 	  return getProperty("history.column." + value);
   }
@@ -503,7 +502,7 @@ public class SiardBundle extends FxBundle
   /* Menu */ /* IntraDIGM */
   public String getMenuFileDownloadStory() { return getProperty("menu.file.downloadstory"); }
   public String getMenuFileUploadStory() { return getProperty("menu.file.uploadstory"); }
-  
+
   /* ToolTip */ /* IntraDIGM */
   public String getToolTipDownload() { return getProperty("tooltip.download"); }
   public String getToolTipUpload() { return getProperty("tooltip.upload"); }
@@ -516,5 +515,29 @@ public class SiardBundle extends FxBundle
   public String getToolTipSearchNext() { return getProperty("tooltip.search.next"); }
   public String getToolTipOptions() { return getProperty("tooltip.options"); }
   public String getToolTipInfo() { return getProperty("tooltip.info"); }
+
+  public String getTableTitle() { return getProperty("table.title"); }
+  public String getTableAllChoose() { return getProperty("table.all.choose"); }
+  public String getTableSchemaName() { return getProperty("table.schema.name"); }
+  public String getTableTableName() { return getProperty("table.table.name"); }
+  public String getTableChoose() { return getProperty("table.choose"); }
+
+  public String getTableColumnTitle(String schemaName, String tableName) {
+  	return MessageFormat.format(getPropertyFormat("table.column.title"), schemaName, tableName);
+  }
+  public String getTableColumnName() { return getProperty("table.column.name"); }
+  public String getTableColumnType() { return getProperty("table.column.type"); }
+  public String getTableColumnRootPath() { return getProperty("table.column.root.path"); }
+  public String getTableColumnChoose() { return getProperty("table.column.choose"); }
+
+  public String getHistoryDownloadTitle() { return getProperty("history.download.title"); }
+  public String getHistoryUploadTitle() { return getProperty("history.update.title"); }
+  public String getHistoryDetailTitle() { return getProperty("history.detail.title"); }
+  public String getListNoData() { return getProperty("list.no.data"); }
+
+  public String getHistoryDivDownload() { return getProperty("history.div.download"); }
+  public String getHistoryDivUpload() { return getProperty("history.div.upload"); }
+  public String getHistoryExecuteReulstSuccess() { return getProperty("history.execute.result.success"); }
+  public String getHistoryExecuteReulstFail() { return getProperty("history.execute.result.fail"); }
 
 } /* SiardBundle */

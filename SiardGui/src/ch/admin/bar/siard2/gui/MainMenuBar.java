@@ -43,7 +43,6 @@ public class MainMenuBar
   /** singleton */
   private static MainMenuBar _mmb = null;
 
-  // 최창근 추가 - 로그
   private static final Logger LOG = Logger.getLogger(MainMenuBar.class);
 
   /** menus and menu items */
@@ -131,11 +130,6 @@ public class MainMenuBar
   {
     SiardGui sg = SiardGui.getSiardGui();
     MenuItem mi = (MenuItem)ae.getSource();
-
-    LOG.info("mi : " + mi);
-    LOG.info("mi.getClass() : " + mi.getClass());
-    LOG.info("mi.getId() : " + mi.getId());
-    LOG.info("mi.getText() : " + mi.getText());
 
     if (mi == _miDownload)
       sg.download();
@@ -369,7 +363,7 @@ public class MainMenuBar
 
 	_miDownloadStory = createMenuItem(); /* IntraDIGM */
 	_menuFile.getItems().add(_miDownloadStory);
-    
+
     _menuFile.getItems().add(new SeparatorMenuItem());
     _miUpload = createMenuItem();
     _menuFile.getItems().add(_miUpload);
@@ -377,7 +371,7 @@ public class MainMenuBar
     _menuUploadMru = new Menu();
     setConnectionMru(false);
     _menuFile.getItems().add(_menuUploadMru);
-    
+
 	_miUploadStory = createMenuItem(); /* IntraDIGM */
 	_menuFile.getItems().add(_miUploadStory);
 

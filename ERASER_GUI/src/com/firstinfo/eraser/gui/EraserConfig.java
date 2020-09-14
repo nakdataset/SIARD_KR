@@ -278,7 +278,6 @@ public class EraserConfig extends JPanel
 			// ClassPathResource resource = new
 			// ClassPathResource("config/db.properties");
 
-			/* 20200703] 최창근 경로수정 */
 //			File			dbconfigfile		= new File("./config/db.properties");
 			File			dbconfigfile		= new File(Constants.DB_PROPERTIES_PATH);
 

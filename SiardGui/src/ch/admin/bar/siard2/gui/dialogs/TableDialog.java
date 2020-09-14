@@ -42,7 +42,6 @@ import javafx.stage.Stage;
 
 public class TableDialog extends ScrollableDialog implements EventHandler<ActionEvent> {
 
-	// 최창근 추가 - 로그
 	private static final Logger LOG = Logger.getLogger(TableDialog.class);
 
 	/** result will be 1 for default, 0 otherwise */
@@ -66,7 +65,7 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 	protected TableColumnDialog tcd;
 
 	private Map<String, FileDownloadModel> chooseColumnMap;
-	
+
 	//20200908 - 이전 파일다운로드모델 리스트 by.pks
 	private List<FileDownloadModel> beforeFileDownloadModelList = new ArrayList<FileDownloadModel>();
 
@@ -75,14 +74,14 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 	private Stage stageOwner;
 
 	private TableDialog(Stage stageOwner, DownloadConnectionDialog dcd) throws Exception{
-		super(stageOwner, "대상 테이블 목록");
+		super(stageOwner, SiardBundle.getSiardBundle().getTableTitle());
 
 		this.dcd = dcd;
 		this.stageOwner = stageOwner;
 
 		chooseColumnMap = new HashMap<String, FileDownloadModel>();
-		//TODO getChooseTableTitle 로 변경해야함
-		double dMinWidth = FxSizes.getTextWidth(SiardBundle.getSiardBundle().getInfoTitle()) + FxSizes.getCloseWidth() + dHSPACING;
+
+		double dMinWidth = FxSizes.getTextWidth(SiardBundle.getSiardBundle().getTableTitle()) + FxSizes.getCloseWidth() + dHSPACING;
 
 		VBox vboxDialog = createVBoxDialog();
 
@@ -102,15 +101,13 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 	@Override
 	public void handle(ActionEvent event) {
 		// TODO Auto-generated method stub
-		LOG.info("handle");
 
 		if (event.getSource() == _btnDefault) {
 			SiardBundle sb = SiardBundle.getSiardBundle();
 
 			if(getChooseTableCount() < 1) {
-				//TODO 최창근 추가 - 테이블을 선택하라는 메시지 alert 추가 .properties로 메시지 관리
-				LOG.info("선택한 테이블 없음");
-				MB.show(this, "제목", "내용", sb.getOk(), null);
+				//TODO .properties로 메시지 관리
+				MB.show(this, "알림", "선택된 테이블이 없습니다.", sb.getOk(), null);
 				return;
 			}
 
@@ -144,9 +141,6 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 
 		for(int i=0; i<size; i++){
 			if(_tvTableList.getItems().get(i).getChooseTableFlag()) {
-				LOG.info("선택 => " + _tvTableList.getItems().get(i).getTableName());
-
-				//TODO 최창근 추가 - siardcmd 에서 스키마.테이블명 구현되면 바꾸기
 				chooseTableList.add(_tvTableList.getItems().get(i).getSchemaName() + "." +_tvTableList.getItems().get(i).getTableName());
 			}
     	}
@@ -155,7 +149,6 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 	}
 
 	private VBox createVBoxDialog() throws Exception{
-		LOG.info("createVBoxDialog");
 
 		/* VBox for title area, separator, credits area, separator and OK button */
 		VBox vboxDialog = new VBox();
@@ -203,8 +196,7 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 	    _cbAllChooseTable.setSelected(true);
 	    _cbAllChooseTable.setOnAction(_aeh);
 
-	    // TODO 최창근 추가 - 전체선택 properties 다국어 지원 추가
-	    _lblAllChooseTable = new Label("전체선택");
+	    _lblAllChooseTable = new Label(sb.getTableAllChoose());
 	    _lblAllChooseTable.setLabelFor(_cbAllChooseTable);
 	    _lblAllChooseTable.setAlignment(Pos.BASELINE_RIGHT);
 
@@ -243,10 +235,7 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 			int cols = rsmd.getColumnCount();
 
 			while (rs.next()) {
-				System.out.println();
-				System.out.println();
 				for(int i=1; i<=cols; i++) {
-					System.out.println(rsmd.getColumnName(i) + " => " + rs.getString(rsmd.getColumnName(i)));
 				}
 			}
 		}catch(Exception e) {
@@ -255,7 +244,6 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 	}
 
 	private HBox createHBoxTableView() throws Exception{
-		LOG.info("createHBoxTableView");
 		SiardBundle sb = SiardBundle.getSiardBundle();
 
 		HBox hBoxTableView = new HBox();
@@ -264,10 +252,9 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 
 		_tvTableList = new TableView<TableModel>();
 
-		//TODO 최창근 추가 - 스키마,테이블,선택 properties에서 key=value로 관리(다국어 지원을 위한)
-		TableColumn<TableModel, String> columnSchemaName = new TableColumn<TableModel, String>("스키마");
-		TableColumn<TableModel, String> columnTableName = new TableColumn<TableModel, String>("테이블");
-		TableColumn<TableModel, Boolean> columnChooseTableFlag = new TableColumn<TableModel, Boolean>("선택");
+		TableColumn<TableModel, String> columnSchemaName = new TableColumn<TableModel, String>(sb.getTableSchemaName());
+		TableColumn<TableModel, String> columnTableName = new TableColumn<TableModel, String>(sb.getTableTableName());
+		TableColumn<TableModel, Boolean> columnChooseTableFlag = new TableColumn<TableModel, Boolean>(sb.getTableChoose());
 
 		columnSchemaName.setCellValueFactory(new PropertyValueFactory<TableModel, String>("schemaName"));
 		columnTableName.setCellValueFactory(new PropertyValueFactory<TableModel, String>("tableName"));
@@ -279,12 +266,11 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 		_tvTableList.getColumns().add(columnChooseTableFlag);
 		_tvTableList.setEditable(true);
 
-		// TODO text값 properties로 관리해야되지 않을까?
-//		historyTableView.setPlaceholder(new Label("데이터 없음 1122"));
+		//list에 데이터가 없을때 보여주는 메시지
+		_tvTableList.setPlaceholder(new Label(sb.getListNoData()));
 
 		SiardConnection.getSiardConnection().loadDriver(dcd.getConnectionUrl());
 		// DriverManager.setLoginTimeout(0);
-//		Connection conn = null;
 
 		conn = DriverManager.getConnection(dcd.getConnectionUrl(), dcd.getDbUser(),  dcd.getDbPassword());
 		conn.setAutoCommit(false);
@@ -294,7 +280,6 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 	      _tvTableList.getItems().add(new TableModel(rs.getString("TABLE_SCHEM"), rs.getString("TABLE_NAME"), true));
 		}
 
-		// 최창근 추가 - 테이블 크기별로 리사이징
 		autoResizeColumns(_tvTableList);
 
 		TableModel tempTableModel = new TableModel();
@@ -313,11 +298,6 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 				TableModel tableModel = (TableModel) clickRowObject;
 
 				if(event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
-					System.out.println("_tvTableList.setOnMouseClicked : " + clickRowObject);
-					System.out.println("_tvTableList.setOnMouseClicked : " + clickRowIndex);
-					System.out.println("_tvTableList.setOnMouseClicked : " + tableModel);
-					System.out.println("schemaName : " + tableModel.getSchemaName());
-					System.out.println("tableName : " + tableModel.getTableName());
 					tempTableModel.setSchemaName(tableModel.getSchemaName());
 					tempTableModel.setTableName(tableModel.getTableName());
 
@@ -325,7 +305,7 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 					_tvTableList.refresh();
 
 					FileDownloadModel beforeFileDownloadModel = null;
-					
+
 					int beforeFileDownloadModelListIndex = 0; //이전 파일다운로드모델 리스트 인덱스
 					for (FileDownloadModel fileDownloadModel : beforeFileDownloadModelList) {
 						if(_tvTableList.getItems().get(clickRowIndex).getTableName().equals(fileDownloadModel.getTableName())
@@ -334,22 +314,21 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 							beforeFileDownloadModel = fileDownloadModel;
 							break;
 						}
-						
+
 						beforeFileDownloadModelListIndex++;
 					}
-					
+
 					tcd = TableColumnDialog.showTableColumnDialog(stageOwner, tempTableModel, beforeFileDownloadModel);
 					if(tcd.getResult() == iRESULT_SUCCESS) {
 						// map 만들어서 넣어보자 key schema.table, value columnList
 						chooseColumnMap.put(tableModel.getSchemaName() + "." +tableModel.getTableName(), tcd.fileDownloadModel);
-						
+
 						if(beforeFileDownloadModel != null) {
 							//기존 모델 리스트에서 제거 후 재등록
 							beforeFileDownloadModelList.remove(beforeFileDownloadModelListIndex);
 						}
 						beforeFileDownloadModelList.add(tcd.fileDownloadModel);
 					}
-					LOG.info("after tcd");
 				}
 			}
 		});
@@ -417,7 +396,6 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 	 * @param stageOwner owner window.
 	 */
 	public static TableDialog showChooseTableDialog(Stage stageOwner, DownloadConnectionDialog dcd) throws Exception{
-		LOG.info("showChooseTableDialog");
 		TableDialog td = new TableDialog(stageOwner, dcd);
 		td.showAndWait(); // until it is closed
 		return td;

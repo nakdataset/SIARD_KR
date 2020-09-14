@@ -41,7 +41,6 @@ public class MainPane extends BorderPane
   /** logger */
   private static IndentLogger _il = IndentLogger.getIndentLogger(MainPane.class.getName());
 
-  //최창근 추가 - 로그
   private static final Logger LOG = Logger.getLogger(MainPane.class);
 
   /** padding inside main pane */
@@ -159,7 +158,6 @@ public class MainPane extends BorderPane
    */
   public void showMetaData(Object oMetaData,Class<?>clsTableData)
   {
-	LOG.info("_dsp != null " + (_dsp != null));
     if (_dsp != null)
       _dsp.setMetaData(oMetaData,clsTableData);
   } /* showMetaData */

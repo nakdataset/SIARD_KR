@@ -1,11 +1,11 @@
 /*
- * ====================================================================== 
- * ValueDialog displays cell values. 
- * Application : Siard2 
- * Description : ValueDialog displays cell values. 
- * Platform : Java 7, JavaFX 2.2 
- * ---------------------------------------------------------------------- 
- * Copyright : 2017, Enter AG, Rüti ZH, Switzerland 
+ * ======================================================================
+ * ValueDialog displays cell values.
+ * Application : Siard2
+ * Description : ValueDialog displays cell values.
+ * Platform : Java 7, JavaFX 2.2
+ * ----------------------------------------------------------------------
+ * Copyright : 2017, Enter AG, Rüti ZH, Switzerland
  * Created : 14.08.2017, Hartwig Thomas
  * ======================================================================
  */
@@ -60,7 +60,7 @@ import javafx.stage.Stage;
 /* ==================================================================== */
 /**
  * ValueDialog displays cell values.
- * 
+ *
  * @author Hartwig Thomas
  */
 public class ValueDialog
@@ -68,7 +68,6 @@ public class ValueDialog
 	implements EventHandler<ActionEvent>
 {
 
-	// 최창근 추가 - 로그
 	private static final Logger LOG = Logger.getLogger(ValueDialog.class);
 
 	// padding inside
@@ -90,7 +89,7 @@ public class ValueDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * display value in tree view cell.
-	 * 
+	 *
 	 * @param vtc tree view cell.
 	 * @throws IOException, if an I/O error occurs.
 	 */
@@ -104,7 +103,7 @@ public class ValueDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * handle close button.
-	 * 
+	 *
 	 * @param action event indicating close button has been pressed.
 	 */
 	@Override
@@ -141,7 +140,7 @@ public class ValueDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create the main VBox with tree or text field/text area and close button.
-	 * 
+	 *
 	 * @return main VBox.
 	 */
 	private VBox createVBoxDialog()
@@ -204,7 +203,7 @@ public class ValueDialog
 		Button btnClose = new Button(SiardBundle.getSiardBundle().getValueDialogClose());
 		btnClose.setDefaultButton(true);
 		btnClose.setOnAction(this);
-		hbox.getChildren().add(btnClose);		
+		hbox.getChildren().add(btnClose);
 //		if (dMinWidth < FxSizes.getNodeWidth(btnClose))
 //			dMinWidth = FxSizes.getNodeWidth(btnClose);
 //		dMinHeight += dVSPACING + FxSizes.getNodeHeight(btnClose);
@@ -222,7 +221,7 @@ public class ValueDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create a dialog that displays the value data.
-	 * 
+	 *
 	 * @param stageOwner
 	 * @param sLocation location in table.
 	 * @param value data.
@@ -234,7 +233,6 @@ public class ValueDialog
 		_value = value;
 		_iMaxInlineSize = iMaxInlineSize;
 		_sLocation = sLocation;
-		LOG.info("ValueDialog");
 		_vbox = createVBoxDialog();
 
 		_vbox.setPadding(new Insets(dOUTER_PADDING * 2, dOUTER_PADDING, 0, dOUTER_PADDING)); /* IntraDIGM */
@@ -257,7 +255,7 @@ public class ValueDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * get text to be displayed from value.
-	 * 
+	 *
 	 * @param value value.
 	 * @param iMaxInlineSize maximum displayable size.
 	 * @return text for value, empty string for null, null for LOB.
@@ -316,7 +314,7 @@ public class ValueDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * display the characters in the text editor.
-	 * 
+	 *
 	 * @param stageOwner
 	 * @param rdr character source.
 	 * @throws IOException if an I/O error occurred.
@@ -351,7 +349,7 @@ public class ValueDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * display the bytes in the bin editor.
-	 * 
+	 *
 	 * @param stageOwner
 	 * @param is byte source.
 	 * @throws IOException if an I/O error occurred.
@@ -384,7 +382,7 @@ public class ValueDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * factory creates the value dialog and shows it.
-	 * 
+	 *
 	 * @param stageOwner
 	 * @param sLocation location in table.
 	 * @param value data.
@@ -395,8 +393,6 @@ public class ValueDialog
 		Value value, int iMaxInlineSize)
 		throws IOException
 	{
-		LOG.info("(value.getCharLength() > iMaxInlineSize) " + (value.getCharLength() > iMaxInlineSize));
-		LOG.info("(value.getByteLength() > iMaxInlineSize/2) " + (value.getByteLength() > iMaxInlineSize / 2));
 		if (value.getCharLength() > iMaxInlineSize)
 			displayText(stageOwner, value.getReader());
 		else if (value.getByteLength() > iMaxInlineSize / 2)
@@ -413,7 +409,7 @@ public class ValueDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * factory creates the value dialog and shows it.
-	 * 
+	 *
 	 * @param stageOwner
 	 * @param cell data.
 	 * @param iMaxInlineSize maximum number of characters to be displayed inline.

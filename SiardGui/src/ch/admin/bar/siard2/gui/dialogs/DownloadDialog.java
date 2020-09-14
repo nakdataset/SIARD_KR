@@ -37,7 +37,7 @@ import javafx.stage.Stage;
 /* ==================================================================== */
 /**
  * DownloadDialog for downloading a database to a SIARD archive.
- * 
+ *
  * @author Hartwig Thomas
  */
 public class DownloadDialog
@@ -46,7 +46,6 @@ public class DownloadDialog
 	/** logger */
 	private static IndentLogger _il = IndentLogger.getIndentLogger(DownloadDialog.class.getName());
 
-	// 최창근 추가 - 로그
 	private static final Logger LOG = Logger.getLogger(DownloadDialog.class);
 
 	// download task
@@ -67,21 +66,11 @@ public class DownloadDialog
 		@Override
 		public void handle(WorkerStateEvent wse)
 		{
-			LOG.info("DownloadTask.call.callback");
-
 			_btnCancel.setDisable(true);
 			DownloadTask dt = (DownloadTask) wse.getSource();
 			SiardBundle sb = SiardBundle.getSiardBundle();
 			String sMessage = null;
 
-			LOG.info("dt.getArchive().getMetaData().getDbName() " + dt.getArchive().getMetaData().getDbName());
-			LOG.info("dt.getArchive().getMetaData().getProducerApplication() " + dt.getArchive().getMetaData().getProducerApplication());
-			LOG.info("dt.getArchive().getMetaData().getClientMachine() " + dt.getArchive().getMetaData().getClientMachine());
-			LOG.info("dt.getArchive().getMetaData().getArchive() " + dt.getArchive().getMetaData().getArchive());
-
-
-			LOG.info("wse.getEventType() " + wse.getEventType());
-			// TODO 최창근 추가 - 추출 결과
 			String execute_result = "";
 			if (wse.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED) {
 				sMessage = sb.getDownloadSuccessMessage();
@@ -127,7 +116,6 @@ public class DownloadDialog
 				e.printStackTrace();
 			}
 
-			LOG.info("sMessage " + sMessage);
 			_tfMessage.setText(sMessage);
 			_btnDefault.setDisable(false);
 		}
@@ -143,7 +131,6 @@ public class DownloadDialog
 		@Override
 		public void handle(ActionEvent ae)
 		{
-			LOG.info("ae.getSource() " + ae.getSource());
 			if (ae.getSource() == _btnCancel) {
 				_dt.cancel();
 				_btnCancel.setDisable(true);
@@ -155,7 +142,6 @@ public class DownloadDialog
 				alert.setContentText("다운로드한 SIARD 파일을 검증하시겠습니까?");
 				Optional<ButtonType> result = alert.showAndWait();
 
-				LOG.info("result.get() " + result.get());
 				if (result.get() == ButtonType.OK) {
 					verify_process = true;
 				} else {
@@ -183,7 +169,7 @@ public class DownloadDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create the parameters VBox at the top of the dialog
-	 * 
+	 *
 	 * @param conn database connection.
 	 * @param fileArchive SIARD archive to be written.
 	 * @param bMetaDataOnly true, if only meta data are to be downloaded.
@@ -255,7 +241,7 @@ public class DownloadDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * display the connection dialog.
-	 * 
+	 *
 	 * @param stageOwner owner window.
 	 * @param conn database connection.
 	 * @param archive SIARD archive to be written.
@@ -267,15 +253,13 @@ public class DownloadDialog
 	{
 		super(stageOwner, conn, archive, bMetaDataOnly, bViewsAsTables, SiardBundle.getSiardBundle().getDownloadTitle());
 
-		LOG.info("startDownloadTask");
-
 		_dt = DownloadTask.startDownloadTask(conn, archive, bMetaDataOnly, bViewsAsTables, _pb.progressProperty(), _wseh);
 	} /* constructor DownloadDialog */
 
 	/*------------------------------------------------------------------*/
 	/**
 	 * show connection dialog and save entered values.
-	 * 
+	 *
 	 * @param stageOwner owner window.
 	 * @param conn database connection.
 	 * @param archive SIARD archive to be written.
@@ -288,12 +272,9 @@ public class DownloadDialog
 		boolean bMetaDataOnly, boolean bViewsAsTables)
 	{
 		_il.enter(conn, archive, String.valueOf(bMetaDataOnly));
-		LOG.info("1 showDownloadDialog");
 		DownloadDialog dd = new DownloadDialog(stageOwner, conn, archive, bMetaDataOnly, bViewsAsTables);
-		LOG.info("2 showDownloadDialog");
 		dd.setResizable(false); /* IntraDIGM */
 		dd.showAndWait();
-		LOG.info("3 showDownloadDialog");
 		System.setOut(dd._psOut);
 		System.setErr(dd._psErr);
 		_il.exit(dd);

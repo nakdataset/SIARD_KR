@@ -35,7 +35,7 @@ import javafx.stage.Stage;
 /* ==================================================================== */
 /**
  * OptionDialog display options for modification.
- * 
+ *
  * @author Hartwig Thomas
  */
 public class OptionDialog
@@ -43,7 +43,6 @@ public class OptionDialog
 	implements EventHandler<ActionEvent>
 {
 
-	// 최창근 추가 - 로그
 	private static final Logger LOG = Logger.getLogger(OptionDialog.class);
 
 	// limits for column width
@@ -71,7 +70,7 @@ public class OptionDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * handle the action of one of the buttons.
-	 * 
+	 *
 	 * @param action event.
 	 */
 	@Override
@@ -121,7 +120,7 @@ public class OptionDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * compute the maximum text width of the given strings.
-	 * 
+	 *
 	 * @param as strings.
 	 * @return maximum text width.
 	 */
@@ -138,7 +137,7 @@ public class OptionDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create the HBox with the OK button.
-	 * 
+	 *
 	 * @return HBox with OK button.
 	 */
 	private HBox createHBoxButtons()
@@ -173,7 +172,7 @@ public class OptionDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create the dialog pane containing the option editors and the ok and cancel button.
-	 * 
+	 *
 	 * @return
 	 */
 	private VBox createVBoxDialog()
@@ -250,17 +249,13 @@ public class OptionDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create the option dialog.
-	 * 
+	 *
 	 * @param stageOwner owner stage.
 	 */
 	private OptionDialog(Stage stageOwner)
 	{
 		super(stageOwner, SiardBundle.getSiardBundle().getOptionTitle());
 		VBox vbox = createVBoxDialog();
-
-		// 최창근 수정 - 가로, 세로 스크롤 제거를 위한 넓이, 높이 값 수정
-		/* scene */
-		// Scene scene = new Scene(vbox, vbox.getMinWidth()+10.0, vbox.getMinHeight()+10.0);
 
 		// Scene scene = new Scene(vbox, vbox.getMinWidth()+20.0, vbox.getMinHeight()+20.0); /* IntraDIGM */
 		Scene scene = new Scene(vbox); /* IntraDIGM */
@@ -271,7 +266,7 @@ public class OptionDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * shows the option dialog.
-	 * 
+	 *
 	 * @param stageOwner owner window.
 	 * @return option dialog with results.
 	 */

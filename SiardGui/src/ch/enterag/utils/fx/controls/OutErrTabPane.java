@@ -21,7 +21,7 @@ import javafx.scene.control.TextArea;
  * OutErrTabPane implements a tab pane with a console tab for stdout and a console tab for stderr.
  * N.B.: System.err and System.out must be saved before this is created and restored after the tab
  * pane is not used any more!
- * 
+ *
  * @author Hartwig
  */
 public class OutErrTabPane extends TabPane
@@ -70,7 +70,7 @@ public class OutErrTabPane extends TabPane
 	/*------------------------------------------------------------------*/
 	/**
 	 * create a tab for the tab pane containing a scrollable console text area.
-	 * 
+	 *
 	 * @param sTitle title of tab.
 	 * @param taConsole console text area.
 	 * @return tab for tab pane.
@@ -135,7 +135,7 @@ public class OutErrTabPane extends TabPane
 		System.setOut(cpsOut);
 
 		/* S: err탭에 로그 출력 */
-		// 최창근 수정 - 파일다운로드 내역이 err창에 출력되서 주석처리
+		// 파일다운로드 내역이 err창에 출력되서 주석처리
 		// System.setOut(cpsErr);
 		/* E: err탭에 로그 출력 */
 

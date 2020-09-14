@@ -31,31 +31,24 @@ public class SQLiteConnection {
 				if(!dbFilePath.exists()) {
 					dbFilePath.mkdirs();
 				}
-				LOG.info("db 파일 경로 생성 성공 => " + dbFilePath);
+				LOG.info("DB file creation completed => " + dbFilePath);
 			}catch(Exception e) {
-				LOG.error("db 파일 경로 생성 실패");
+				LOG.error("DB file creation failure");
 			}
 
 			try {
 				Class.forName("org.sqlite.JDBC");
-				LOG.info("드라이버 로딩 성공");
+				LOG.info("Driver loading success");
 			}catch(Exception e) {
-				LOG.error("드라이버 로딩 실패");
+				LOG.error("Driver loading failure");
 			}
 
 			String dbConnectionURL = "jdbc:sqlite:" + dbFilePath + File.separator + DATABASE_FILE_NAME;
 			try {
-				// 읽기 전용
-				/*
-				SQLiteConfig config = new SQLiteConfig();
-				config.setReadOnly(true);
-				conn = DriverManager.getConnection(dbConnectionURL, config.toProperties());
-				*/
-//				conn = DriverManager.getConnection("jdbc:sqlite:db\testCCG.db");
 				conn = DriverManager.getConnection(dbConnectionURL);
-				LOG.info("DB 연결 성공 => " + dbConnectionURL);
+				LOG.info("DB connection success => " + dbConnectionURL);
 			}catch(Exception e) {
-				LOG.error("DB 연결 실패 => " + dbConnectionURL);
+				LOG.error("DB connection failure => " + dbConnectionURL);
 			}
 
 			return conn;

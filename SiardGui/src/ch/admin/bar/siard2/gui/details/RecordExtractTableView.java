@@ -61,7 +61,6 @@ public class RecordExtractTableView
   implements EventHandler<ActionEvent>
 {
 
-  // 최창근 추가 - 로그
   private static final Logger LOG = Logger.getLogger(RecordExtractTableView.class);
 
   private RecordExtract _re = null;
@@ -82,8 +81,6 @@ public class RecordExtractTableView
     RecordExtract reRecord = _re.getRecordExtract(iRow);
     Record re = reRecord.getRecord();
     Cell cell = re.getCell(iColumn);
-    LOG.info("iRow " + iRow);
-    LOG.info("iColumn " + iColumn);
     ValueDialog.displayValue(SiardGui.getSiardGui().getStage(), cell, iMaxInlineSize);
   } /* displayCell */
 
@@ -95,7 +92,6 @@ public class RecordExtractTableView
   {
     if (ae.getTarget() instanceof ObjectListTableView.ObjectTableCell)
     {
-      LOG.info("ae.getTarget() " + ae.getTarget());
       ObjectListTableView.ObjectTableCell otc = (ObjectListTableView.ObjectTableCell)ae.getTarget();
       Platform.runLater(new Runnable()
       {
@@ -109,8 +105,6 @@ public class RecordExtractTableView
         public void run()
         {
           try {
-        	  LOG.info("_otc.getRow() " + _otc.getRow());
-        	  LOG.info("_otc.getColumn()-1 " + (_otc.getColumn()-1));
         	  displayCell(_otc.getRow(), _otc.getColumn()-1);
           }catch(IOException ie) {
         	  System.err.println(EU.getExceptionMessage(ie));
@@ -243,7 +237,7 @@ public class RecordExtractTableView
     for (Iterator<TableColumn<List<Object>,?>> iterColumn = getColumns().iterator(); iterColumn.hasNext(); )
     {
       ObjectListTableColumn oltc = (ObjectListTableColumn)iterColumn.next();
-      double dPreferredColumnWidth = (double) UserProperties.getUserProperties().getColumnWidth();
+      double dPreferredColumnWidth = UserProperties.getUserProperties().getColumnWidth();
       oltc.setMinWidth(FxSizes.fromEms(sMIN_COLUMN_WIDTH));
       oltc.setPrefWidth(FxSizes.fromEms(dPreferredColumnWidth));
       oltc.setMaxWidth(FxSizes.fromEms(dPreferredColumnWidth*dPreferredColumnWidth/sMIN_COLUMN_WIDTH));

@@ -37,11 +37,9 @@ public class SFTPConnection{
 	public void download(FileDownloadModel fileDownloadModel){
 
 		try {
-			// TODO 최창근 추가 - 입력값이 잘못 되었을때 예외 메시지 출력해주기
 			initSFTPConnection(fileDownloadModel);
 		}catch(Exception e) {
 			System.out.println("SFTP access information is incorrect.");
-			// e.printStackTrace();
 		}
 
 		try {

@@ -37,7 +37,6 @@ public class DownloadTask
   /** logger */
   private static IndentLogger _il = IndentLogger.getIndentLogger(DownloadTask.class.getName());
 
-  //최창근 추가 - 로그
   private static final Logger LOG = Logger.getLogger(DownloadTask.class);
 
   private Connection _conn = null;
@@ -71,33 +70,23 @@ public class DownloadTask
   @Override
   protected Void call() throws Exception
   {
-	LOG.info("call");
     _il.enter();
     _conn.setAutoCommit(false);
     UserProperties up = UserProperties.getUserProperties();
     //MetaDataFromDb mdfd = MetaDataFromDb.newInstance(_conn.getMetaData(), _archive.getMetaData());
-    LOG.info("SiardCmd->MetaDataFromDb call");
 
-    LOG.info("_conn.getMetaData() " + _conn.getMetaData());
-    LOG.info("_archive.getMetaData() " + _archive.getMetaData());
-
-    LOG.info("SiardCmd->MetaDataFromDb call");
 	MetaDataFromDb mdfd	= MetaDataFromDb.newInstance(_conn.getMetaData(), _archive.getMetaData(), _archive);
 
     mdfd.setQueryTimeout(up.getQueryTimeoutSeconds());
-    LOG.info("up.getQueryTimeoutSeconds() " + up.getQueryTimeoutSeconds());
 
     mdfd.download(_bViewsAsTables, false, this);
-    LOG.info("_bViewsAsTables " + _bViewsAsTables);
 
-    LOG.info("!_bMetaDataOnly " + !_bMetaDataOnly);
     if (!_bMetaDataOnly)
     {
       updateProgress(0,100);
       PrimaryDataFromDb pdfd = PrimaryDataFromDb.newInstance(_conn, _archive);
       pdfd.setQueryTimeout(up.getQueryTimeoutSeconds());
 
-      //여기서 호출하는거네?
       pdfd.download(this);
     }
     _il.exit();
@@ -148,9 +137,7 @@ public class DownloadTask
     DownloadTask dt = new DownloadTask(conn, archive, bMetaDataOnly, bViewsAsTables, dp, eh);
     Thread thread = new Thread(dt);
     thread.setDaemon(true);
-    LOG.info("before statr DownloadTask Thread");
     thread.start();
-    LOG.info("after statr DownloadTask Thread");
     _il.exit(dt);
     return dt;
   } /* startDownloadTask */

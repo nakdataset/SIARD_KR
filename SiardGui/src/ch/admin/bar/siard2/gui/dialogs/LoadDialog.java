@@ -1,12 +1,12 @@
 /*
  * ============================================================================
- * LoadDialog for up-/down-loading a database to a SIARD archive. 
- * Application : Siard2 
- * Description : LoadDialog for up-/down-loading a database to a SIARD archive. 
+ * LoadDialog for up-/down-loading a database to a SIARD archive.
+ * Application : Siard2
+ * Description : LoadDialog for up-/down-loading a database to a SIARD archive.
  * Platform : Java 7, JavaFX 2.2
- * ---------------------------------------------------------------------------- 
- * Copyright : Swiss Federal Archives, Berne, Switzerland, 2017 
- * Created : 27.06.2017, Hartwig Thomas, Enter AG, Rüti ZH 
+ * ----------------------------------------------------------------------------
+ * Copyright : Swiss Federal Archives, Berne, Switzerland, 2017
+ * Created : 27.06.2017, Hartwig Thomas, Enter AG, Rüti ZH
  * ============================================================================
  */
 package ch.admin.bar.siard2.gui.dialogs;
@@ -43,13 +43,12 @@ import javafx.stage.WindowEvent;
 /**
  * LoadDialog for up-/down-loading a database to a SIARD archive. Abstract base class for
  * DownloadDialog and UploadDialog.
- * 
+ *
  * @author Hartwig Thomas
  */
 public abstract class LoadDialog extends ScrollableDialog implements EventHandler<WindowEvent>
 {
 
-	// 최창근 추가 - 로그
 	private static final Logger LOG = Logger.getLogger(LoadDialog.class);
 
 	// archive
@@ -84,7 +83,7 @@ public abstract class LoadDialog extends ScrollableDialog implements EventHandle
 	/*------------------------------------------------------------------*/
 	/**
 	 * action event handler handles Ok, Cancel.
-	 * 
+	 *
 	 * @return handler.
 	 */
 	/* action event handle */
@@ -93,7 +92,7 @@ public abstract class LoadDialog extends ScrollableDialog implements EventHandle
 	/*------------------------------------------------------------------*/
 	/**
 	 * prevent closing if background action is still running.
-	 * 
+	 *
 	 * @param we Windows Event from close button in title bar.
 	 */
 	@Override
@@ -106,7 +105,7 @@ public abstract class LoadDialog extends ScrollableDialog implements EventHandle
 	/*------------------------------------------------------------------*/
 	/**
 	 * create the HBox with an OK and a Cancel button.
-	 * 
+	 *
 	 * @return HBox with an OK and a Cancel button.
 	 */
 	private HBox createHBoxButtons()
@@ -139,7 +138,7 @@ public abstract class LoadDialog extends ScrollableDialog implements EventHandle
 	/*------------------------------------------------------------------*/
 	/**
 	 * create a label with the given text and set its preferred width to the text width.
-	 * 
+	 *
 	 * @param sText text for label.
 	 * @param dMaxWidth maximum width of label.
 	 * @return new label.
@@ -161,7 +160,7 @@ public abstract class LoadDialog extends ScrollableDialog implements EventHandle
 	/**
 	 * create a label with the given text followed by a colon, set its preferred width to the text width
 	 * and set its alignment to right.
-	 * 
+	 *
 	 * @param sText text for label.
 	 * @return new label.
 	 */
@@ -178,7 +177,7 @@ public abstract class LoadDialog extends ScrollableDialog implements EventHandle
 	/*------------------------------------------------------------------*/
 	/**
 	 * create a HBox containing the label and the text of a parameter.
-	 * 
+	 *
 	 * @param lblLabel label of the parameter.
 	 * @param lblText text of the parameter.
 	 * @return
@@ -201,7 +200,7 @@ public abstract class LoadDialog extends ScrollableDialog implements EventHandle
 	/*------------------------------------------------------------------*/
 	/**
 	 * create the parameters VBox at the top of the dialog
-	 * 
+	 *
 	 * @param conn database connection.
 	 * @param fileArchive SIARD archive to be written.
 	 * @param bMetaDataOnly true, if only meta data are to be up- or downloaded.
@@ -214,7 +213,7 @@ public abstract class LoadDialog extends ScrollableDialog implements EventHandle
 	/*------------------------------------------------------------------*/
 	/**
 	 * create the HBox with an progress bar.
-	 * 
+	 *
 	 * @return HBox with an progress bar.
 	 */
 	private HBox createHBoxProgress() /* IntraDIGM */
@@ -229,12 +228,12 @@ public abstract class LoadDialog extends ScrollableDialog implements EventHandle
 		hbox.getChildren().add(_pb);
 		return hbox;
 	} /* createHBoxProgress */
-	
+
 	/*------------------------------------------------------------------*/
 	/**
 	 * create the main VBox of the dialog containing title area, text area, progress bar, separator and
 	 * OK and Cancel buttons.
-	 * 
+	 *
 	 * @param conn database connection.
 	 * @param fileArchive SIARD archive to be written.
 	 * @param bMetaDataOnly true, if only meta data are to be up- or downloaded.
@@ -245,7 +244,6 @@ public abstract class LoadDialog extends ScrollableDialog implements EventHandle
 		boolean bMetaDataOnly, boolean bViewsAsTables)
 	{
 		/* VBox for title area, text area, progress bar, message, separator and OK and Cancel buttons */
-		LOG.info("createVBoxDialog");
 		VBox vbox = new VBox();
 
 		// vbox.setPadding(new Insets(dOUTER_PADDING)); /* IntraDIGM */
@@ -264,7 +262,7 @@ public abstract class LoadDialog extends ScrollableDialog implements EventHandle
 		vbox.getChildren().add(vboxParameters);
 
 		vbox.getChildren().add(new Separator());
-		
+
 		// progress bar
 		HBox hboxProgress = createHBoxProgress();
 		vbox.getChildren().add(hboxProgress);
@@ -298,7 +296,7 @@ public abstract class LoadDialog extends ScrollableDialog implements EventHandle
 	/*------------------------------------------------------------------*/
 	/**
 	 * display the connection dialog.
-	 * 
+	 *
 	 * @param stageOwner owner window.
 	 * @param conn database connection.
 	 * @param archive SIARD archive to be written.

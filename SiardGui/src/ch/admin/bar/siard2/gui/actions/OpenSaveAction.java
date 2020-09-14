@@ -35,7 +35,6 @@ public class OpenSaveAction
   /** logger */
   private static IndentLogger _il = IndentLogger.getIndentLogger(OpenSaveAction.class.getName());
 
-  //최창근 추가 - 로그
   private static final Logger LOG = Logger.getLogger(OpenSaveAction.class);
 
   /*------------------------------------------------------------------*/
@@ -58,21 +57,17 @@ public class OpenSaveAction
    */
   public void open(String sFile)
   {
-	LOG.info("");
     _il.enter(sFile);
     SiardBundle sb = SiardBundle.getSiardBundle();
     Stage stage = SiardGui.getSiardGui().getStage();
     File fileArchive = null;
 
-    LOG.info("sFile " + sFile);
     if (sFile != null)
     {
       fileArchive = new File(sFile);
       if (!fileArchive.exists())
         fileArchive = null;
     }
-
-    LOG.info("fileArchive " + fileArchive);
 
     if (fileArchive == null)
     {
@@ -95,14 +90,11 @@ public class OpenSaveAction
       try
       {
         archive.open(fileArchive);
-        LOG.info("fileArchive " + fileArchive);
 
-        LOG.info("archive.isValid() " + archive.isValid());
         if (archive.isValid())
         {
           MruFile mf = MruFile.getMruFile();
           mf.setMruFile(archive.getFile().getAbsolutePath());
-          LOG.info("archive.getFile().getAbsolutePath() " + archive.getFile().getAbsolutePath());
 
           MainMenuBar.getMainMenuBar().setFileMru();
           SiardGui.getSiardGui().setArchive(archive);
