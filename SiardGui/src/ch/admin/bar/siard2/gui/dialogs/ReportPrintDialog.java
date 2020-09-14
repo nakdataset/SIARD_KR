@@ -28,11 +28,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.print.PrinterJob;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -46,19 +43,18 @@ import javafx.stage.Stage;
  */
 public class ReportPrintDialog extends ScrollableDialog implements EventHandler<ActionEvent> {
 
-	// 최창근 추가 - 로그
 	private static final Logger LOG = Logger.getLogger(ReportPrintDialog.class);
 
 	public static final int iRESULT_CANCELED = 0;
 	public static final int iRESULT_SUCCESS = 1;
 	protected int _iResult = iRESULT_CANCELED;
 	public int getResult() { return _iResult; }
-	
+
 	protected HistoryModel historyModel;
 
 	private Button _btnDefault;
 	private Button _btnCancel;
-	
+
 	private BrowserRegion br;
 
 	private ReportPrintDialog(Stage stageOwner, HistoryModel historyModel) {
@@ -91,8 +87,6 @@ public class ReportPrintDialog extends ScrollableDialog implements EventHandler<
 	 */
 	@Override
 	public void handle(ActionEvent event) {
-		LOG.info("handle");
-
 //		SiardBundle sb = SiardBundle.getSiardBundle();
 
 		if (event.getSource() == _btnCancel) {
@@ -137,27 +131,27 @@ public class ReportPrintDialog extends ScrollableDialog implements EventHandler<
 //		vbox.setMinWidth(dMinWidth);
 		return vbox;
 	} /* createVBoxDialog */
-	
+
 	/**
 	 * create a browser region and display meta data HTML in it.
-	 * 
+	 *
 	 * @return browser region.
 	 */
 	private BrowserRegion createBrowserRegion(Stage stageOwner)
 	{
 		URL rdrHtmlUrl = MainToolBar.class.getResource("res/reportPrint.html");
-		
+
 		BrowserRegion br = BrowserRegion.newBrowserRegion_reportPrint(stageOwner, rdrHtmlUrl, setHistoryModelConvertToJsonString());
-		
+
 		br.setPrefSize(0.4 * FxSizes.getScreenBounds().getWidth(), 0.8 * FxSizes.getScreenBounds().getHeight()); /* IntraDIGM */
 		br.setPadding(new Insets(dOUTER_PADDING));
 		br.setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
 		return br;
 	} /* createBrowserRegion */
-	
+
 	/**
 	 * create the HBox with the OK button.
-	 * 
+	 *
 	 * @return HBox with OK button.
 	 */
 	private HBox createHBoxButtons(Stage stageOwner)
@@ -167,60 +161,60 @@ public class ReportPrintDialog extends ScrollableDialog implements EventHandler<
 		hbox.setSpacing(dHSPACING);
 		hbox.setAlignment(Pos.TOP_RIGHT);
 		SiardBundle sb = SiardBundle.getSiardBundle();
-		
+
 		//웹뷰 프린트 사용으로 해당 기능 제거.
 //		printSetupButton = new Button("인쇄");
-//		printSetupButton.setOnAction(new EventHandler <ActionEvent>() 
+//		printSetupButton.setOnAction(new EventHandler <ActionEvent>()
 //		{
-//            public void handle(ActionEvent event) 
+//            public void handle(ActionEvent event)
 //            {
 //            	pageSetup(br, stageOwner);
 //            }
 //        });
 //		hbox.getChildren().add(printSetupButton);
-		
+
 		/* OK button */
 		_btnDefault = new Button(sb.getOk());
 		_btnDefault.setDefaultButton(true);
 		_btnDefault.setOnAction(this);
 		hbox.getChildren().add(_btnDefault);
-	
+
 		return hbox;
 	} /* createHBoxButtons */
-	
-//	private void pageSetup(Node node, Stage owner) 
+
+//	private void pageSetup(Node node, Stage owner)
 //	{
 //		// Create the PrinterJob
 //		PrinterJob job = PrinterJob.createPrinterJob();
-//		
-//		if (job == null) 
+//
+//		if (job == null)
 //		{
 //			return;
 //		}
-//		
+//
 //		// Show the page setup dialog
 //		boolean proceed = job.showPrintDialog(owner);
-//		
-//		if (proceed) 
+//
+//		if (proceed)
 //		{
 //			print(job, node);
 //		}
 //	}
-//	
-//	private void print(PrinterJob job, Node node) 
+//
+//	private void print(PrinterJob job, Node node)
 //	{
 //		// Set the Job Status Message
 //		jobStatus.textProperty().bind(job.jobStatusProperty().asString());
-//		
+//
 //		// Print the node
 //		boolean printed = job.printPage(node);
-//	
-//		if (printed) 
+//
+//		if (printed)
 //		{
 //			job.endJob();
 //		}
 //	}
-	
+
 	/*------------------------------------------------------------------*/
 	/**
 	 * show the modal history detail dialog.
@@ -228,12 +222,11 @@ public class ReportPrintDialog extends ScrollableDialog implements EventHandler<
 	 * @param stageOwner owner window.
 	 */
 	public static ReportPrintDialog showReportPrintDialog(Stage stageOwner, HistoryModel historyModel) {
-		LOG.info("showReportPrintDialog");
 		ReportPrintDialog rpd = new ReportPrintDialog(stageOwner, historyModel);
 		rpd.showAndWait(); // until it is closed
 		return rpd;
 	} /* showInfoDialog */
-	
+
 	//historyModel 데이터를 json형식의 String으로 변환(보고서 출력 웹뷰 연동용)
 	@SuppressWarnings("rawtypes")
 	private String setHistoryModelConvertToJsonString() {
@@ -247,7 +240,7 @@ public class ReportPrintDialog extends ScrollableDialog implements EventHandler<
 	  	  jsonBuf.append(",executeResult:\""+historyModel.getExecute_result()+"\"");
 	  	  jsonBuf.append(",schemaName:\""+historyModel.getSchema_name()+"\"");
 	  	  jsonBuf.append(",tableCount:\""+historyModel.getTable_count()+"\"");
-	      
+
 	  	  //이력 상세
 	  	  StringBuilder sbHistoryDetail = new StringBuilder();
 	      try {
@@ -257,7 +250,7 @@ public class ReportPrintDialog extends ScrollableDialog implements EventHandler<
 				params.put("history_idx", String.valueOf(historyModel.getHistory_idx()));
 
 				List<Map> resultList = dao.selectListHistoryDetail(params);
-				
+
 				sbHistoryDetail.append("<table style='width: 100%; border: 1px; border-color: black; border-style: solid;' border='1'>");
 				sbHistoryDetail.append("<colgroup>");
 				sbHistoryDetail.append("	<col width='60%' />");
@@ -269,30 +262,28 @@ public class ReportPrintDialog extends ScrollableDialog implements EventHandler<
 				sbHistoryDetail.append("<th>테이블 컬럼 수</th>");
 				sbHistoryDetail.append("<th>테이블 레코드 수</th>");
 				sbHistoryDetail.append("</tr>");
-				
+
 				for(int i=0; i<resultList.size(); i++) {
-					// TODO text값 properties로 관리해야되지 않을까?
 					HistoryDetailModel historyDetailModel = new HistoryDetailModel();
 					historyDetailModel.fromMap(resultList.get(i));
-//					historyDetailTableView.getItems().add(historyDetailModel)
-					
+
 					sbHistoryDetail.append("<tr>");
 					sbHistoryDetail.append("<td align='left'>"+historyDetailModel.getTable_name()+"</td>");
 					sbHistoryDetail.append("<td align='right'>"+historyDetailModel.getTable_column_count()+"</td>");
 					sbHistoryDetail.append("<td align='right'>"+historyDetailModel.getTable_record_count()+"</td>");
 					sbHistoryDetail.append("</tr>");
 				}
-				
+
 				sbHistoryDetail.append("</table>");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	      
+
 	      jsonBuf.append(",historyDetailTable:\""+sbHistoryDetail.toString()+"\"");
 	  	  jsonBuf.append("}");
 	      jsonBuf.append("]");
-	      
+
 	      return jsonBuf.toString();
 	}
 

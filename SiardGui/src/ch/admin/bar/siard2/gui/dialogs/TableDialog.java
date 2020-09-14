@@ -42,7 +42,6 @@ import javafx.stage.Stage;
 
 public class TableDialog extends ScrollableDialog implements EventHandler<ActionEvent> {
 
-	// 최창근 추가 - 로그
 	private static final Logger LOG = Logger.getLogger(TableDialog.class);
 
 	/** result will be 1 for default, 0 otherwise */
@@ -102,14 +101,12 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 	@Override
 	public void handle(ActionEvent event) {
 		// TODO Auto-generated method stub
-		LOG.info("handle");
 
 		if (event.getSource() == _btnDefault) {
 			SiardBundle sb = SiardBundle.getSiardBundle();
 
 			if(getChooseTableCount() < 1) {
-				//TODO 최창근 추가 - 테이블을 선택하라는 메시지 alert 추가 .properties로 메시지 관리
-				LOG.info("선택한 테이블 없음");
+				//TODO .properties로 메시지 관리
 				MB.show(this, "알림", "선택된 테이블이 없습니다.", sb.getOk(), null);
 				return;
 			}
@@ -144,8 +141,6 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 
 		for(int i=0; i<size; i++){
 			if(_tvTableList.getItems().get(i).getChooseTableFlag()) {
-				LOG.info("선택 => " + _tvTableList.getItems().get(i).getTableName());
-
 				chooseTableList.add(_tvTableList.getItems().get(i).getSchemaName() + "." +_tvTableList.getItems().get(i).getTableName());
 			}
     	}
@@ -154,7 +149,6 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 	}
 
 	private VBox createVBoxDialog() throws Exception{
-		LOG.info("createVBoxDialog");
 
 		/* VBox for title area, separator, credits area, separator and OK button */
 		VBox vboxDialog = new VBox();
@@ -241,10 +235,7 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 			int cols = rsmd.getColumnCount();
 
 			while (rs.next()) {
-				System.out.println();
-				System.out.println();
 				for(int i=1; i<=cols; i++) {
-					System.out.println(rsmd.getColumnName(i) + " => " + rs.getString(rsmd.getColumnName(i)));
 				}
 			}
 		}catch(Exception e) {
@@ -253,7 +244,6 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 	}
 
 	private HBox createHBoxTableView() throws Exception{
-		LOG.info("createHBoxTableView");
 		SiardBundle sb = SiardBundle.getSiardBundle();
 
 		HBox hBoxTableView = new HBox();
@@ -308,11 +298,6 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 				TableModel tableModel = (TableModel) clickRowObject;
 
 				if(event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
-					System.out.println("_tvTableList.setOnMouseClicked : " + clickRowObject);
-					System.out.println("_tvTableList.setOnMouseClicked : " + clickRowIndex);
-					System.out.println("_tvTableList.setOnMouseClicked : " + tableModel);
-					System.out.println("schemaName : " + tableModel.getSchemaName());
-					System.out.println("tableName : " + tableModel.getTableName());
 					tempTableModel.setSchemaName(tableModel.getSchemaName());
 					tempTableModel.setTableName(tableModel.getTableName());
 
@@ -344,7 +329,6 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 						}
 						beforeFileDownloadModelList.add(tcd.fileDownloadModel);
 					}
-					LOG.info("after tcd");
 				}
 			}
 		});
@@ -412,7 +396,6 @@ public class TableDialog extends ScrollableDialog implements EventHandler<Action
 	 * @param stageOwner owner window.
 	 */
 	public static TableDialog showChooseTableDialog(Stage stageOwner, DownloadConnectionDialog dcd) throws Exception{
-		LOG.info("showChooseTableDialog");
 		TableDialog td = new TableDialog(stageOwner, dcd);
 		td.showAndWait(); // until it is closed
 		return td;

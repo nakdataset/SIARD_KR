@@ -32,7 +32,7 @@ import javafx.stage.Stage;
 /* ==================================================================== */
 /**
  * FindDialog asks for a string to find in the meta data.
- * 
+ *
  * @author Hartwig Thomas
  */
 public class FindDialog
@@ -63,7 +63,7 @@ public class FindDialog
 
 	private Button _btnOk = null;
 	private Button _btnCancel = null;
-	
+
 	private void disableOk()
 	{
 		_btnOk.setDisable(getFindString().length() == 0);
@@ -83,13 +83,13 @@ public class FindDialog
 			disableOk();
 		} /* changed */
 	} /* class StringChangeListener */
-	
+
 	private StringChangeListener _scl = new StringChangeListener();
 
 	/*------------------------------------------------------------------*/
 	/**
 	 * handle pressed button.
-	 * 
+	 *
 	 * @param ae action event.
 	 */
 	@Override
@@ -103,7 +103,7 @@ public class FindDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create a HBox with OK and Cancel button.
-	 * 
+	 *
 	 * @param sOk text on OK button.
 	 * @param sCancel text on Cancel button.
 	 * @return HBox.
@@ -130,7 +130,7 @@ public class FindDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create HBox with label and check box for match case.
-	 * 
+	 *
 	 * @param sMatchCaseLabel label.
 	 * @param dLabelWidth width of label.
 	 * @param bMatchCase initial value of match case.
@@ -156,7 +156,7 @@ public class FindDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create HBox with label and text field for find string.
-	 * 
+	 *
 	 * @param sFindStringLabel label.
 	 * @param dLabelWidth width of label.
 	 * @param sFindString initial value of find string.
@@ -172,8 +172,6 @@ public class FindDialog
 		if (sFindString != null)
 			_tfFindString.setText(sFindString);
 		_tfFindString.setMinWidth(FxSizes.fromEms(iTEXT_COLUMNS));
-
-		// 최창근 추가 - 텍스트필드 가변크기 변환을 위한 설정
 		HBox.setHgrow(_tfFindString, Priority.ALWAYS);
 		_tfFindString.textProperty().addListener(_scl);
 		Label lblFindString = new Label(sFindStringLabel);
@@ -189,7 +187,7 @@ public class FindDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create the main VBox of the dialog.
-	 * 
+	 *
 	 * @param sb bundle.
 	 * @param sFindString initial find string value.
 	 * @param bMatchCase initial match case value.
@@ -198,9 +196,6 @@ public class FindDialog
 	private VBox createVBox(SiardBundle sb, String sFindString, boolean bMatchCase)
 	{
 		VBox vbox = new VBox();
-
-		// 최창근 수정 - margin 값 수정
-		// vbox.setPadding(new Insets(dINNER_PADDING));
 
 		// vbox.setPadding(new Insets(dOUTER_PADDING));/* IntraDIGM */
 		vbox.setPadding(new Insets(dOUTER_PADDING * 2, dOUTER_PADDING, 0, dOUTER_PADDING)); /* IntraDIGM */
@@ -227,7 +222,7 @@ public class FindDialog
 
 	/**
 	 * constructor
-	 * 
+	 *
 	 * @param stageOwner owner window.
 	 * @param sFindString initial find string value.
 	 * @param bMatchCase initial match case value.
@@ -236,9 +231,6 @@ public class FindDialog
 	{
 		super(stageOwner, SiardBundle.getSiardBundle().getFindTitle());
 		VBox vbox = createVBox(SiardBundle.getSiardBundle(), sFindString, bMatchCase);
-		// 최창근 수정 - 가로, 세로 스크롤 제거를 위한 넓이, 높이 값 수정
-		/* scene */
-		// Scene scene = new Scene(vbox, vbox.getMinWidth()+10.0, vbox.getMinHeight()+10.0);
 
 		// Scene scene = new Scene(vbox, vbox.getMinWidth()+20.0, vbox.getMinHeight()+20.0); /* IntraDIGM */
 		Scene scene = new Scene(vbox); /* IntraDIGM */
@@ -249,7 +241,7 @@ public class FindDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * shows find dialog.
-	 * 
+	 *
 	 * @param stageOwner owner window.
 	 * @param sFindString initial find string value.
 	 * @param bMatchCase initial match case value.

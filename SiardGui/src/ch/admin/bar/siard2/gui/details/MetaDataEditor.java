@@ -74,7 +74,6 @@ public class MetaDataEditor
   /** logger */
   private static IndentLogger _il = IndentLogger.getIndentLogger(MetaDataEditor.class.getName());
 
-  //최창근 추가 - 로그
   private static final Logger LOG = Logger.getLogger(MetaDataEditor.class);
 
   private SiardBundle _sb = SiardBundle.getSiardBundle();
@@ -118,7 +117,7 @@ public class MetaDataEditor
         String sKey = iterProperty.next();
         if (sKey.startsWith("label."))
         {
-          String sValue = (String) sb.getProperty(sKey);
+          String sValue = sb.getProperty(sKey);
           if (dLabelWidth < FxSizes.getTextWidth(sValue))
             dLabelWidth = FxSizes.getTextWidth(sValue);
         }
@@ -324,7 +323,6 @@ public class MetaDataEditor
    */
   private HBox displayButtons(double dPropertyWidth)
   {
-    LOG.info("displayButtons");
     HBox hbox = new HBox();
 //    hbox.setPadding(new Insets(dINNER_PADDING));
     hbox.setPadding(new Insets(10,0,0,0)); /* IntraDIGM */
@@ -348,7 +346,6 @@ public class MetaDataEditor
     	dPropertyWidth = FxSizes.getNodeWidth(hbox);
     }
 
-    // 최창근 수정 - 버튼 우측 정렬을 위해 width set 해제
 //    hbox.setMaxWidth(dPropertyWidth);
     hbox.setAlignment(Pos.TOP_RIGHT);
 
@@ -602,10 +599,8 @@ public class MetaDataEditor
         dPropertyWidth = phbox.getMinWidth();
     }
 
-    LOG.info("_bEditable " + _bEditable);
     if (_bEditable)
     {
-      LOG.info("dPropertyWidth " + dPropertyWidth);
       displayButtons(dPropertyWidth);
       _bChanged = false;
       MainMenuBar.getMainMenuBar().restrict();
@@ -642,7 +637,6 @@ public class MetaDataEditor
    */
   public void setMetaData(Object oMetaData)
   {
-	LOG.info("(_oMetaData != null) && _bChanged " + ((_oMetaData != null) && _bChanged));
     if ((_oMetaData != null) && _bChanged)
     {
       if (MB.show(SiardGui.getSiardGui().getStage(),
@@ -650,12 +644,10 @@ public class MetaDataEditor
           _sb.getEditMetaDataQuery(),
           _sb.getYes(),
           _sb.getNo()) == 1) {
-    	  LOG.info("true");
     	  apply();
       }
     }
     _oMetaData = oMetaData;
-    LOG.info("oMetaData " + oMetaData);
     reset();
   } /* setMetaData */
 
@@ -675,7 +667,6 @@ public class MetaDataEditor
   public MetaDataEditor()
   {
     super();
-    LOG.info("MetaDataEditor");
     setPadding(new Insets(dOUTER_PADDING));
     setSpacing(dVSPACING);
     setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);

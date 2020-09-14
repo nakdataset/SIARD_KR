@@ -55,7 +55,6 @@ import javafx.util.Callback;
  */
 public class HistoryDialog extends ScrollableDialog implements EventHandler<ActionEvent> {
 
-	// 최창근 추가 - 로그
 	private static final Logger LOG = Logger.getLogger(HistoryDialog.class);
 	private String uploadDownloadDivCode;
 	private Stage stageOwner;
@@ -65,8 +64,6 @@ public class HistoryDialog extends ScrollableDialog implements EventHandler<Acti
 		this.stageOwner = stageOwner;
 
 		uploadDownloadDivCode = div;
-
-		LOG.info("HistoryDialog uploadDownloadDivCode " + div);
 
 		double dMinWidth = FxSizes.getTextWidth(SiardBundle.getSiardBundle().getHistoryDownloadTitle()) + FxSizes.getCloseWidth() + dHSPACING;
 
@@ -89,8 +86,6 @@ public class HistoryDialog extends ScrollableDialog implements EventHandler<Acti
 	 */
 	@Override
 	public void handle(ActionEvent ae) {
-		LOG.info("handle");
-
 		close();
 	} /* handle */
 
@@ -101,8 +96,6 @@ public class HistoryDialog extends ScrollableDialog implements EventHandler<Acti
 	 * @return main VBox
 	 */
 	private VBox createVBoxDialog() {
-		LOG.info("createVBoxDialog");
-
 		/* VBox for title area, separator, credits area, separator and OK button */
 		VBox vboxDialog = new VBox();
 		vboxDialog.setPadding(new Insets(dOUTER_PADDING));
@@ -134,8 +127,6 @@ public class HistoryDialog extends ScrollableDialog implements EventHandler<Acti
 
 	@SuppressWarnings("unchecked")
 	private HBox createHBoxTableView() {
-
-		LOG.info("createHBoxTableView");
 		SiardBundle sb = SiardBundle.getSiardBundle();
 
 		HBox hBoxTableView = new HBox();
@@ -156,7 +147,6 @@ public class HistoryDialog extends ScrollableDialog implements EventHandler<Acti
 			List<Map> resultList = dao.selectListHistory(params);
 
 			for(int i=0; i<resultList.size(); i++) {
-				// TODO text값 properties로 관리해야되지 않을까?
 				HistoryModel historyModel = new HistoryModel();
 
 				//보고서 출력용 HistoryModel
@@ -188,6 +178,8 @@ public class HistoryDialog extends ScrollableDialog implements EventHandler<Acti
 
 		// HISTORY_IDX 컬럼 숨기기
 		historyTableView.getColumns().get(0).setVisible(false);
+		// DIV 컬럼 숨기기
+		historyTableView.getColumns().get(1).setVisible(false);
 
 		// 테이블 클릭 이벤트
 		historyTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -197,28 +189,21 @@ public class HistoryDialog extends ScrollableDialog implements EventHandler<Acti
 				// TODO Auto-generated method stub
 
 				Object clickRowObject =  historyTableView.getSelectionModel().selectedItemProperty().get();
-//				int clickRowIndex = historyTableView.getSelectionModel().selectedIndexProperty().get();
 
 				//20200903 - 헤더를 더블클릭할 경우 널 포인트 에러 방지용
 				if(clickRowObject == null) return;
 
 				HistoryModel historyModel = (HistoryModel) clickRowObject;
-//				System.out.println("history_idx : " + historyModel.getHistory_idx());
-//				System.out.println("table row : " + clickRowIndex);
 
 				if(event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
 //					HistoryDetailDialog.showHistoryDetailDialog(stageOwner);
 					HistoryDetailDialog.showHistoryDetailDialog(stageOwner, historyModel.getHistory_idx() + "");
 				}
-//				else {
-//					historyTableView.getSelectionModel().clearSelection();
-//				}
 
 			}
 
 		});
 
-		// TODO text값 properties로 관리해야되지 않을까?
 		historyTableView.setPlaceholder(new Label(sb.getListNoData()));
 
 		hBoxTableView.getChildren().add(historyTableView);
@@ -266,7 +251,6 @@ public class HistoryDialog extends ScrollableDialog implements EventHandler<Acti
         	index++;
 		}
 
-        //최창근 추가 - 테이블 크기별로 리사이징
  		autoResizeColumns(historyTableView);
 
  		HBox.setHgrow(historyTableView, Priority.ALWAYS);
@@ -342,24 +326,10 @@ public class HistoryDialog extends ScrollableDialog implements EventHandler<Acti
 	 *
 	 * @param stageOwner owner window.
 	 */
-//	public static void showHistoryDialog(Stage stageOwner) {
-//		LOG.info("showHistoryDialog");
-//		HistoryDialog hd = new HistoryDialog(stageOwner);
-//		hd.showAndWait(); // until it is closed
-//	} /* showInfoDialog */
-
-	/*------------------------------------------------------------------*/
-	/**
-	 * show the modal info dialog.
-	 *
-	 * @param stageOwner owner window.
-	 */
 	public static void showHistoryDialog(Stage stageOwner, String div) {
-		LOG.info("showHistoryDialog");
 		HistoryDialog hd = new HistoryDialog(stageOwner, div);
 		hd.showAndWait(); // until it is closed
 	} /* showInfoDialog */
-
 
 	private List<TableColumn<HistoryModel, Object>> createHistoryTableColumn() {
 		List<TableColumn<HistoryModel, Object>> historyTableColumnList = new ArrayList<TableColumn<HistoryModel, Object>>();
@@ -376,15 +346,10 @@ public class HistoryDialog extends ScrollableDialog implements EventHandler<Acti
 	            	|| javafx.beans.property.SimpleStringProperty.class.isAssignableFrom(fields[i].getType())
 	            	|| Button.class.isAssignableFrom(fields[i].getType())) {
 
-	            	// TODO 최창근 추가 - 테이블 컬럼명 property로 관리하자(변수명으로 컬럼명으로 나오고, 다국어 지원도 필요)
 	            	String columnName = sb.getTableColumnName(fields[i].getName());
 	            	historyTableColumnList.add(new TableColumn<HistoryModel, Object>(columnName.equals("") ? fields[i].getName() : columnName));
 	            	historyTableColumnList.get(i).setCellValueFactory(new PropertyValueFactory<HistoryModel, Object>(fields[i].getName()));
 
-//	            	historyTableColumnList.add(new TableColumn<HistoryModel, String>(fields[i].getName()));
-//	            	historyTableColumnList.get(i).setCellValueFactory(new PropertyValueFactory<HistoryModel, String>(fields[i].getName()));
-//		            	LOG.info("필드타입 : " + fields[i].getType());
-//		            	LOG.info("필드명 : " + fields[i].getName());
 	            }
 
 	        }

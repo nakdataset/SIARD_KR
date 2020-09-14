@@ -420,7 +420,6 @@ public class EraserServiceImpl implements EraserService
 			// ClassPathResource resource = new
 			// ClassPathResource("config/db.properties");
 
-			/* 20200703] 최창근 경로수정 */
 //			File			dbconfigfile		= new File("./config/db.properties");
 			File			dbconfigfile		= new File(Constants.DB_PROPERTIES_PATH);
 
@@ -467,7 +466,6 @@ public class EraserServiceImpl implements EraserService
 		{
 			// ClassPathResource resource = new
 			// ClassPathResource("config/db.properties");
-			/* 20200703] 최창근 경로수정 */
 //			File			dbconfigfile		= new File("./config/db.properties");
 			File			dbconfigfile		= new File(Constants.DB_PROPERTIES_PATH);
 
@@ -554,7 +552,6 @@ public class EraserServiceImpl implements EraserService
 
 			// ClassPathResource resource = new
 			// ClassPathResource("config/db.properties");
-			/* 20200703] 최창근 경로수정 */
 //			File			dbconfigfile		= new File("./config/db.properties");
 			File			dbconfigfile		= new File(Constants.DB_PROPERTIES_PATH);
 
@@ -803,7 +800,6 @@ public class EraserServiceImpl implements EraserService
 
 			// ClassPathResource resource = new
 			// ClassPathResource("config/db.properties");
-			/* 20200703] 최창근 경로수정 */
 //			File			dbconfigfile		= new File("./config/db.properties");
 			File			dbconfigfile		= new File(Constants.DB_PROPERTIES_PATH);
 
@@ -1352,7 +1348,6 @@ public class EraserServiceImpl implements EraserService
 			// ClassPathResource resource = new
 			// ClassPathResource("config/db.properties");
 
-			/* 20200703] 최창근 경로수정 */
 //			File				managerfile	= new File("./config/manager.properties");
 			File			managerfile		= new File(Constants.MESSAGE_PROPERTIES_PATH);
 
@@ -1397,7 +1392,6 @@ public class EraserServiceImpl implements EraserService
 			// ClassPathResource resource = new
 			// ClassPathResource("config/db.properties");
 
-			/* 20200703] 최창근 경로수정 */
 //			File				managerfile	= new File("./config/manager.properties");
 			File			dbconfigfile		= new File(Constants.MESSAGE_PROPERTIES_PATH);
 

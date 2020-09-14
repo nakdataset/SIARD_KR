@@ -200,16 +200,6 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
     if (rsmd.getColumnCount() != record.getCells())
       throw new IOException("Invalid number of result columns found!");
 
-
-    //TODO 최창근 추가
-//    ExecutorService executorService = Executors.newCachedThreadPool();
-
-    /* AS-IS
-		String org_path = "";
-		String org_path_hash = "";
-		String filepath_siard	= "";
-		//FileDownloadArchive	downloadpath = new FileDownloadArchive();
-		 */
     for (int iCell = 0; iCell < record.getCells(); iCell++)
     {
     	_swGetCell.start();
@@ -333,192 +323,13 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
       _swGetValue.stop();
       _swSetValue.start();
 
-      /* AS-IS
-			String	sColumnName		= mc.getName();
-			boolean	is_filepath		= false;
-			String	filepathfield	= _archive.getFilePath();
-
-			if(filepathfield == null)
-			{
-				filepathfield = "";
-			}
-			// 저장경로 필드명이 왔을 경우
-			if(filepathfield != null && filepathfield.toUpperCase().equals(sColumnName.toUpperCase()))
-			{
-				is_filepath = true;
-			}
-			//System.out.println("PrimaryDataFromDb 314 column name=" + sColumnName);
-			//System.out.println("PrimaryDataFromDb 314 is_filepath=" + is_filepath);
-
-			// 일단 모든필드를 받는다.
-			//fileext.putfilepath(sColumnName, String.valueOf(oValue));
-
-			// 파일 다운로드를 sftp 할 경우
-			// 국가기록원 교육훈련DB은 첨부파일 필드명은 FILENAME 이다.
-			if(is_filepath == true && _archive.getFileDown().equals("SFTP"))
-			{
-				org_path = (String) oValue;
-				//System.out.println("PrimaryDataFromDb 314 org_path=" + org_path);
-
-				// 파일경로를 해쉬로 변환한다.
-				try
-				{
-					MessageDigest	digest = MessageDigest.getInstance("SHA-256");
-					byte[] encodedhash = digest.digest(org_path.getBytes(StandardCharsets.UTF_8));
-
-					org_path_hash = String.valueOf(encodedhash);
-				}
-				catch(NoSuchAlgorithmException e)
-				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-				// SFTP 로 파일 다운로드한다.
-				try
-				{
-					String filepath = new File(".").getAbsolutePath() + File.separator + "etc" + File.separator + "sftp.properties";
-					File sftpproperties	= new File(filepath);
-					FileInputStream	fis = new FileInputStream(sftpproperties);
-					Properties prop = new Properties();
-					prop.load(fis);
-
-					String	host				= prop.getProperty("host");
-					String	id					= prop.getProperty("id");
-					String	password		= prop.getProperty("password");
-					String	port				= prop.getProperty("port");
-//					String	root				= prop.getProperty("root");
-
-					String	remotepath	= "";
-					String	remotename	= "";
-
-					// 파일명에 랜덤을 붙힌다.
-					// 파일명 중복 방지
-					long seed = System.currentTimeMillis();
-					Random rand = new Random(seed);
-					int filenamerandom = rand.nextInt(99999999);
-
-					// 파일명에 랜덤을 붙힌다.
-					//String savepath = _archive.getTargetDir() + "\\" + filenamerandom + "_" + org_path;
-
-					String	savepath = "";
-					if(org_path.lastIndexOf("/") > -1)
-					{
-						savepath = _archive.getTargetDir() + "\\" + org_path.substring(1, org_path.lastIndexOf("/") + 1) + filenamerandom + "_" + org_path.substring(org_path.lastIndexOf("/") + 1);
-					}
-					else
-					{
-						savepath = _archive.getTargetDir() + "\\" + filenamerandom + "_" + org_path;
-					}
-
-					// 필드명_SIARD 에 저장한다.
-					filepath_siard	= savepath;
-					savepath		= savepath.replaceAll("/", "\\\\");
-
-					if(org_path.lastIndexOf("/") > -1)
-					{
-						remotepath	= org_path.substring(0, org_path.lastIndexOf("/"));
-						remotename	= org_path.substring(org_path.lastIndexOf("/") + 1);
-					}
-					else
-					{
-						remotepath	= "";
-						remotename	= org_path;
-					}
-
-					// 파일저장경로 출력
-					//System.out.println(savepath);
-					SftpFileDownload filedownload = new SftpFileDownload(host, id, password, Integer.parseInt(port));
-
-					Instant downstart = Instant.now();
-					filedownload.download(remotepath, remotename, savepath);
-					this.downsizesum += filedownload.getFileSize();
-					filedownload.disconnection();
-
-					Instant downend = Instant.now();
-					downtimesum = downtimesum.plus(java.time.Duration.between(downstart, downend));
-					downcount++;
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-
-				setValue(cell, oValue);
-			}
-			else if(is_filepath == true && _archive.getFileDown().equals("COPY")) // 파일 다운로드를 디렉토리 카피로 할경우
-			{
-				org_path = (String) oValue;
-				SiardFileLocalSave siardfile = new SiardFileLocalSave();
-
-				String org_file_path = _archive.getOriginalDir() + "/" + org_path;
-				//String org_file_path = ".\\" + org_path;
-				String siard_file_path = _archive.getTargetDir() + "/" + org_path;
-
-				org_file_path	= org_file_path.replaceAll("\\\\", "/");
-				siard_file_path	= siard_file_path.replaceAll("\\\\", "/");
-
-				org_file_path	= org_file_path.replaceAll("//", "/");
-				siard_file_path	= siard_file_path.replaceAll("//", "/");
-
-				System.out.println("org_file_path=" + org_file_path);
-				System.out.println("siard_file_path=" + siard_file_path);
-
-				if(org_file_path != null && org_file_path.length() > 0 && siard_file_path != null && siard_file_path.length() > 0)
-				{
-					File org_file	= new File(org_file_path);
-					File target_path = new File(siard_file_path);
-					siardfile.filecopy(org_file, target_path);
-
-					try
-					{
-						MessageDigest	digest = MessageDigest.getInstance("SHA-256");
-						byte[] encodedhash = digest.digest(siard_file_path.getBytes(StandardCharsets.UTF_8));
-
-						org_path_hash = String.valueOf(encodedhash);
-						//System.out.println("PrimaryDataFromDb 383 filepath_siard	=" + filepath_siard);
-					}
-					catch(NoSuchAlgorithmException e)
-					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-
-				setValue(cell, oValue);
-			}
-			else if(sColumnName.equals(filepathfield + "_SIARD")) // 파일경로를 ***_SIARD 에 저장한다.
-			{
-				setValue(cell, filepath_siard);
-			}
-			else if(sColumnName.equals(filepathfield + "_HASH")) // 파일경로를 해쉬로 저장한다.
-			{
-				setValue(cell, org_path_hash);
-			}
-			else
-			{
-				setValue(cell, oValue);
-			}
-       */
-
       setValue(cell, oValue);
-//			_swSetValue.stop();
-
-			// TODO 최창근 추가 - _archive.getFile().getParent()->.siard파일 떨어지는 경로, 사용자가 첨부파일 저장경로를 선택하지 않았을경우 해당 경로 첨부파일 저장하기
-			/*
-			System.out.println("_archive.getColumnCheckedMap().toString() : " + _archive.getColumnCheckedMap().toString());
-			System.out.println("mc.getParentMetaTable() : " + mc.getParentMetaTable());
-			System.out.println("mc.getParentMetaTable().getParentMetaSchema() : " + mc.getParentMetaTable().getParentMetaSchema());
-			 */
 
 			for(String key : _archive.getColumnCheckedMap().keySet() ) {
 				FileDownloadModel fileDownloadModel = _archive.getColumnCheckedMap().get(key);
 
 				//테이블 컬럼 선택값이 null이면 continue
 				if(fileDownloadModel == null) continue;
-
-//				//선택한 컬럼 리스트에 존재하지 않으면 continue
-//				if(!chooseColumnList.contains(mc.getName())) continue;
 
 				String sourceFileRootPath = "";
 				boolean chooseColumnFlag = false;
@@ -534,7 +345,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 
 				//20200904 - 파일 경로의 데이터가 null인경우 제외 추가 by.pks
         if(!chooseColumnFlag || oValue == null) continue;
-        
+
 
 				//TODO 테스트 용 로그
 //				System.out.println();
@@ -546,14 +357,11 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 //				final String SOURCE_FILE = sourceFileRootPath + File.separator +  oValue.toString();
 				final String SOURCE_FILE = sourceFileRootPath + oValue.toString();
 
-//				System.out.println("SOURCE_FILE => " + SOURCE_FILE);
-
 				if(fileDownloadModel.isSftpFlag()) {
 					try {
 						String targetFilePath = "";
 						targetFilePath = fileDownloadModel.getTargetFilePath();
 
-						// 파일 저장경로 받아오기, 경로가 없다면 siard파일이랑 같은경로
 						if("".equals(targetFilePath.trim())) {
 							targetFilePath = _archive.getFile().getParent();
 						}
@@ -571,44 +379,16 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 					} catch (Exception e) {
 					}
 
-					//쓰레드 풀 사용
-//					Runnable runnable = new Runnable() {
-//						@Override
-//						public void run() {
-//							try {
-//								String targetFilePath = "";
-//								targetFilePath = fileDownloadModel.getTargetFilePath();
-//
-//								//TODO 최창근 추가 - 파일 저장경로 받아오기, 경로가 없다면 siard파일이랑 같은경로
-//								if("".equals(targetFilePath)) {
-//									targetFilePath = _archive.getFile().getParent();
-//								}
-//								FileDownloadModel model = new FileDownloadModel();
-//								model.setSourceFile(SOURCE_FILE);
-//								model.setTargetFile(targetFilePath);
-//
-//								SFTPConnection sftpConnection = new SFTPConnection(fileDownloadModel.getHost(), fileDownloadModel.getUser(), fileDownloadModel.getPassword(), fileDownloadModel.getPort());
-//								sftpConnection.download(model);
-//
-//							} catch (Exception e) {
-//								e.printStackTrace();
-//							}
-//						}
-//					};
-//					executorService.execute(runnable);
-
 				}else if(fileDownloadModel.isFileCopyFlag()) {
 
 					try {
 						String targetFilePath = "";
 						targetFilePath = fileDownloadModel.getTargetFilePath();
 
-						// 파일 저장경로 받아오기, 경로가 없다면 siard파일이랑 같은경로
 						if("".equals(targetFilePath.trim())) {
 							targetFilePath = _archive.getFile().getParent();
 						}
 						FileUtils fileUtis = new FileUtils();
-//						fileUtis.copy(fileDownloadModel.getSourceFilePath() + File.separator + SOURCE_FILE, targetFilePath + File.separator);
 						fileUtis.copy(SOURCE_FILE, targetFilePath + File.separator + SOURCE_FILE.substring(0, SOURCE_FILE.lastIndexOf("/") + 1));
 
 						map.put("sourceFileSize", map.get("sourceFileSize") + fileUtis.sourceFileSize);
@@ -618,36 +398,12 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 					} catch (Exception e) {
 					}
 
-					//쓰레드 풀 사용
-//					Runnable runnable = new Runnable() {
-//						@Override
-//						public void run() {
-//							try {
-//								String targetFilePath = "";
-//								targetFilePath = fileDownloadModel.getTargetFilePath();
-//
-//								//TODO 최창근 추가 - 파일 저장경로 받아오기, 경로가 없다면 siard파일이랑 같은경로
-//								if("".equals(targetFilePath)) {
-//									targetFilePath = _archive.getFile().getParent();
-//								}
-//
-//								FileUtils fileUtis = new FileUtils();
-//								fileUtis.copy(fileDownloadModel.getSourceFilePath() + File.separator + SOURCE_FILE, targetFilePath + UUID.randomUUID().toString() + "/");
-//							} catch (Exception e) {
-//								e.printStackTrace();
-//							}
-//						}
-//					};
-//					executorService.execute(runnable);
 
 				}
 
 			}
 
 		} /* loop over values */
-
-    //TODO 최창근 추가
-//    executorService.shutdown();
 
     _swSetValue.stop();
 	} /* getRecord */

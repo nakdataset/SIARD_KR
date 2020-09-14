@@ -35,14 +35,13 @@ import javafx.stage.Stage;
 /* ==================================================================== */
 /**
  * UploadConnectionDialog for entering data to connect to a database for upload.
- * 
+ *
  * @author Hartwig Thomas
  */
 public class UploadConnectionDialog
 	extends ConnectionDialog
 {
 
-	// 최창근 추가 - 로그
 	private static final Logger LOG = Logger.getLogger(UploadConnectionDialog.class);
 
 	private static SiardBundle _sb = SiardBundle.getSiardBundle();
@@ -95,7 +94,7 @@ public class UploadConnectionDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create a VBox for the schema mapping.
-	 * 
+	 *
 	 * @return VBox for the schema mapping.
 	 */
 	private VBox createVBoxSchemas()
@@ -160,7 +159,7 @@ public class UploadConnectionDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * display the upload connection dialog.
-	 * 
+	 *
 	 * @param stageOwner owner window.
 	 * @param sConnectionUrl initial value for connection (JDBC) URL or null.
 	 * @param sDbUser initial value for user of database opr null.
@@ -177,17 +176,7 @@ public class UploadConnectionDialog
 			_sb.getConnectionUploadOverwriteTooltip(),
 			null, null);
 
-		LOG.info("sConnectionUrl " + sConnectionUrl);
-		LOG.info("sDbUser " + sDbUser);
-		LOG.info("_sb.getConnectionDownloadTitle() " + _sb.getConnectionUploadTitle());
-		LOG.info("_sb.getConnectionUploadMetaDataOnlyLabel() " + _sb.getConnectionUploadMetaDataOnlyLabel());
-		LOG.info("_sb.getConnectionUploadMetaDataOnlyTooltip() " + _sb.getConnectionUploadMetaDataOnlyTooltip());
-		LOG.info("_sb.getConnectionUploadOverwriteLabel() " + _sb.getConnectionUploadOverwriteLabel());
-		LOG.info("_sb.getConnectionUploadOverwriteTooltip() " + _sb.getConnectionUploadOverwriteTooltip());
-
 		_archive = archive;
-
-		LOG.info("UploadConnectionDialog");
 
 		/* add the schemas from the meta data to the dialog */
 		VBox vboxDialog = (VBox) getScene().getRoot();
@@ -206,7 +195,7 @@ public class UploadConnectionDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * show upload connection dialog and save entered values.
-	 * 
+	 *
 	 * @param stageOwner owner window.
 	 * @param sConnectionUrl initial value for connection (JDBC) URL or null.
 	 * @param sDbUser initial value for user of database or null.

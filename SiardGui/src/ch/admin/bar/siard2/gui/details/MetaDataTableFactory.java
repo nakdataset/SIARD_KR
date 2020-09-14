@@ -41,7 +41,6 @@ import ch.enterag.utils.fx.controls.ObjectListTableView;
 public abstract class MetaDataTableFactory
 {
 
-  // 최창근 추가 - 로그
   private static final Logger LOG = Logger.getLogger(MetaDataTableFactory.class);
 
   /*------------------------------------------------------------------*/
@@ -63,9 +62,6 @@ public abstract class MetaDataTableFactory
       MetaSchema ms = md.getMetaSchema(iSchema);
 			List<Object> listRow = Arrays.asList((Object)(iSchema + 1),
         ms.getName(), ms.getMetaTables());
-      LOG.info("(Object)iSchema " + (Object)iSchema);
-      LOG.info("ms.getName() " + ms.getName());
-      LOG.info("ms.getMetaTables() " + ms.getMetaTables());
       oltv.getItems().add(listRow);
     }
     return oltv;

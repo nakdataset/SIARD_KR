@@ -34,7 +34,6 @@ public abstract class FS
 {
   public static final String sUSE_NATIVE_PROPERTY = "ch.enterag.utils.fx.dialogs.FS.useNative";
 
-  //최창근 추가 - 로그
   private static final Logger LOG = Logger.getLogger(FS.class);
 
   /*------------------------------------------------------------------*/
@@ -83,19 +82,10 @@ public abstract class FS
     throws IOException
   {
     File fileFolder = null;
-    LOG.info("chooseNewFolder");
-    LOG.info("stageOwner " + stageOwner);
-    LOG.info("sTitle " + sTitle);
-    LOG.info("sMessage " + sMessage);
-    LOG.info("fileInitialFolder " + fileInitialFolder);
-
-    LOG.info("sUSE_NATIVE_PROPERTY " + sUSE_NATIVE_PROPERTY);
-    LOG.info("Boolean.valueOf(System.getProperty(sUSE_NATIVE_PROPERTY)) " + Boolean.valueOf(System.getProperty(sUSE_NATIVE_PROPERTY)));
     if (Boolean.valueOf(System.getProperty(sUSE_NATIVE_PROPERTY)))
     {
       DirectoryChooser dc = new DirectoryChooser();
       dc.setTitle(sTitle);
-      LOG.info("sTitle " + sTitle);
 
       /* if the initial folder does not exist, create it */
       int iCreated = 0;

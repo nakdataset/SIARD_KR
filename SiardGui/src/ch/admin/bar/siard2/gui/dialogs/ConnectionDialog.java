@@ -71,8 +71,7 @@ public abstract class ConnectionDialog extends ScrollableDialog
 	/** logger */
 	private static IndentLogger _il = IndentLogger.getIndentLogger(ConnectionDialog.class.getName());
 
-	// 최창근 추가 - 로그
-	private static final Logger LOG = Logger.getLogger(ConnectionDialog_original.class);
+	private static final Logger LOG = Logger.getLogger(ConnectionDialog.class);
 	private Stage _stageOwner;
 
 	// width of JDBC URL input box
@@ -230,12 +229,6 @@ public abstract class ConnectionDialog extends ScrollableDialog
 
 		up.setDatabaseUser(_sDbUser);
 
-		LOG.info("sDbScheme : " + sDbScheme);
-		LOG.info("sDbHost : " + sDbHost);
-		LOG.info("sDbName : " + sDbName);
-		LOG.info("getSelectedOption() : " + getSelectedOption());
-		LOG.info("_tfDbUser.getText() : " + _tfDbUser.getText());
-
 	} /* persist */
 
 	protected String validate()
@@ -267,11 +260,9 @@ public abstract class ConnectionDialog extends ScrollableDialog
 			} else if (ae.getSource() == _btnDefault) {
 				String sError = validate();
 
-				LOG.info("sError " + sError);
 				if (sError == null) {
 					persist();
 					_iResult = iRESULT_SUCCESS;
-					LOG.info("1 _iResult " + _iResult);
 
 					close();
 
@@ -987,11 +978,6 @@ public abstract class ConnectionDialog extends ScrollableDialog
 		HBox hboxButton = createHBoxButtons();
 		vbox.getChildren().add(hboxButton);
 
-		// TODO 최창근 추가 - 중요!! 테스트 후 반드시 삭제 =========
-		// HBox hboxTestButton = createHBoxTestButtons();
-		// vbox.getChildren().add(hboxTestButton);
-		// 중요!! 테스트 후 반드시 삭제 =========
-
 		getMaxPaneMinWidth(_vboxParameters, vboxConnectionUrl, vboxConnectionParameters, hboxButton);
 		// vbox.setMinWidth(dMinWidth);
 		return vbox;
@@ -1019,8 +1005,6 @@ public abstract class ConnectionDialog extends ScrollableDialog
 	{
 		super(stageOwner, sTitle);
 
-		LOG.info("sTitle " + sTitle);
-
 		_stageOwner = stageOwner;
 		_sConnectionUrl = sConnectionUrl;
 		_sDbUser = sDbUser;
@@ -1041,205 +1025,6 @@ public abstract class ConnectionDialog extends ScrollableDialog
 		Scene scene = new Scene(vboxDialog);
 		setScene(scene);
 
-		// TODO 최창근 추가 - 테스트 후 삭제
-//		testInit();
-
 	} /* constructor DownloadConnectionDialog */
-
-	/* 최창근 추가 - 테스트를 위한 LocalDB 정보로 Set */
-	void testInit()
-	{
-
-		_cbDbScheme.getSelectionModel().select("MySQL");
-
-		_tfDbHost.setText("192.168.1.152");
-
-		_tfDbName.setText("MYSQL");
-
-		_tfConnectionUrl.setText("jdbc:mysql://192.168.1.152:3306/Mysql?serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull");
-
-		_tfDbUser.setText("root");
-
-		_pfDbPassword.setText("root");
-	}
-
-	// ☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★
-	// ☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★
-	// TODO 최창근 추가 - 중요!! 테스트 후 반드시 삭제
-	Button btnMysqlConnection;
-	Button btnOracleConnection;
-	Button btnAccessConnection;
-	Button btnCubridConnection;
-	Button btnDB2Connection;
-	Button btnH2Connection;
-	Button btnPostgresSQLConnection;
-	Button btnMsSQLConnection;
-
-	private HBox createHBoxTestButtons()
-	{
-		btnMysqlConnection = new Button("MySQL");
-		btnMysqlConnection.setDefaultButton(true);
-		btnMysqlConnection.setOnAction(_tbeh);
-		double dMinWidth = btnMysqlConnection.getLayoutBounds().getWidth();
-
-		btnOracleConnection = new Button("Oracle");
-		btnOracleConnection.setDefaultButton(true);
-		btnOracleConnection.setOnAction(_tbeh);
-		dMinWidth += dHSPACING + btnOracleConnection.getLayoutBounds().getWidth();
-
-		btnAccessConnection = new Button("Access");
-		btnAccessConnection.setDefaultButton(true);
-		btnAccessConnection.setOnAction(_tbeh);
-		dMinWidth += dHSPACING + btnAccessConnection.getLayoutBounds().getWidth();
-
-		btnCubridConnection = new Button("Cubrid");
-		btnCubridConnection.setDefaultButton(true);
-		btnCubridConnection.setOnAction(_tbeh);
-		dMinWidth += dHSPACING + btnCubridConnection.getLayoutBounds().getWidth();
-
-		btnDB2Connection = new Button("DB2");
-		btnDB2Connection.setDefaultButton(true);
-		btnDB2Connection.setOnAction(_tbeh);
-		dMinWidth += dHSPACING + btnDB2Connection.getLayoutBounds().getWidth();
-
-		btnH2Connection = new Button("H2");
-		btnH2Connection.setDefaultButton(true);
-		btnH2Connection.setOnAction(_tbeh);
-		dMinWidth += dHSPACING + btnH2Connection.getLayoutBounds().getWidth();
-
-		btnPostgresSQLConnection = new Button("PostgreSQL");
-		btnPostgresSQLConnection.setDefaultButton(true);
-		btnPostgresSQLConnection.setOnAction(_tbeh);
-		dMinWidth += dHSPACING + btnPostgresSQLConnection.getLayoutBounds().getWidth();
-
-		btnMsSQLConnection = new Button("MsSQL");
-		btnMsSQLConnection.setDefaultButton(true);
-		btnMsSQLConnection.setOnAction(_tbeh);
-		dMinWidth += dHSPACING + btnMsSQLConnection.getLayoutBounds().getWidth();
-
-		/* HBox for buttons */
-		HBox hboxButton = new HBox();
-		hboxButton.setPadding(new Insets(dINNER_PADDING));
-		hboxButton.setSpacing(dHSPACING);
-
-		hboxButton.getChildren().add(btnMysqlConnection);
-		hboxButton.getChildren().add(btnOracleConnection);
-		hboxButton.getChildren().add(btnAccessConnection);
-		hboxButton.getChildren().add(btnCubridConnection);
-		hboxButton.getChildren().add(btnDB2Connection);
-		hboxButton.getChildren().add(btnH2Connection);
-		hboxButton.getChildren().add(btnPostgresSQLConnection);
-		hboxButton.getChildren().add(btnMsSQLConnection);
-
-		HBox.setMargin(btnMysqlConnection, new Insets(dOUTER_PADDING));
-		HBox.setMargin(btnOracleConnection, new Insets(dOUTER_PADDING));
-		HBox.setMargin(btnAccessConnection, new Insets(dOUTER_PADDING));
-		HBox.setMargin(btnCubridConnection, new Insets(dOUTER_PADDING));
-		HBox.setMargin(btnDB2Connection, new Insets(dOUTER_PADDING));
-		HBox.setMargin(btnH2Connection, new Insets(dOUTER_PADDING));
-		HBox.setMargin(btnPostgresSQLConnection, new Insets(dOUTER_PADDING));
-		HBox.setMargin(btnMsSQLConnection, new Insets(dOUTER_PADDING));
-
-		hboxButton.setMinWidth(dMinWidth);
-
-		String cssLayout = "-fx-border-color: red;\n" +
-			"-fx-border-insets: 5;\n" +
-			"-fx-border-width: 3;\n" +
-			"-fx-border-style: dashed;\n";
-
-		hboxButton.setStyle(cssLayout);
-
-		return hboxButton;
-	}
-
-	// TODO 최창근 추가 - 중요!! 테스트 후 반드시 삭제
-	private class TestButtonEventHandler implements EventHandler<ActionEvent>
-	{
-
-		@Override
-		public void handle(ActionEvent event)
-		{
-			// TODO Auto-generated method stub
-			Button btn = (Button) event.getSource();
-			setDbConnectionInfo(btn.getText());
-		}
-
-	}
-
-	private TestButtonEventHandler _tbeh = new TestButtonEventHandler();
-
-	// TODO 최창근 추가 - 중요!! 테스트 후 반드시 삭제
-	void setDbConnectionInfo(String dbProduct)
-	{
-		if ("MYSQL".equals(dbProduct.toUpperCase())) {
-			_cbDbScheme.getSelectionModel().select("MySQL");
-			_tfDbHost.setText("192.168.1.152");
-			_tfDbName.setText("MYSQL");
-			_tfConnectionUrl.setText("jdbc:mysql://192.168.1.152:3306/Mysql?serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull");
-			_tfDbUser.setText("root");
-			_pfDbPassword.setText("root");
-
-		} else if ("ORACLE".equals(dbProduct.toUpperCase())) {
-			_cbDbScheme.getSelectionModel().select("Oracle");
-			_tfDbHost.setText("192.168.1.151");
-			_tfDbName.setText("orcl");
-			_tfConnectionUrl.setText("jdbc:oracle:thin:@192.168.1.151:1521:orcl");
-			_tfDbUser.setText("scott");
-			_pfDbPassword.setText("tiger");
-
-		} else if ("ACCESS".equals(dbProduct.toUpperCase())) {
-			_cbDbScheme.getSelectionModel().select("Microsoft Access");
-			_tfDbFolder.setText("C:\\downdown");
-			_tfDbHost.setText("192.168.1.151");
-			_tfDbName.setText("orcl");
-			_tfConnectionUrl.setText("jdbc:oracle:thin:@192.168.1.151:1521:orcl");
-			_tfDbUser.setText("scott");
-			_pfDbPassword.setText("tiger");
-
-		} else if ("CUBRID".equals(dbProduct.toUpperCase())) {
-			_cbDbScheme.getSelectionModel().select("CUBRID");
-			_tfDbHost.setText("192.168.1.151");
-			_tfDbName.setText("orcl");
-			_tfConnectionUrl.setText("jdbc:oracle:thin:@192.168.1.151:1521:orcl");
-			_tfDbUser.setText("scott");
-			_pfDbPassword.setText("tiger");
-
-		} else if ("MSSQL".equals(dbProduct.toUpperCase())) {
-			_cbDbScheme.getSelectionModel().select("SQL Server");
-			_tfDbHost.setText("192.168.1.151");
-			_tfDbName.setText("orcl");
-			_tfConnectionUrl.setText("jdbc:oracle:thin:@192.168.1.151:1521:orcl");
-			_tfDbUser.setText("scott");
-			_pfDbPassword.setText("tiger");
-
-		} else if ("POSTGRESQL".equals(dbProduct.toUpperCase())) {
-			_cbDbScheme.getSelectionModel().select("PostgreSQL");
-			_tfDbHost.setText("192.168.1.151");
-			_tfDbName.setText("orcl");
-			_tfConnectionUrl.setText("jdbc:oracle:thin:@192.168.1.151:1521:orcl");
-			_tfDbUser.setText("scott");
-			_pfDbPassword.setText("tiger");
-
-		} else if ("DB2".equals(dbProduct.toUpperCase())) {
-			_cbDbScheme.getSelectionModel().select("DB/2");
-			_tfDbHost.setText("192.168.1.151");
-			_tfDbName.setText("orcl");
-			_tfConnectionUrl.setText("jdbc:oracle:thin:@192.168.1.151:1521:orcl");
-			_tfDbUser.setText("scott");
-			_pfDbPassword.setText("tiger");
-
-		} else if ("H2".equals(dbProduct.toUpperCase())) {
-			_cbDbScheme.getSelectionModel().select("H2 database");
-			_tfDbFolder.setText("C:\\downdown");
-			_tfDbHost.setText("192.168.1.151");
-			_tfDbName.setText("orcl");
-			_tfConnectionUrl.setText("jdbc:oracle:thin:@192.168.1.151:1521:orcl");
-			_tfDbUser.setText("scott");
-			_pfDbPassword.setText("tiger");
-		}
-
-	}
-	// ☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★
-	// ☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★
 
 } /* class ConnectionDialog */

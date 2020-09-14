@@ -67,7 +67,6 @@ import javafx.util.Callback;
  */
 public class TableColumnDialog extends ScrollableDialog implements EventHandler<ActionEvent> {
 
-	// 최창근 추가 - 로그
 	private static final Logger LOG = Logger.getLogger(TableColumnDialog.class);
 
 	public static final int iRESULT_CANCELED = 0;
@@ -105,7 +104,6 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 
 		this.tableModel = tableModel;
 
-		// TODO getColumnTitle 로 변경해야함
 		double dMinWidth = FxSizes.getTextWidth(SiardBundle.getSiardBundle().getTableColumnTitle(tableModel.getSchemaName(), tableModel.getTableName())) + FxSizes.getCloseWidth() + dHSPACING;
 
 		VBox vboxDialog = createVBoxDialog();
@@ -132,8 +130,6 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 	 */
 	@Override
 	public void handle(ActionEvent event) {
-		LOG.info("handle");
-
 		SiardBundle sb = SiardBundle.getSiardBundle();
 
 		if (event.getSource() == _btnCancel) {
@@ -148,16 +144,13 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 			close();
 
 		} else if (event.getSource() == _btnTargetFileBrowser) {
-			// UserProperties up = UserProperties.getUserProperties();
-			// String sDbFolder = _tfDbFolder.getText();
-//			File fileDbFolder = new File(_tfTargetFilePath.getText());
+
 			File fileDbFolder = null;
 			try {
 				fileDbFolder = FS.chooseExistingFolder(TableColumnDialog.this,
 					sb.getConnectionDbFolderTitle(), sb.getConnectionDbFolderMessage(), sb,
 					fileDbFolder);
 				if (fileDbFolder != null) {
-					// up.setDatabaseFolder(fileDbFolder);
 					_tfTargetFilePath.setText(fileDbFolder.getAbsolutePath());
 				}
 			} catch (Exception e) {
@@ -165,16 +158,14 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 			}
 
 		} else if (event.getSource() == _btnSourceFileBrowser) {
-			// UserProperties up = UserProperties.getUserProperties();
-			// String sDbFolder = _tfDbFolder.getText();
-//			File fileDbFolder = new File(_tfSourceFilePath.getText());
+
 			File fileDbFolder = null;
 			try {
 				fileDbFolder = FS.chooseExistingFolder(TableColumnDialog.this,
 					sb.getConnectionDbFolderTitle(), sb.getConnectionDbFolderMessage(), sb,
 					fileDbFolder);
 				if (fileDbFolder != null) {
-					// up.setDatabaseFolder(fileDbFolder);
+
 					_tfSourceFilePath.setText(fileDbFolder.getAbsolutePath());
 				}
 			} catch (Exception e) {
@@ -196,11 +187,11 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 				chooseColumnList.add(chooseColumnFdm);
 			}
 		}
-		LOG.info(chooseColumnList.toString());
 
 		if (fileDownloadModel == null) {
 			fileDownloadModel = new FileDownloadModel();
 		}
+
 		fileDownloadModel.setSchemaName(tableModel.getSchemaName());
 		fileDownloadModel.setTableName(tableModel.getTableName());
 
@@ -210,14 +201,12 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		fileDownloadModel.setHost(_tfSFTPHost.getText());
 		fileDownloadModel.setUser(_tfSFTPUser.getText());
 		fileDownloadModel.setPassword(_tfSFTPPassword.getText());
-		fileDownloadModel.setPort(Integer.parseInt(_tfSFTPPort.getText()));
+		fileDownloadModel.setPort(Integer.parseInt("".equals(_tfSFTPPort.getText().trim())  ? "0" : _tfSFTPPort.getText()));
 
-//		fileDownloadModel.setSourceFilePath(_tfSourceFilePath.getText());
 		fileDownloadModel.setTargetFilePath(_tfTargetFilePath.getText());
 
 		fileDownloadModel.setChooseColumnList(chooseColumnList);
 
-		LOG.info("fileDownloadModel.getChooseColumnList() " + fileDownloadModel.getChooseColumnList().toString());
 	}
 
 	//이전에 입력한 값으로 세팅
@@ -228,22 +217,12 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		for (int i = 0; i < _tvColumnListSize; i++) {
 			for(int j = 0; j < chooseColumnListSize; j++) {
 				if (_tvColumnList.getItems().get(i).getColumnName().equals(beforfileDownloadModel.getChooseColumnList().get(j).getColumnName())) {
-					System.out.println("beforfileDownloadModel.getChooseColumnList().get(j).getSourceFileRootPath() ::: " + beforfileDownloadModel.getChooseColumnList().get(j).getSourceFileRootPath());
-					System.out.println("beforfileDownloadModel.getChooseColumnList().get(j).isChooseColumnFlag() ::: " + beforfileDownloadModel.getChooseColumnList().get(j).isChooseColumnFlag());
-//				_tvColumnList.getItems().get(i).setColumnName(new SimpleStringProperty(beforfileDownloadModel.getChooseColumnList().get(i).getColumnName()));
-//				_tvColumnList.getItems().get(i).setColumnType(new SimpleStringProperty(beforfileDownloadModel.getChooseColumnList().get(i).getColumnType()));
 					_tvColumnList.getItems().get(i).setSourceFileRootPath(new SimpleStringProperty(beforfileDownloadModel.getChooseColumnList().get(j).getSourceFileRootPath()));
 					_tvColumnList.getItems().get(i).setChooseColumnFlag(new SimpleBooleanProperty(beforfileDownloadModel.getChooseColumnList().get(j).isChooseColumnFlag()));
-//				_tvColumnList.getItems().get(i).setChooseColumnFlag(new SimpleStringProperty(beforfileDownloadModel.getChooseColumnList().get(i).getcol));
-//				chooseColumnFdm.setSourceFileRootPath(_tvColumnList.getItems().get(i).getSourceFileRootPath());
 				}
 			}
 		}
 
-		System.out.println("beforfileDownloadModel.isSftpFlag() :: " + beforfileDownloadModel.isSftpFlag());
-		System.out.println("beforfileDownloadModel.isFileCopyFlag() :: " + beforfileDownloadModel.isFileCopyFlag());
-//		tableModel.setSchemaName(beforfileDownloadModel.getSchemaName());
-//		tableModel.setTableName(beforfileDownloadModel.getTableName());
 		_rbSFTP.setSelected(beforfileDownloadModel.isSftpFlag());
 		_rbFileCopy.setSelected(beforfileDownloadModel.isFileCopyFlag());
 		_tfSFTPHost.setText(beforfileDownloadModel.getHost());
@@ -260,7 +239,6 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 	 * @return main VBox
 	 */
 	private VBox createVBoxDialog() {
-		LOG.info("createVBoxDialog");
 
 		/* VBox for title area, separator, credits area, separator and OK button */
 		VBox vboxDialog = new VBox();
@@ -315,18 +293,10 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		_vboxSFTPConnection = createVBoxSFTPConnection();
 		vbox.getChildren().add(_vboxSFTPConnection);
 
-//		_vboxFileCopy = createVBoxFileCopy();
-//		_vboxFileCopy.setVisible(false);
-//		_vboxFileCopy.setManaged(false);
-//		vbox.getChildren().add(_vboxFileCopy);
-
-//		vbox.getChildren().add(new Separator());
-
 		Label lblSFTPTargetFilePath = createLabel("Target FilePath :", _tfTargetFilePath);
 		_tfTargetFilePath = new PastingTextField("");
 		_tfTargetFilePath.setText("");
 
-		// TODO 최창근 추가 - 다국어 지원을 위한 .properties 관리.
 		_btnTargetFileBrowser = new Button(sb.getConnectionDbFolderButton());
 		_btnTargetFileBrowser.setAlignment(Pos.BASELINE_RIGHT);
 		_btnTargetFileBrowser.setMinWidth(FxSizes.getNodeWidth(_btnTargetFileBrowser));
@@ -335,7 +305,6 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		HBox hboxSFTPTargetFilePath = createHBox(lblSFTPTargetFilePath, _tfTargetFilePath, _btnTargetFileBrowser);
 		vbox.getChildren().add(hboxSFTPTargetFilePath);
 
-//		getMaxLabelPrefWidth(_lblSourceFilePath, lblSFTPTargetFilePath);
 		getMaxLabelPrefWidth(lblSFTPTargetFilePath);
 
 		return vbox;
@@ -380,7 +349,6 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		return hbox;
 	}
 
-	//TODO 최창근 추가 - setText 테스트 후 삭제하기
 	private VBox createVBoxSFTPConnection() {
 		VBox vbox = new VBox();
 		vbox.setPadding(new Insets(dINNER_PADDING));
@@ -390,29 +358,21 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		_tfSFTPHost = new TextField();
 		Label lblSFTPHost = createLabel("Host :", _tfSFTPHost);
 		HBox hboxSFTPHost = createHBox(lblSFTPHost, _tfSFTPHost);
-		// TODO 테스트 후 삭제
-		_tfSFTPHost.setText("192.168.1.153");
 		vbox.getChildren().add(hboxSFTPHost);
 
 		_tfSFTPPort = new TextField();
 		Label lblSFTPPort = createLabel("Port :", _tfSFTPPort);
 		HBox hboxSFTPPort = createHBox(lblSFTPPort, _tfSFTPPort);
-		// TODO 테스트 후 삭제
-		_tfSFTPPort.setText("22");
 		vbox.getChildren().add(hboxSFTPPort);
 
 		_tfSFTPUser = new TextField();
 		Label lblSFTPUser = createLabel("User :", _tfSFTPUser);
 		HBox hboxSFTPUser = createHBox(lblSFTPUser, _tfSFTPUser);
-		// TODO 테스트 후 삭제
-		_tfSFTPUser.setText("dsrms_db");
 		vbox.getChildren().add(hboxSFTPUser);
 
 		_tfSFTPPassword = new PasswordField();
 		Label lblSFTPPassword = createLabel("Password :", _tfSFTPPassword);
 		HBox hboxSFTPPassword = createHBox(lblSFTPPassword, _tfSFTPPassword);
-		// TODO 테스트 후 삭제
-		_tfSFTPPassword.setText("1234");
 		vbox.getChildren().add(hboxSFTPPassword);
 
 		getMaxLabelPrefWidth(lblSFTPHost, lblSFTPPort, lblSFTPUser, lblSFTPPassword);
@@ -421,33 +381,6 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 
 		return vbox;
 	}
-
-	/*
-	private VBox createVBoxFileCopy() {
-		SiardBundle sb = SiardBundle.getSiardBundle();
-
-		VBox vbox = new VBox();
-		vbox.setPadding(new Insets(dINNER_PADDING));
-		vbox.setSpacing(dVSPACING);
-		vbox.setAlignment(Pos.TOP_LEFT);
-
-		_lblSourceFilePath = createLabel("Source File Path :", _tfSourceFilePath);
-
-		_tfSourceFilePath = new PastingTextField("");
-		_tfSourceFilePath.setText("");
-
-		// TODO 최창근 추가 - 다국어 지원을 위한 .properties 관리.
-		_btnSourceFileBrowser = new Button(sb.getConnectionDbFolderButton());
-		_btnSourceFileBrowser.setAlignment(Pos.BASELINE_RIGHT);
-		_btnSourceFileBrowser.setMinWidth(FxSizes.getNodeWidth(_btnSourceFileBrowser));
-		_btnSourceFileBrowser.setOnAction(this);
-
-		HBox hboxSourceFilePath = createHBox(_lblSourceFilePath, _tfSourceFilePath, _btnSourceFileBrowser);
-		vbox.getChildren().add(hboxSourceFilePath);
-
-		return vbox;
-	}
-	*/
 
 	private class ToggleChangeListener implements ChangeListener<Toggle> {
 		@Override
@@ -459,15 +392,10 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 				_vboxSFTPConnection.setManaged(true);
 				_vboxSFTPConnection.setVisible(true);
 
-//				_vboxFileCopy.setManaged(false);
-//				_vboxFileCopy.setVisible(false);
-
 			} else if (rb == _rbFileCopy) {
 				_vboxSFTPConnection.setManaged(false);
 				_vboxSFTPConnection.setVisible(false);
 
-//				_vboxFileCopy.setManaged(true);
-//				_vboxFileCopy.setVisible(true);
 			}
 
 		}
@@ -485,7 +413,6 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		hbox.getChildren().add(node);
 		double dWidth = 0.0;
 
-		// TODO 최창근 수정 - 동적 크기조절을 위한 설정
 		HBox.setHgrow(node, Priority.ALWAYS);
 		if (node instanceof TextField) // PasswordField is a TextField
 			dWidth = ((TextField) node).getPrefWidth();
@@ -602,7 +529,6 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 
 	private HBox createHBoxTableView() {
 
-		LOG.info("createHBoxTableView");
 		SiardBundle sb = SiardBundle.getSiardBundle();
 
 		HBox hBoxTableView = new HBox();
@@ -659,7 +585,7 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		_tvColumnList.setPlaceholder(new Label(sb.getListNoData()));
 
 		SiardConnection.getSiardConnection().loadDriver(tableModel.getConnectionUrl());
-		// DriverManager.setLoginTimeout(0);
+		DriverManager.setLoginTimeout(0);
 
 		try {
 			Connection conn = null;
@@ -676,7 +602,6 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 
 		hBoxTableView.getChildren().add(_tvColumnList);
 
-		// 최창근 추가 - 테이블 크기별로 리사이징
 		// autoResizeColumns(_tvColumnList);
 
 		HBox.setHgrow(_tvColumnList, Priority.ALWAYS);
@@ -747,7 +672,6 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 	 * @param stageOwner owner window.
 	 */
 	public static TableColumnDialog showTableColumnDialog(Stage stageOwner, TableModel tableModel, FileDownloadModel fileDownloadModel) {
-		LOG.info("showTableColumnDialog");
 		TableColumnDialog tcd = new TableColumnDialog(stageOwner, tableModel, fileDownloadModel);
 		tcd.showAndWait(); // until it is closed
 		return tcd;

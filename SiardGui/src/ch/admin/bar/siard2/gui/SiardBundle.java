@@ -495,7 +495,6 @@ public class SiardBundle extends FxBundle
       sApplication,String.valueOf(iResult),sOut,(sErr == null)?getValueDisplayErrorSystem():sErr);
   }
 
-  // 최창근 추가 - 테이블 컬럼명을 properties에 관리 => 다국어 지원
   public String getTableColumnName(String value) {
 	  return getProperty("history.column." + value);
   }
@@ -517,7 +516,6 @@ public class SiardBundle extends FxBundle
   public String getToolTipOptions() { return getProperty("tooltip.options"); }
   public String getToolTipInfo() { return getProperty("tooltip.info"); }
 
-  // 20200909 - 최창근 추가
   public String getTableTitle() { return getProperty("table.title"); }
   public String getTableAllChoose() { return getProperty("table.all.choose"); }
   public String getTableSchemaName() { return getProperty("table.schema.name"); }
@@ -536,5 +534,10 @@ public class SiardBundle extends FxBundle
   public String getHistoryUploadTitle() { return getProperty("history.update.title"); }
   public String getHistoryDetailTitle() { return getProperty("history.detail.title"); }
   public String getListNoData() { return getProperty("list.no.data"); }
+
+  public String getHistoryDivDownload() { return getProperty("history.div.download"); }
+  public String getHistoryDivUpload() { return getProperty("history.div.upload"); }
+  public String getHistoryExecuteReulstSuccess() { return getProperty("history.execute.result.success"); }
+  public String getHistoryExecuteReulstFail() { return getProperty("history.execute.result.fail"); }
 
 } /* SiardBundle */

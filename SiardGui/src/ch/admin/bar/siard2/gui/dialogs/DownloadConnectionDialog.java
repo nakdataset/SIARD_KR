@@ -24,7 +24,7 @@ import javafx.stage.Stage;
 /* ==================================================================== */
 /**
  * DownloadConnectionDialog for entering data to connect to a database for download.
- * 
+ *
  * @author Hartwig Thomas
  */
 public class DownloadConnectionDialog
@@ -32,7 +32,6 @@ public class DownloadConnectionDialog
 {
 	private static SiardBundle _sb = SiardBundle.getSiardBundle();
 
-	// 최창근 추가 - 로그
 	private static final Logger LOG = Logger.getLogger(DownloadConnectionDialog.class);
 
 	public List<String> chooseTableList;
@@ -41,7 +40,7 @@ public class DownloadConnectionDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * display the connection dialog.
-	 * 
+	 *
 	 * @param stageOwner owner window.
 	 * @param sConnectionUrl initial value for connection (JDBC) URL or null.
 	 * @param sDbUser initial value for user of database or null.
@@ -59,15 +58,12 @@ public class DownloadConnectionDialog
 		chooseTableList = new ArrayList<String>();
 		chooseColumnMap = new HashMap<String, FileDownloadModel>();
 
-		LOG.info("sConnectionUrl " + sConnectionUrl);
-		LOG.info("sDbUser " + sDbUser);
-
 	} /* constructor DownloadConnectionDialog */
 
 	/*------------------------------------------------------------------*/
 	/**
 	 * show download connection dialog and save entered values.
-	 * 
+	 *
 	 * @param stageOwner owner window.
 	 * @param sConnectionUrl initial value for connection (JDBC) URL or null.
 	 * @param sDbUser initial value for user of database or null.
@@ -78,15 +74,12 @@ public class DownloadConnectionDialog
 	public static DownloadConnectionDialog showDownloadConnectionDialog(
 		Stage stageOwner, String sConnectionUrl, String sDbUser)
 	{
-		LOG.info("DownloadConnectionDialog call!");
 		DownloadConnectionDialog dcd = new DownloadConnectionDialog(stageOwner, sConnectionUrl, sDbUser);
-		LOG.info("DownloadConnectionDialog before dcd.showAndWait()");
 
 		Rectangle2D rectScreen = FxSizes.getScreenBounds(); /* IntraDIGM */
 		dcd.setWidth(rectScreen.getWidth() * 0.4); /* IntraDIGM */
 
 		dcd.showAndWait();
-		LOG.info("DownloadConnectionDialog after dcd.showAndWait()");
 		return dcd;
 	} /* showDownloadConnectionDialog */
 

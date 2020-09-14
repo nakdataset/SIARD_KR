@@ -1,12 +1,12 @@
 /*
- * ========================================================================= 
- * UploadDialog for uploading a database from a SIARD archive. 
- * Application : Siard2 
- * Description : UploadDialog for uploading a database from a SIARD archive. 
+ * =========================================================================
+ * UploadDialog for uploading a database from a SIARD archive.
+ * Application : Siard2
+ * Description : UploadDialog for uploading a database from a SIARD archive.
  * Platform : Java 7, JavaFX 2.2
- * ------------------------------------------------------------------------- 
- * Copyright : Swiss Federal Archives, Berne, Switzerland, 2017 
- * Created : 29.06.2017, Hartwig Thomas, Enter AG, Rüti ZH 
+ * -------------------------------------------------------------------------
+ * Copyright : Swiss Federal Archives, Berne, Switzerland, 2017
+ * Created : 29.06.2017, Hartwig Thomas, Enter AG, Rüti ZH
  * =========================================================================
  */
 package ch.admin.bar.siard2.gui.dialogs;
@@ -40,7 +40,7 @@ import javafx.stage.Stage;
 /* ==================================================================== */
 /**
  * UploadDialog for uploading a database from a SIARD archive.
- * 
+ *
  * @author Hartwig Thomas
  */
 public class UploadDialog
@@ -49,7 +49,6 @@ public class UploadDialog
 	/** logger */
 	private static IndentLogger _il = IndentLogger.getIndentLogger(UploadDialog.class.getName());
 
-	// 최창근 추가 - 로그
 	private static final Logger LOG = Logger.getLogger(UploadDialog.class);
 
 	// upload task
@@ -62,15 +61,11 @@ public class UploadDialog
 		@Override
 		public void handle(WorkerStateEvent wse)
 		{
-			LOG.info("Upload.call.callback");
-
 			_btnCancel.setDisable(true);
 			UploadTask ut = (UploadTask) wse.getSource();
 			SiardBundle sb = SiardBundle.getSiardBundle();
 			String sMessage = null;
 
-			LOG.info("wse.getEventType() " + wse.getEventType());
-			// TODO 최창근 추가 - 재현 결과
 			String execute_result = "";
 			if (wse.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED) {
 				sMessage = sb.getUploadSuccessMessage();
@@ -162,7 +157,7 @@ public class UploadDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create the parameters VBox at the top of the dialog
-	 * 
+	 *
 	 * @param archive SIARD archive to be uploaded.
 	 * @param conn target database connection.
 	 * @param bMetaDataOnly true, if only schema is to be created.
@@ -228,7 +223,7 @@ public class UploadDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * display the upload dialog.
-	 * 
+	 *
 	 * @param stageOwner owner window.
 	 * @param archive SIARD archive to be uploaded.
 	 * @param conn database connection.
@@ -257,7 +252,7 @@ public class UploadDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * show upload dialog and start uploading.
-	 * 
+	 *
 	 * @param stageOwner owner window.
 	 * @param archive SIARD archive to be uploaded.
 	 * @param conn database connection.

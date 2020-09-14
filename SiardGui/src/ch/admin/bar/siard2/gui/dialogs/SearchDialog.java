@@ -38,14 +38,13 @@ import javafx.stage.Stage;
 /* ==================================================================== */
 /**
  * SearchDialog asks for a string to find in the table data.
- * 
+ *
  * @author Hartwig Thomas
  */
 public class SearchDialog
 	extends ScrollableDialog
 	implements EventHandler<ActionEvent>
 {
-	// 최창근 추가 - 로그
 	private static final Logger LOG = Logger.getLogger(SearchDialog.class);
 
 	private static final double dINNER_PADDING = 10.0;
@@ -126,7 +125,7 @@ public class SearchDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * handle pressed button.
-	 * 
+	 *
 	 * @param ae action event.
 	 */
 	@Override
@@ -140,7 +139,7 @@ public class SearchDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create a HBox with OK and Cancel button.
-	 * 
+	 *
 	 * @param sOk text on OK button.
 	 * @param sCancel text on Cancel button.
 	 * @return HBox.
@@ -169,7 +168,7 @@ public class SearchDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create the columns VBox
-	 * 
+	 *
 	 * @param sb string pool.
 	 * @param table table to be searched.
 	 * @return columns VBox with all/none button.
@@ -184,7 +183,7 @@ public class SearchDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create HBox with label and check box for match case.
-	 * 
+	 *
 	 * @param sMatchCaseLabel label.
 	 * @param dLabelWidth width of label.
 	 * @param bMatchCase initial value of match case.
@@ -210,7 +209,7 @@ public class SearchDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create HBox with label and text field for find string.
-	 * 
+	 *
 	 * @param sFindStringLabel label.
 	 * @param dLabelWidth width of label.
 	 * @param sFindString initial value of find string.
@@ -228,7 +227,6 @@ public class SearchDialog
 		_tfFindString.setMinWidth(FxSizes.fromEms(iTEXT_COLUMNS));
 		_tfFindString.textProperty().addListener(_scl);
 
-		// 최창근 추가 - 텍스트필드 가변크기 변환을 위한 설정
 		HBox.setHgrow(_tfFindString, Priority.ALWAYS);
 
 		Label lblFindString = new Label(sFindStringLabel);
@@ -244,7 +242,7 @@ public class SearchDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * create the main VBox of the dialog.
-	 * 
+	 *
 	 * @param sb string pool.
 	 * @param mt meta data of table to be searched.
 	 * @param sFindString initial find string.
@@ -283,7 +281,7 @@ public class SearchDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * constructor
-	 * 
+	 *
 	 * @param stageOwner owner window.
 	 * @param mt meta data of table to be searched.
 	 * @param sFindString initial find string value.
@@ -303,7 +301,7 @@ public class SearchDialog
 	/*------------------------------------------------------------------*/
 	/**
 	 * shows search dialog.
-	 * 
+	 *
 	 * @param stageOwner owner window.
 	 * @param mt meta data of table to be searched.
 	 * @param sFindString initial find string value.
@@ -313,8 +311,6 @@ public class SearchDialog
 	public static SearchDialog showSearchDialog(Stage stageOwner,
 		MetaTable mt, String sFindString, boolean bMatchCase)
 	{
-		LOG.info("showSearchDialog");
-
 		SearchDialog sd = new SearchDialog(stageOwner, mt, sFindString, bMatchCase);
 
 		sd.setResizable(false); /* IntraDIGM */

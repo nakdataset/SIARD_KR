@@ -74,7 +74,6 @@ public class SiardGui extends Application
 	/** logger */
 	private static IndentLogger _il = IndentLogger.getIndentLogger(SiardGui.class.getName());
 
-	// 최창근 추가 - 로그
 	private static final Logger LOG = Logger.getLogger(SiardGui.class);
 
 	/** return codes */
@@ -253,8 +252,6 @@ public class SiardGui extends Application
 		_il.enter();
 		Scene scene = getScene();
 		if (scene != null) {
-			LOG.info("terminateAction");
-
 			MainPane.getMainPane().setModal(null);
 			scene.setCursor(_cursor);
 		}
@@ -335,18 +332,13 @@ public class SiardGui extends Application
 	 * initialize language, size and state of stage from user data.
 	 */
 	private UserProperties loadProperties() {
-		LOG.info("");
 		_il.enter();
 		Rectangle2D rectScreen = FxSizes.getScreenBounds();
 		UserProperties up = UserProperties.getUserProperties();
 		up.load();
 		SiardBundle sb = SiardBundle.getSiardBundle();
-		// String sDefaultLanguage = Locale.getDefault().getLanguage();
 		String sDefaultLanguage = System.getProperty("user.language");
 		String sLanguage = up.getUiLanguage(sDefaultLanguage);
-
-		LOG.info("sDefaultLanguage " + sDefaultLanguage);
-		LOG.info("sLanguage " + sLanguage);
 
 		sb.setLanguage(up.getUiLanguage(sLanguage));
 		_stage.setFullScreen(false);
@@ -427,10 +419,9 @@ public class SiardGui extends Application
 	 * download action
 	 */
 	public void download(String sConnectionUrl, String sDbUser) {
-		LOG.info("sConnectionUrl " + sConnectionUrl);
-		LOG.info("sDbUser " + sDbUser);
+
 		UploadDownloadAction.newUploadDownloadAction().download(sConnectionUrl, sDbUser);
-		LOG.info("_archive " + _archive);
+
 		if (_archive != null) {
 			setTitle();
 			MainMenuBar.getMainMenuBar().restrict();
@@ -460,7 +451,6 @@ public class SiardGui extends Application
 	 * upload action
 	 */
 	public void upload() {
-		LOG.info("");
 		upload(null, null);
 	} /* upload */
 
@@ -469,7 +459,6 @@ public class SiardGui extends Application
 	 * open action
 	 */
 	public void openArchive(String sFile) {
-		LOG.info("");
 		swOpen.start();
 		OpenSaveAction.newOpenSaveAction().open(sFile);
 		swOpen.stop();
@@ -612,7 +601,6 @@ public class SiardGui extends Application
 	 * find (meta data) action
 	 */
 	public void find() {
-		LOG.info("find");
 		if (FindAction.newFindAction().find())
 			findNext();
 	} /* find */
@@ -646,7 +634,6 @@ public class SiardGui extends Application
 	 * search (current table primary data) action
 	 */
 	public void search() {
-		LOG.info("search");
 		if (SearchAction.newSearchAction().search(MainPane.getMainPane().getSelectedTable()))
 			searchNext();
 	} /* search */
@@ -664,7 +651,6 @@ public class SiardGui extends Application
 	 * install SIARD Suite
 	 */
 	public void install() {
-		LOG.info("install");
 		InstallUninstallHandler.getInstallUninstallHandler().install();
 	} /* install */
 
@@ -723,7 +709,6 @@ public class SiardGui extends Application
 		InfoDialog.showInfoDialog(getStage());
 	} /* info */
 
-	// 최창근 추가 - 사용자 이벤트 내역 화면 호출
 	/*------------------------------------------------------------------*/
 	/**
 	 * display history dialog
@@ -741,7 +726,6 @@ public class SiardGui extends Application
 	 * @param clsTableData class of table data to show.
 	 */
 	public void showDetails(Object oMetaData, Class<?> clsTableData) {
-		LOG.info("showDetails");
 		MainPane.getMainPane().showMetaData(oMetaData, clsTableData);
 	} /* showDetails */
 
@@ -816,21 +800,16 @@ public class SiardGui extends Application
 	 */
 	public boolean checkInstall() {
 		_il.enter();
-		LOG.info("");
+
 		boolean bInstall = false;
 		UserProperties up = UserProperties.getUserProperties();
 		SiardBundle sb = SiardBundle.getSiardBundle();
 		String sInstalledVersion = up.getInstalledVersion(null);
 
-		LOG.info("sInstalledVersion : " + sInstalledVersion);
-
 		int iResult = 0; // proceed
 		int iCompare = compareVersion(sInstalledVersion);
-		LOG.info("iCompare : " + iCompare);
 
-		LOG.info("iCompare > 0 : " + (iCompare > 0));
 		if (iCompare > 0) {
-			LOG.info("sInstalledVersion : " + sInstalledVersion);
 
 			try {
 				if (sInstalledVersion == null) {
@@ -838,7 +817,7 @@ public class SiardGui extends Application
 					iResult = MB.show(getStage(), sb.getInstalledNoneTitle(),
 						sb.getInstalledNoneMessage(up.getFile(), getVersion()),
 						sb.getYes(), sb.getNo());
-					LOG.info("iResult : " + iResult);
+
 				} else {
 					// display message, that an older version is installed
 					iResult = MB.show(getStage(), sb.getInstalledOlderTitle(),
@@ -869,16 +848,12 @@ public class SiardGui extends Application
 	 */
 	@Override
 	public void start(Stage stage) throws Exception {
-		LOG.info("stage : " + stage);
-
 		_il.enter(stage);
 		_stage = stage;
 		// load the user properties and display an installation note, if appropriate
 		UserProperties up = loadProperties();
 		_stage.setOnCloseRequest(this);
 		_bInitialInstall = checkInstall();
-
-		LOG.info("_bInitialInstall : " + _bInitialInstall);
 
 		_stageSplash = new Stage(StageStyle.UNDECORATED);
 		Scene scene = new Scene(SplashPane.newSplashPane());
@@ -936,7 +911,6 @@ public class SiardGui extends Application
 		throws Exception {
 		super.init();
 
-		LOG.info("init()");
 		_il.enter();
 		List<String> listParameters = getParameters().getRaw();
 		if (listParameters.size() > 0)
@@ -967,11 +941,8 @@ public class SiardGui extends Application
 	 * @param args optional file name of SIARD file to be opened. 테스트!!!!!!!!!!!!!!!!!!!!!!
 	 */
 	public static void main(String[] args) {
-		// 최창근 추가 - 로그, SQLite Set
 		initLogSetting();
 		initSQLiteSettingInit();
-
-		LOG.info("main");
 
 		int iReturn = iRETURN_ERROR;
 		for (int i = 0; i < args.length; i++)
@@ -1021,8 +992,6 @@ public class SiardGui extends Application
 	} /* makeLogDir */
 	/* E: log 디렉토리 생성 메서드 */
 
-
-	// 최창근 추가 - log4j 사용을 properties 위한 설정 메소드
 	private static void initLogSetting() {
 		try {
 			FileInputStream log4jRead = new FileInputStream("log4j.properties");
@@ -1034,11 +1003,9 @@ public class SiardGui extends Application
 		}
 	}
 
-	// 최창근 추가 - SQLite 사용을 위한 설정 메소드
 	private static void initSQLiteSettingInit() {
 		Connection conn = SQLiteConnection.getConnection();
 		try {
-			// 테이블 생성
 			Statement stmt = conn.createStatement();
 
 			String createTableHistory = "";
@@ -1053,7 +1020,6 @@ public class SiardGui extends Application
 			createTableHistory += "   EXECUTE_DATE text";
 			createTableHistory += ")";
 			stmt.execute(createTableHistory);
-			LOG.info("history 생성 완료");
 
 			String createTableHistoryDetail = "";
 			createTableHistoryDetail += "CREATE TABLE IF NOT EXISTS HISTORY_DETAIL(";
@@ -1064,7 +1030,6 @@ public class SiardGui extends Application
 			createTableHistoryDetail += "	TABLE_RECORD_COUNT integer";
 			createTableHistoryDetail += ")";
 			stmt.execute(createTableHistoryDetail);
-			LOG.info("historyDetail 생성 완료");
 
 		} catch (Exception e) {
 			e.printStackTrace();

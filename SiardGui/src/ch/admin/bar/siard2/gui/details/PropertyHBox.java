@@ -37,7 +37,6 @@ import javafx.stage.Stage;
  */
 public class PropertyHBox extends HBox implements ObservableValue<String>{
 
-  // 최창근 추가 - 로그
   private static final Logger LOG = Logger.getLogger(PropertyHBox.class);
 
   // padding inside
@@ -117,12 +116,6 @@ public class PropertyHBox extends HBox implements ObservableValue<String>{
   {
     super();
 
-    LOG.info("PropertyHBox");
-    LOG.info("PropertyHBox sProperty " + sProperty);
-    LOG.info("PropertyHBox sLabel " + sLabel);
-    LOG.info("PropertyHBox sValue " + sValue);
-    LOG.info("PropertyHBox bMultiline " + bMultiline);
-
     setPadding(new Insets(dINNER_PADDING));
     setSpacing(dHSPACING);
 
@@ -136,7 +129,6 @@ public class PropertyHBox extends HBox implements ObservableValue<String>{
     double dTextHeight = FxSizes.getNodeHeight(tf);
     tf.setMinHeight(dTextHeight);
 
-    LOG.info("!bMultiline " + !bMultiline);
     if (!bMultiline) {
     	_tic = tf;
 
@@ -166,7 +158,6 @@ public class PropertyHBox extends HBox implements ObservableValue<String>{
     else
       _tic.setStyle(FxStyles.sSTYLE_BACKGROUND_LIGHTGREY);
 
-    //TODO 최창근 추가 - 동적 크기 조절을 위한 설정 추가
     HBox.setHgrow(_tic, Priority.ALWAYS);
 
     _bMandatory = bMandatory;

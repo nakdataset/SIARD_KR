@@ -43,7 +43,6 @@ import javafx.scene.layout.VBox;
  */
 public class DetailsScrollPane extends ScrollPane implements EventHandler<ActionEvent>{
 
-  // 최창근 추가 - 로그
   private static final Logger LOG = Logger.getLogger(DetailsScrollPane.class);
 
   private VBox _vbox = null;
@@ -75,17 +74,12 @@ public class DetailsScrollPane extends ScrollPane implements EventHandler<Action
    */
   public void reset()
   {
-	LOG.info("reset()");
-	LOG.info("_oMetaData " + _oMetaData);
-
     _vbox.getChildren().remove(_oltv);
     _vbox.minHeightProperty().unbind();
     _oltv = null;
 
-    LOG.info("_clsTableData " + _clsTableData);
     if (_oMetaData instanceof MetaData)
     {
-      LOG.info("instanceof MetaData");
       MetaData md = (MetaData)_oMetaData;
       _mde.setMetaData(md);
       if (_clsTableData.equals(MetaSchema.class))
@@ -99,8 +93,6 @@ public class DetailsScrollPane extends ScrollPane implements EventHandler<Action
     }
     else if (_oMetaData instanceof MetaSchema)
     {
-      LOG.info("instanceof MetaSchema");
-      LOG.info("_clsTableData " + _clsTableData);
       MetaSchema ms = (MetaSchema)_oMetaData;
       _mde.setMetaData(ms);
       if (_clsTableData.equals(MetaType.class))
@@ -114,14 +106,12 @@ public class DetailsScrollPane extends ScrollPane implements EventHandler<Action
     }
     else if (_oMetaData instanceof MetaType)
     {
-      LOG.info("instanceof MetaType");
       MetaType mt = (MetaType)_oMetaData;
       _mde.setMetaData(mt);
       _oltv = MetaDataTableFactory.newMetaAttributesTableView(mt);
     }
     else if (_oMetaData instanceof MetaTable)
     {
-      LOG.info("instanceof MetaTable");
       MetaTable mt = (MetaTable)_oMetaData;
       _mde.setMetaData(mt);
       if (_clsTableData.equals(MetaColumn.class))
@@ -133,21 +123,18 @@ public class DetailsScrollPane extends ScrollPane implements EventHandler<Action
     }
     else if (_oMetaData instanceof MetaView)
     {
-      LOG.info("instanceof MetaView");
       MetaView mv = (MetaView)_oMetaData;
       _mde.setMetaData(mv);
       _oltv = MetaDataTableFactory.newMetaColumnsTableView(mv);
     }
     else if (_oMetaData instanceof MetaRoutine)
     {
-      LOG.info("instanceof MetaRoutine");
       MetaRoutine mr = (MetaRoutine)_oMetaData;
       _mde.setMetaData(mr);
       _oltv = MetaDataTableFactory.newMetaParametersTableView(mr);
     }
     else if (_oMetaData instanceof MetaColumn)
     {
-      LOG.info("instanceof MetaColumn");
       MetaColumn mc = (MetaColumn)_oMetaData;
       _mde.setMetaData(mc);
       try
@@ -159,7 +146,6 @@ public class DetailsScrollPane extends ScrollPane implements EventHandler<Action
     }
     else if (_oMetaData instanceof MetaField)
     {
-      LOG.info("instanceof MetaField");
       MetaField mf = (MetaField)_oMetaData;
       _mde.setMetaData(mf);
       try
@@ -171,7 +157,6 @@ public class DetailsScrollPane extends ScrollPane implements EventHandler<Action
     }
     else if ((_oMetaData instanceof RecordExtract))
     {
-      LOG.info("instanceof RecordExtract");
       RecordExtract re = (RecordExtract)_oMetaData;
       _mde.setMetaData(re);
       try { _oltv = new RecordExtractTableView(re); }

@@ -47,7 +47,6 @@ public class EraserGui extends JFrame implements ActionListener
 
 	EraserMain	main		= null;
 
-//	/* 20200703] 최창근 이미지경로 수정 */
 //	JButton		btnlist		= new JButton(new ImageIcon("images/script_list.jpg"));
 //	JButton		btncreate	= new JButton(new ImageIcon("images/script_create.jpg"));
 //	JButton		btnhistory	= new JButton(new ImageIcon("images/script_history.jpg"));
