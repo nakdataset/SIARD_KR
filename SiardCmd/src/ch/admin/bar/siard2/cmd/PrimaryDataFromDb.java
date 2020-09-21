@@ -747,7 +747,6 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 
     	}
 
-
     if (cancelRequested())
       throw new IOException("\r\nDownload of primary data cancelled!");
     System.out.println("\r\nDownload terminated successfully.");
