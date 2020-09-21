@@ -231,8 +231,9 @@ public class ReportPrintDialog extends ScrollableDialog implements EventHandler<
 	@SuppressWarnings("rawtypes")
 	private String setHistoryModelConvertToJsonString() {
 		 StringBuffer jsonBuf = new StringBuffer();
-	      jsonBuf.append("var jsonObj=[");
-	  	  jsonBuf.append("{");
+//	      jsonBuf.append("var jsonObj=[");
+//		 jsonBuf.append("{");
+	      jsonBuf.append("var jsonObj={");
 	  	  jsonBuf.append("dbConUrl:\""+historyModel.getDb_con_url()+"\"");
 	  	  jsonBuf.append(",dbName:\""+historyModel.getDb_name().replaceAll("\n", "\\n").replaceAll("\r", "\\r")+"\"");
 	  	  jsonBuf.append(",executeDiv:\""+historyModel.getDiv()+"\"");
@@ -240,6 +241,16 @@ public class ReportPrintDialog extends ScrollableDialog implements EventHandler<
 	  	  jsonBuf.append(",executeResult:\""+historyModel.getExecute_result()+"\"");
 	  	  jsonBuf.append(",schemaName:\""+historyModel.getSchema_name()+"\"");
 	  	  jsonBuf.append(",tableCount:\""+historyModel.getTable_count()+"\"");
+
+	  	  jsonBuf.append(",dbConUrlTitle:\""+SiardBundle.getSiardBundle().getTableColumnName("db_con_url")+"\"");
+	  	  jsonBuf.append(",dbNameTitle:\""+SiardBundle.getSiardBundle().getTableColumnName("db_name")+"\"");
+
+	  	  //TODO text properties 로 변경
+	  	  jsonBuf.append(",executeDivTitle:\"" + "구분" + "\"");
+	  	  jsonBuf.append(",executeDateTitle:\""+SiardBundle.getSiardBundle().getTableColumnName("execute_date")+"\"");
+	  	  jsonBuf.append(",executeResultTitle:\""+SiardBundle.getSiardBundle().getTableColumnName("execute_result")+"\"");
+	  	  jsonBuf.append(",schemaNameTitle:\""+SiardBundle.getSiardBundle().getTableColumnName("schema_name")+"\"");
+	  	  jsonBuf.append(",tableCountTitle:\""+SiardBundle.getSiardBundle().getTableColumnName("table_count")+"\"");
 
 	  	  //이력 상세
 	  	  StringBuilder sbHistoryDetail = new StringBuilder();
@@ -253,14 +264,16 @@ public class ReportPrintDialog extends ScrollableDialog implements EventHandler<
 
 				sbHistoryDetail.append("<table style='width: 100%; border: 1px; border-color: black; border-style: solid;' border='1'>");
 				sbHistoryDetail.append("<colgroup>");
-				sbHistoryDetail.append("	<col width='60%' />");
+				sbHistoryDetail.append("	<col width='50%' />");
 				sbHistoryDetail.append("	<col width='20%' />");
 				sbHistoryDetail.append("	<col width='20%' />");
+				sbHistoryDetail.append("	<col width='10%' />");
 				sbHistoryDetail.append("</colgroup>");
 				sbHistoryDetail.append("<tr>");
-				sbHistoryDetail.append("<th>테이블명</th>");
-				sbHistoryDetail.append("<th>테이블 컬럼 수</th>");
-				sbHistoryDetail.append("<th>테이블 레코드 수</th>");
+				sbHistoryDetail.append("<th>" + SiardBundle.getSiardBundle().getTableColumnName("table_name") + "</th>");
+				sbHistoryDetail.append("<th>" + SiardBundle.getSiardBundle().getTableColumnName("table_column_count") + "</th>");
+				sbHistoryDetail.append("<th>" + SiardBundle.getSiardBundle().getTableColumnName("table_record_count") + "</th>");
+				sbHistoryDetail.append("<th>" + SiardBundle.getSiardBundle().getTableColumnName("execute_result") + "</th>");
 				sbHistoryDetail.append("</tr>");
 
 				for(int i=0; i<resultList.size(); i++) {
@@ -271,6 +284,7 @@ public class ReportPrintDialog extends ScrollableDialog implements EventHandler<
 					sbHistoryDetail.append("<td align='left'>"+historyDetailModel.getTable_name()+"</td>");
 					sbHistoryDetail.append("<td align='right'>"+historyDetailModel.getTable_column_count()+"</td>");
 					sbHistoryDetail.append("<td align='right'>"+historyDetailModel.getTable_record_count()+"</td>");
+					sbHistoryDetail.append("<td align='center'>"+historyDetailModel.getExecute_result()+"</td>");
 					sbHistoryDetail.append("</tr>");
 				}
 
@@ -282,7 +296,7 @@ public class ReportPrintDialog extends ScrollableDialog implements EventHandler<
 
 	      jsonBuf.append(",historyDetailTable:\""+sbHistoryDetail.toString()+"\"");
 	  	  jsonBuf.append("}");
-	      jsonBuf.append("]");
+//	      jsonBuf.append("]");
 
 	      return jsonBuf.toString();
 	}

@@ -12,16 +12,18 @@ public class HistoryDetailModel {
 	private SimpleStringProperty table_name;
 	private SimpleIntegerProperty table_column_count;
 	private SimpleIntegerProperty table_record_count;
+	private SimpleStringProperty execute_result;
 
 	public HistoryDetailModel(){}
 
-	public HistoryDetailModel(SimpleIntegerProperty history_detail_idx, SimpleIntegerProperty history_idx, SimpleStringProperty table_name, SimpleIntegerProperty table_column_count, SimpleIntegerProperty table_record_count) {
+	public HistoryDetailModel(SimpleIntegerProperty history_detail_idx, SimpleIntegerProperty history_idx, SimpleStringProperty table_name, SimpleIntegerProperty table_column_count, SimpleIntegerProperty table_record_count, SimpleStringProperty execute_result) {
 		super();
 		this.history_detail_idx = history_detail_idx;
 		this.history_idx = history_idx;
 		this.table_name = table_name;
 		this.table_column_count = table_column_count;
 		this.table_record_count = table_record_count;
+		this.execute_result = execute_result;
 	}
 
 	public int getHistory_detail_idx() {
@@ -64,9 +66,18 @@ public class HistoryDetailModel {
 		this.table_record_count = table_record_count;
 	}
 
+	public String getExecute_result() {
+		return execute_result.get();
+	}
+
+	public void setExecute_result(SimpleStringProperty execute_result) {
+		this.execute_result = execute_result;
+	}
+
 	@Override
 	public String toString() {
-		return "HistoryDetailModel [history_detail_idx=" + history_detail_idx + ", history_idx=" + history_idx + ", table_name=" + table_name + ", table_column_count=" + table_column_count + ", table_record_count=" + table_record_count + "]";
+		return "HistoryDetailModel [history_detail_idx=" + history_detail_idx + ", history_idx=" + history_idx + ", table_name=" + table_name + ", table_column_count=" + table_column_count + ", table_record_count=" + table_record_count
+			+ ", execute_result=" + execute_result + "]";
 	}
 
 	public void fromMap(Map map) {
@@ -75,6 +86,7 @@ public class HistoryDetailModel {
 		setTable_name(getSimpleStringProperty(map, "TABLE_NAME"));
 		setTable_column_count(getSimpleIntegerProperty(map, "TABLE_COLUMN_COUNT"));
 		setTable_record_count(getSimpleIntegerProperty(map, "TABLE_RECORD_COUNT"));
+		setExecute_result(getSimpleStringProperty(map, "EXECUTE_RESULT"));
 	}
 
 	private SimpleIntegerProperty getSimpleIntegerProperty(Map map, String key) {
