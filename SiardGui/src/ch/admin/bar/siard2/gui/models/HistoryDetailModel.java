@@ -58,6 +58,7 @@ public class HistoryDetailModel {
 		this.table_column_count = table_column_count;
 	}
 
+
 	public int getTable_record_count() {
 		return table_record_count.get();
 	}
