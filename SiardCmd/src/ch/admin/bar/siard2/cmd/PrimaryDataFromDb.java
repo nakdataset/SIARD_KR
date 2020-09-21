@@ -745,6 +745,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 
     		try { dao.insertHistory(params); }catch(Exception e) {}
 
+
     	}
 
     if (cancelRequested())
