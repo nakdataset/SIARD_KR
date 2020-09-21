@@ -1,73 +1,93 @@
 <!DOCTYPE html>
 <html>
-<head>                                                                                                                         
-	<META http-equiv="Content-Type" content="text/html; charset=utf-8">                                                            
-	<title>행정정보데이터세트 실행 결과</title>                                                                                
-	<meta charset="utf-8">                                                                                                         
-	<style>                                                                                                                        
-		    dl { margin: 0; padding: 0; }                                                                                         
-		    dt, dd { padding: 1mm; margin-top: 0; margin-bottom: 0; }                                                             
-				dt /* puts dt and dd on same line and right-adjusts dt */                                                         
-				{                                                                                                                 
-			    float: left;                                                                                                      
-			    width: 7em;                                                                                                      
-			    text-align: right;                                                                                                
-			  }                                                                                                                   
-			  dt:after { content: " : "; }                                                                                          
-			  dd:after /* handles empty values */                                                                                 
-			  {                                                                                                                   
-			    content: " "; /* nbsp */                                                                                          
-			  }                                                                                                                   
-			  /* extend header styles beyond h6 */                                                                                
-			  h1 { margin-left:  0mm; display: block; font-size: 2.0em; font-weight: bold; margin-top: 0; margin-bottom: 1em; text-align: center;}     
-			  h2 { margin-left:  5mm; display: block; font-size: 1.8em; font-weight: bold; margin-top: 0; margin-bottom: 0; }
-			  
-			  div {margin: 0px auto;}         
+<head>
+	<META http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>행정정보데이터세트 실행 결과</title>
+	<meta charset="utf-8">
+	<style>
+		    dl { margin: 0; padding: 0; }
+		    dt, dd { padding: 1mm; margin-top: 0; margin-bottom: 0; }
+		    /* puts dt and dd on same line and right-adjusts dt */
+			dt{
+				float: left;
+				width: 7em;
+				text-align: right;
+			}
+			dt:after { content: " : "; }
+			/* handles empty values */
+			dd:after{
+				content: " "; /* nbsp */
+			}
+			/* extend header styles beyond h6 */
+			h1 { margin-left:  0mm; display: block; font-size: 2.0em; font-weight: bold; margin-top: 0; margin-bottom: 1em; text-align: center;}
+			h2 { margin-left:  5mm; display: block; font-size: 1.8em; font-weight: bold; margin-top: 0; margin-bottom: 0; }
+			div {margin: 0px auto;}
 /*   	    	  table { border: 1px; border-color: black; }        */
-	</style>    
-	<script type="text/javascript">	
-		function requestHistoryModelFromFx() {
-			setTimeout(function(){javaConnector.sendHistoryModelToJs()}, 100);
-	    };
-	
-	    var jsConnector = {
-	        setHistoryModel: function (historyModel) {
-	        	var json = eval(historyModel);
-	            document.getElementById('dbConUrl').innerHTML = json[0].dbConUrl;
-	            document.getElementById('dbName').innerHTML = json[0].dbName;
-	            document.getElementById('executeDiv').innerHTML = json[0].executeDiv;
-	            document.getElementById('executeDate').innerHTML = json[0].executeDate;
-	            document.getElementById('executeResult').innerHTML = json[0].executeResult;
-	            document.getElementById('schemaName').innerHTML = json[0].schemaName;
-	            document.getElementById('tableCount').innerHTML = json[0].tableCount;
-	            document.getElementById('historyDetailTable').innerHTML = json[0].historyDetailTable; 
-	        }
-	    };
-	
-	    function getJsConnector() {
-	        return jsConnector;
-	    };
-	    
-	    window.onload = requestHistoryModelFromFx;
-	</script>                                                                                                            
-</head>                                                                                                                        
-<body>                      
-<h1>행정정보데이터세트 실행 결과</h1>                                                                                                   
-<dl>                                                                                                                           
-<dt>DB 접속URL</dt>                                                                                                          
-<dd id="dbConUrl"></dd>                                                                                                                   
-<dt>DB명</dt>                                                                                                         
-<dd id="dbName"></dd>                                                                                                                 
-<dt>구분</dt>                                                                                                           
-<dd id="executeDiv"></dd>                                                                                                                      
-<dt>실행 일시</dt>                                                                                                              
-<dd id="executeDate"></dd>                                                                                                                      
-<dt>실행 결과</dt>                                                                                                      
-<dd id="executeResult"></dd>                                                                                                                      
-<dt>스키마</dt>                                                                                                      
-<dd id="schemaName"></dd>                                                                                                                      
-<dt>테이블 수</dt>                                                                                                      
-<dd id="tableCount"></dd>                                                                                                                      
+	</style>
+</head>
+<body>
+<h1>행정정보데이터세트 실행 결과</h1>
+<dl>
+	<dt id="dbConUrlTitle">DB 접속URL</dt>
+	<dd id="dbConUrl"></dd>
+	<dt id="dbNameTitle">DB명</dt>
+	<dd id="dbName"></dd>
+	<dt id="executeDivTitle">구분</dt>
+	<dd id="executeDiv"></dd>
+	<dt id="executeDateTitle">실행 일시</dt>
+	<dd id="executeDate"></dd>
+	<dt id="executeResultTitle">실행 결과</dt>
+	<dd id="executeResult"></dd>
+	<dt id="schemaNameTitle">스키마</dt>
+	<dd id="schemaName"></dd>
+	<dt id="tableCountTitle">테이블 수</dt>
+	<dd id="tableCount"></dd>
 </dl>
-<div id="historyDetailTable">
-</div>
+<div id="historyDetailTable"></div>
+</body>
+<script type="text/javascript">
+    window.onload = requestHistoryModelFromFx;
+    
+	function requestHistoryModelFromFx() {
+		// BrowserRegioin.java -> javaConnector.sendHistoryModelToJs()
+		setTimeout(function(){javaConnector.sendHistoryModelToJs()}, 100);
+    };
+
+    var jsConnector = {
+		// BrowserRegioin.java -> javaConnector.sendHistoryModelToJs() -> javascriptConnector.call("setHistoryModel", new Object[] {"jsonObj"});
+    	setHistoryModel: function (historyModel) {
+        	var json = eval(historyModel);
+        	
+        	for(key in json) {
+//         		eval("document.getElementById(" + key + ").innerHTML = json[0]." + key);
+        		document.getElementById(key).innerHTML = json[key];
+    		}
+        	
+        	/*
+            document.getElementById('dbConUrl').innerHTML = json[0].dbConUrl;
+            document.getElementById('dbName').innerHTML = json[0].dbName;
+            document.getElementById('executeDiv').innerHTML = json[0].executeDiv;
+            document.getElementById('executeDate').innerHTML = json[0].executeDate;
+            document.getElementById('executeResult').innerHTML = json[0].executeResult;
+            document.getElementById('schemaName').innerHTML = json[0].schemaName;
+            document.getElementById('tableCount').innerHTML = json[0].tableCount;
+            document.getElementById('historyDetailTable').innerHTML = json[0].historyDetailTable;
+            
+            document.getElementById('dbConUrlTitle').innerHTML = json[0].dbConUrlTitle;
+            document.getElementById('dbNameTitle').innerHTML = json[0].dbNameTitle;
+            document.getElementById('executeDivTitle').innerHTML = json[0].executeDivTitle;
+            document.getElementById('executeDateTitle').innerHTML = json[0].executeDateTitle;
+            document.getElementById('executeResultTitle').innerHTML = json[0].executeResultTitle;
+            document.getElementById('schemaNameTitle').innerHTML = json[0].schemaNameTitle;
+            document.getElementById('tableCountTitle').innerHTML = json[0].tableCountTitle;
+            document.getElementById('historyDetailTableTitle').innerHTML = json[0].historyDetailTableTitle;
+            */
+        }
+    };
+
+    function getJsConnector() {
+        return jsConnector;
+    };
+    
+</script>
+</html>
