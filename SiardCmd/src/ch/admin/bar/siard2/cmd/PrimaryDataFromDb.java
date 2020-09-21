@@ -31,6 +31,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -50,6 +51,7 @@ import ch.admin.bar.siard2.api.Value;
 import ch.admin.bar.siard2.api.generated.CategoryType;
 import ch.admin.bar.siard2.api.primary.FileDownloadModel;
 import ch.admin.bar.siard2.cmd.util.FileUtils;
+import ch.config.db.HistoryDAO;
 import ch.enterag.sqlparser.identifier.QualifiedId;
 import ch.enterag.utils.StopWatch;
 import ch.enterag.utils.background.Progress;
@@ -196,6 +198,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
   private void getRecord(ResultSet rs, Record record, Map<String, Long> map)
     throws IOException, SQLException
   {
+
     ResultSetMetaData rsmd = rs.getMetaData();
     if (rsmd.getColumnCount() != record.getCells())
       throw new IOException("Invalid number of result columns found!");
@@ -442,61 +445,72 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 		map.put("executeTime", (long) 0);
 		map.put("fileCount", (long) 0);
 
-    while(rs.next() && (!cancelRequested()))
-    {
-    	swCreate.start();
-      Record record = rr.create();
-      swCreate.stop();
-      swGet.start();
+		try {
 
-      /***
-      if (qiTable.getName().equals("Products") && (lRecord >=4) && (lRecord <= 5))
-      {
-        Cell cell = record.getCell(0);
-        MetaColumn mc = cell.getMetaColumn();
-        System.out.println("start: "+String.valueOf(mc.getMetaFields()));
-      }
-      ***/
-      getRecord(rs,record, map);
-      /***
-      if (qiTable.getName().equals("Products") && (lRecord >=4) && (lRecord <= 5))
-      {
-      	for (int iCell = 0; iCell < record.getCells(); iCell++)
-      	{
-      		Cell cell = record.getCell(iCell);
-      		MetaColumn mc = cell.getMetaColumn();
-    			Object oCell = cell.getObject();
-      		if (mc.getCardinality() > 0)
-      		{
-      			System.out.println(String.valueOf(iCell)+": "+mc.getName()+" "+String.valueOf(oCell)+": "+((oCell == null)?"null":oCell.getClass().getName())+" "+mc.getCardinality());
-      			for (int iElement = 0; iElement < cell.getElements(); iElement++)
-      			{
-      				Field field = cell.getElement(iElement);
-      				Object oField = field.getObject();
-      				System.out.println("  "+String.valueOf(iElement)+" "+String.valueOf(oField));
-      			}
-      		}
-      		else
-      			System.out.println(String.valueOf(iCell)+": "+mc.getName()+" "+String.valueOf(oCell)+": "+((oCell == null)?"null":oCell.getClass().getName()));
-      	}
-    		Cell cell = record.getCell(0);
-        MetaColumn mc = cell.getMetaColumn();
-        System.out.println("stop: "+String.valueOf(mc.getMetaFields()));
-      }
-      ***/
-      swGet.stop();
-      swPut.start();
-      rr.put(record);
-      swPut.stop();
-      lRecord++;
-      if ((lRecord % _lREPORT_RECORDS) == 0)
-      {
-        System.out.println("    Record "+String.valueOf(lRecord)+" ("+sw.formatRate(rr.getByteCount()-lBytesStart,sw.stop())+" kB/s)");
-      	lBytesStart = rr.getByteCount();
-      	sw.start();
-      }
-      incDownloaded();
-    }
+			while(rs.next() && (!cancelRequested()))
+	    {
+	    	swCreate.start();
+	      Record record = rr.create();
+	      swCreate.stop();
+	      swGet.start();
+
+	      /***
+	      if (qiTable.getName().equals("Products") && (lRecord >=4) && (lRecord <= 5))
+	      {
+	        Cell cell = record.getCell(0);
+	        MetaColumn mc = cell.getMetaColumn();
+	        System.out.println("start: "+String.valueOf(mc.getMetaFields()));
+	      }
+	      ***/
+	      getRecord(rs,record, map);
+
+
+
+
+	      /***
+	      if (qiTable.getName().equals("Products") && (lRecord >=4) && (lRecord <= 5))
+	      {
+	      	for (int iCell = 0; iCell < record.getCells(); iCell++)
+	      	{
+	      		Cell cell = record.getCell(iCell);
+	      		MetaColumn mc = cell.getMetaColumn();
+	    			Object oCell = cell.getObject();
+	      		if (mc.getCardinality() > 0)
+	      		{
+	      			System.out.println(String.valueOf(iCell)+": "+mc.getName()+" "+String.valueOf(oCell)+": "+((oCell == null)?"null":oCell.getClass().getName())+" "+mc.getCardinality());
+	      			for (int iElement = 0; iElement < cell.getElements(); iElement++)
+	      			{
+	      				Field field = cell.getElement(iElement);
+	      				Object oField = field.getObject();
+	      				System.out.println("  "+String.valueOf(iElement)+" "+String.valueOf(oField));
+	      			}
+	      		}
+	      		else
+	      			System.out.println(String.valueOf(iCell)+": "+mc.getName()+" "+String.valueOf(oCell)+": "+((oCell == null)?"null":oCell.getClass().getName()));
+	      	}
+	    		Cell cell = record.getCell(0);
+	        MetaColumn mc = cell.getMetaColumn();
+	        System.out.println("stop: "+String.valueOf(mc.getMetaFields()));
+	      }
+	      ***/
+	      swGet.stop();
+	      swPut.start();
+	      rr.put(record);
+	      swPut.stop();
+	      lRecord++;
+	      if ((lRecord % _lREPORT_RECORDS) == 0)
+	      {
+	        System.out.println("    Record "+String.valueOf(lRecord)+" ("+sw.formatRate(rr.getByteCount()-lBytesStart,sw.stop())+" kB/s)");
+	      	lBytesStart = rr.getByteCount();
+	      	sw.start();
+	      }
+	      incDownloaded();
+
+	    }
+
+		}catch(Exception e) {
+
+		}
 
 /*
 		String hms = String.format("%2d:%02d:%02d",
@@ -546,8 +560,8 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
    * @throws SQLException if a database error occurred.
    */
   @SuppressWarnings("unchecked")
-	private void getSchema(Schema schema)
-    throws IOException, SQLException
+	private void getSchema(Schema schema, String history_idx)
+    throws IOException, SQLException, Exception
   {
   	String schema_name = schema.getMetaSchema().getName();
     _il.enter(schema_name);
@@ -572,73 +586,102 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 			}
 		}
 
+		HistoryDAO dao = new HistoryDAO();
+		Map<String, String> tableParams = null;
 		boolean is_schema_all = false;
-    for (int iTable = 0; (iTable < schema.getTables()) && (!cancelRequested()); iTable++)
-    {
-      Table table = schema.getTable(iTable);
 
-      //특정 스키마에 대한 전체 테이블 (*)다운로드 처리
-      if(!is_schema_all && schemaSelList.size() > 0) {
-      	for (int j = 0; j < schemaSelList.size(); j++)
-      	{
-      		if(schema_name.toUpperCase().equals(schemaSelList.get(j).toUpperCase())) {
-      			is_schema_all = true;
 
-      			schemaSelList.remove(j);
-      			break;
-      		}
-      	}
-      }
+			for (int iTable = 0; (iTable < schema.getTables()) && (!cancelRequested()); iTable++)
+	    {
+	    	try {
 
-      //테이블 선택 로직
-			// 테이블을 명시하면
-			// 해당 테이블만 내려 받는다.
-			if(is_table_select && !is_schema_all)
-			{
-				MetaTable meta_table = table.getMetaTable();
+	    		try {
 
-				for(int ix = 0; ix < list.size(); ix++)
-				{
-					String name = list.get(ix);
-				  //테이블에 schema 추가함.
-					String schemaName = "";
-					String tableName = "";
+			      Table table = schema.getTable(iTable);
 
-					//"."이 없으면 스키마가 없는것으로 간주함.
-					if(name.indexOf(".") < 0) {
-						throw new IOException("스키마가 없는 테이블이 존재합니다. 테이블(t) 파라미터값 입력 형식은 \"스키마.테이블\"입니다. \n테이블:"+name + "\n스키마 및 테이블에 대한 전체 다운로드 시에서는 \"all\"을 입력해주세요.");
-					}
+			      tableParams = new LinkedHashMap<String, String>();
+			      tableParams.put("history_idx", history_idx);
+						tableParams.put("table_name", table.getMetaTable().getName());
+						tableParams.put("table_column_count", table.getMetaTable().getMetaColumns() + "");
+						tableParams.put("table_record_count", table.getMetaTable().getRows() + "");
 
-					StringTokenizer st = new StringTokenizer(name, ".");
+			      //특정 스키마에 대한 전체 테이블 (*)다운로드 처리
+			      if(!is_schema_all && schemaSelList.size() > 0) {
+			      	for (int j = 0; j < schemaSelList.size(); j++)
+			      	{
+			      		if(schema_name.toUpperCase().equals(schemaSelList.get(j).toUpperCase())) {
+			      			is_schema_all = true;
 
-					int index = 0;
-					while (st.hasMoreElements())
-      		{
-      			String parmName = (String) st.nextElement();
-      			if(parmName != null && !parmName.isEmpty()) {
-      				if(index == 0) { //스키마명
-      					schemaName = parmName.trim().toUpperCase();
-      				} else if(index == 1) {//테이블명
-      					tableName = parmName.trim().toUpperCase();
-      				}
-      			}
-      			index++;
-      		}
+			      			schemaSelList.remove(j);
+			      			break;
+			      		}
+			      	}
+			      }
 
-				  //스키마와 테이블명이 모두 같아야 함.
-					if(meta_table.getName().toUpperCase().equals(tableName)
-							&& schema_name.toUpperCase().equals(schemaName))
-					{
-						getTable(table);
-						break;
-					}
-				}
+			      //테이블 선택 로직
+						// 테이블을 명시하면
+						// 해당 테이블만 내려 받는다.
+
+			      //테이블에 schema 추가함.
+			      String schemaName = "";
+			      String tableName = "";
+
+						if(is_table_select && !is_schema_all)
+						{
+							MetaTable meta_table = table.getMetaTable();
+
+							for(int ix = 0; ix < list.size(); ix++)
+							{
+								String name = list.get(ix);
+
+								//"."이 없으면 스키마가 없는것으로 간주함.
+								if(name.indexOf(".") < 0) {
+									throw new IOException("스키마가 없는 테이블이 존재합니다. 테이블(t) 파라미터값 입력 형식은 \"스키마.테이블\"입니다. \n테이블:"+name + "\n스키마 및 테이블에 대한 전체 다운로드 시에서는 \"all\"을 입력해주세요.");
+								}
+
+								StringTokenizer st = new StringTokenizer(name, ".");
+
+								int index = 0;
+								while (st.hasMoreElements())
+			      		{
+			      			String parmName = (String) st.nextElement();
+			      			if(parmName != null && !parmName.isEmpty()) {
+			      				if(index == 0) { //스키마명
+			      					schemaName = parmName.trim().toUpperCase();
+			      				} else if(index == 1) {//테이블명
+			      					tableName = parmName.trim().toUpperCase();
+			      				}
+			      			}
+			      			index++;
+			      		}
+
+							  //스키마와 테이블명이 모두 같아야 함.
+								if(meta_table.getName().toUpperCase().equals(tableName)
+										&& schema_name.toUpperCase().equals(schemaName))
+								{
+									getTable(table);
+									break;
+								}
+							}
+						}
+						else
+						{
+							getTable(table);
+						}
+
+						tableParams.put("execute_result", "1");
+
+	    		}catch(Exception e) {
+	    			tableParams.put("execute_result", "0");
+
+	    		}
+
+	    		dao.insertHistoryDetail(tableParams);
+	    	}catch(Exception e) {
+	    		e.printStackTrace();
+	    	}
 			}
-			else
-			{
-				getTable(table);
-			}
-		}
+
     _il.exit();
   } /* getSchema */
 
@@ -676,12 +719,34 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
     _lRecordsPercent = (_lRecordsTotal+99)/100;
     _lRecordsDownloaded = 0;
 
-    /* now download */
-    for (int iSchema = 0; (iSchema < _archive.getSchemas()) && (!cancelRequested()); iSchema++)
-    {
-      Schema schema = _archive.getSchema(iSchema);
-      getSchema(schema);
-    }
+    String history_idx = "";
+    Map<String, String> params = new LinkedHashMap<String, String>();
+    HistoryDAO dao = new HistoryDAO();
+
+    	/* now download */
+    	for (int iSchema = 0; (iSchema < _archive.getSchemas()) && (!cancelRequested()); iSchema++)
+    	{
+    		Schema schema = _archive.getSchema(iSchema);
+
+    		try {
+    			history_idx = dao.selectMaxHistoryIdx();
+    			params.put("history_idx", history_idx);
+    			params.put("div", "0001");
+    			params.put("db_name", schema.getParentArchive().getMetaData().getDatabaseProduct());
+    			params.put("db_con_url", schema.getParentArchive().getMetaData().getConnection());
+    			params.put("schema_name", schema.getMetaSchema().getName());
+    			params.put("table_count", schema.getMetaSchema().getMetaTables() + "");
+    			getSchema(schema, history_idx);
+    			params.put("execute_result", "1");
+    		}catch(Exception e) {
+    			params.put("execute_result", "0");
+
+    		}
+
+    		try { dao.insertHistory(params); }catch(Exception e) {}
+
+    	}
+
     if (cancelRequested())
       throw new IOException("\r\nDownload of primary data cancelled!");
     System.out.println("\r\nDownload terminated successfully.");

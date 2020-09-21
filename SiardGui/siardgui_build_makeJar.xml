@@ -1,0 +1,40 @@
+<project name="siardgui" default="make-jar">
+
+<description></description>
+
+	<property name="bin" 		location="./build" />
+	<property name="lib" 		location="./lib" />
+
+	<!-- 현재 시간 얻기 -->
+	<tstamp>
+		<format property="filetime" pattern="yyyyMMdd_HHmm" />
+	</tstamp>
+	
+	<property name="dirsrc" value="src" />
+	<property name="dirdist" value="dist" />
+	<property name="dirbuild" value="build" />
+	<property name="dirbuildclasses" value="${dirbuild}" />
+	<property name="filemanifest" value="${dirsrc}/META-INF/MANIFEST.MF" />
+
+	<property name="jarfile" value="${ant.project.name}.jar" />
+	<target name="make-jar">
+		<echo>Make siardgui.jar</echo>
+		<!--jar destfile="${bin}/siardcmd.jar" encoding="utf-8"><fileset dir="${bin}"></fileset></jar-->
+		
+		<jar jarfile="${dirdist}/${jarfile}" manifest="${filemanifest}">
+			<fileset dir="${dirbuildclasses}">
+				<include name="**/*.class" />
+				<include name="**/res/*.*" />
+			</fileset>
+		</jar>
+			
+		<!-- 
+		<echo>Copy siardcmd.jar</echo>
+		<copy file="${bin}/siardcmd.jar" 	todir="../SiardGui/lib"/>
+		
+		<echo>Delete siardcmd.jar</echo>
+		<delete file="${bin}/siardcmd.jar"/>
+		-->
+	</target>
+		
+</project>

@@ -28,7 +28,9 @@ import java.sql.Types;
 import java.text.ParseException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import ch.admin.bar.siard2.api.Archive;
@@ -48,6 +50,7 @@ import ch.admin.bar.siard2.api.Schema;
 import ch.admin.bar.siard2.api.Table;
 import ch.admin.bar.siard2.api.Value;
 import ch.admin.bar.siard2.api.generated.CategoryType;
+import ch.config.db.HistoryDAO;
 import ch.enterag.sqlparser.SqlLiterals;
 import ch.enterag.sqlparser.identifier.QualifiedId;
 import ch.enterag.utils.EU;
@@ -576,7 +579,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
    * @throws IOException if an I/O error occurred.
    * @throws SQLException if a database error occurred.
    */
-  private void putSchema(Schema schema)
+  private void putSchema(Schema schema, String history_idx)
     throws IOException, SQLException
   {
     MetaSchema ms = schema.getMetaSchema();
@@ -584,19 +587,46 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
     SchemaMapping sm = _am.getSchemaMapping(ms.getName());
 		String todb = _conn.getMetaData().getDatabaseProductName();
 		String ardb = _archive.getMetaData().getDatabaseProduct().substring(0, 6);
+		HistoryDAO dao = new HistoryDAO();
+		Map<String, String> tableParams = null;
+
     for (int iTable = 0; (iTable < schema.getTables()) && (!cancelRequested()); iTable++)
     {
-      Table table = schema.getTable(iTable);
-			if (ardb.equals("CUBRID") && !todb.equals("CUBRID"))
-			{
-				MetaTable mt = table.getMetaTable();
-				if (mt.getName().equals("_db_stored_procedure"))
-					continue;
-				if (mt.getName().equals("db_serial"))
-					continue;
-			}
-      putTable(table,sm);
+    	try {
+
+    		try {
+		      Table table = schema.getTable(iTable);
+
+		      tableParams = new LinkedHashMap<String, String>();
+		      tableParams.put("history_idx", history_idx);
+					tableParams.put("table_name", table.getMetaTable().getName());
+					tableParams.put("table_column_count", table.getMetaTable().getMetaColumns() + "");
+					tableParams.put("table_record_count", table.getMetaTable().getRows() + "");
+
+					if (ardb.equals("CUBRID") && !todb.equals("CUBRID"))
+					{
+						MetaTable mt = table.getMetaTable();
+						if (mt.getName().equals("_db_stored_procedure"))
+							continue;
+						if (mt.getName().equals("db_serial"))
+							continue;
+					}
+		      putTable(table,sm);
+		      tableParams.put("execute_result", "1");
+
+    		}catch(Exception e) {
+    			tableParams.put("execute_result", "0");
+    			e.printStackTrace();
+
+    		}
+
+    		dao.insertHistoryDetail(tableParams);
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    	}
+
     }
+
     _conn.commit();
     _il.exit();
   } /* putSchema */
@@ -632,12 +662,37 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
     }
     _lRecordsPercent = (_lRecordsTotal+99)/100;
     _lRecordsUploaded = 0;
+
+    String history_idx = "";
+    Map<String, String> params = new LinkedHashMap<String, String>();
+    HistoryDAO dao = new HistoryDAO();
+
     /* now upload */
     for (int iSchema = 0; (iSchema < _archive.getSchemas()) && (!cancelRequested()); iSchema++)
     {
       Schema schema = _archive.getSchema(iSchema);
-      putSchema(schema);
+
+      try {
+  			history_idx = dao.selectMaxHistoryIdx();
+  			params.put("history_idx", history_idx);
+  			params.put("div", "0002");
+  			params.put("db_name", schema.getParentArchive().getMetaData().getDatabaseProduct());
+  			params.put("db_con_url", schema.getParentArchive().getMetaData().getConnection());
+  			params.put("schema_name", schema.getMetaSchema().getName());
+  			params.put("table_count", schema.getMetaSchema().getMetaTables() + "");
+  			putSchema(schema, history_idx);
+  			params.put("execute_result", "1");
+
+  		}catch(Exception e) {
+  			params.put("execute_result", "0");
+  			e.printStackTrace();
+
+  		}
+      
+  		try { dao.insertHistory(params); }catch(Exception e) {}
+  		
     }
+
     if (!cancelRequested())
       enableConstraints();
     if (cancelRequested())

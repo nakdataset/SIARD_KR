@@ -66,50 +66,50 @@ public class UploadDialog
 			SiardBundle sb = SiardBundle.getSiardBundle();
 			String sMessage = null;
 
-			String execute_result = "";
+			// String execute_result = "";
 			if (wse.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED) {
 				sMessage = sb.getUploadSuccessMessage();
 				_bSuccess = true;
-				execute_result = "1";
+				// execute_result = "1";
 
 			} else if (wse.getEventType() == WorkerStateEvent.WORKER_STATE_CANCELLED) {
 				sMessage = sb.getUploadCanceledMessage();
-				execute_result = "0";
+				// execute_result = "0";
 
 			} else if (wse.getEventType() == WorkerStateEvent.WORKER_STATE_FAILED) {
 				sMessage = sb.getUploadFailureMessage(ut.getException());
-				execute_result = "0";
+				// execute_result = "0";
 
 			}
 
-			try {
-				HistoryDAO dao = new HistoryDAO();
-				String history_idx = "";
-				Map<String, String> params = null;
-				for (int i = 0, schemaSize = ut.getArchive().getMetaData().getMetaSchemas(); i < schemaSize; i++) {
-					params = new LinkedHashMap<String, String>();
-					history_idx = dao.selectMaxHistoryIdx();
-					params.put("history_idx", history_idx);
-					params.put("div", "0002");
-					params.put("db_name", ut.getArchive().getMetaData().getDatabaseProduct());
-					params.put("db_con_url", ut.getArchive().getMetaData().getConnection());
-					params.put("schema_name", ut.getArchive().getMetaData().getMetaSchema(i) + "");
-					params.put("table_count", ut.getArchive().getMetaData().getMetaSchema(i).getMetaTables() + "");
-					params.put("execute_result", execute_result);
-					dao.insertHistory(params);
-
-					for (int j = 0, tableSize = ut.getArchive().getMetaData().getMetaSchema(i).getMetaTables(); j < tableSize; j++) {
-						params = new LinkedHashMap<String, String>();
-						params.put("history_idx", history_idx);
-						params.put("table_name", ut.getArchive().getMetaData().getMetaSchema(i).getMetaTable(j) + "");
-						params.put("table_column_count", ut.getArchive().getMetaData().getMetaSchema(i).getMetaTable(j).getMetaColumns() + "");
-						params.put("table_record_count", ut.getArchive().getMetaData().getMetaSchema(i).getMetaTable(j).getRows() + "");
-						dao.insertHistoryDetail(params);
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+//			try {
+//				HistoryDAO dao = new HistoryDAO();
+//				String history_idx = "";
+//				Map<String, String> params = null;
+//				for (int i = 0, schemaSize = ut.getArchive().getMetaData().getMetaSchemas(); i < schemaSize; i++) {
+//					params = new LinkedHashMap<String, String>();
+//					history_idx = dao.selectMaxHistoryIdx();
+//					params.put("history_idx", history_idx);
+//					params.put("div", "0002");
+//					params.put("db_name", ut.getArchive().getMetaData().getDatabaseProduct());
+//					params.put("db_con_url", ut.getArchive().getMetaData().getConnection());
+//					params.put("schema_name", ut.getArchive().getMetaData().getMetaSchema(i) + "");
+//					params.put("table_count", ut.getArchive().getMetaData().getMetaSchema(i).getMetaTables() + "");
+//					params.put("execute_result", execute_result);
+//					dao.insertHistory(params);
+//
+//					for (int j = 0, tableSize = ut.getArchive().getMetaData().getMetaSchema(i).getMetaTables(); j < tableSize; j++) {
+//						params = new LinkedHashMap<String, String>();
+//						params.put("history_idx", history_idx);
+//						params.put("table_name", ut.getArchive().getMetaData().getMetaSchema(i).getMetaTable(j) + "");
+//						params.put("table_column_count", ut.getArchive().getMetaData().getMetaSchema(i).getMetaTable(j).getMetaColumns() + "");
+//						params.put("table_record_count", ut.getArchive().getMetaData().getMetaSchema(i).getMetaTable(j).getRows() + "");
+//						dao.insertHistoryDetail(params);
+//					}
+//				}
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
 
 			_tfMessage.setText(sMessage);
 

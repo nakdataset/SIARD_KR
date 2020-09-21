@@ -1028,6 +1028,7 @@ public class SiardGui extends Application
 			createTableHistoryDetail += "	TABLE_NAME text,";
 			createTableHistoryDetail += "	TABLE_COLUMN_COUNT integer,";
 			createTableHistoryDetail += "	TABLE_RECORD_COUNT integer";
+			createTableHistoryDetail += "	EXECUTE_RESULT integer";
 			createTableHistoryDetail += ")";
 			stmt.execute(createTableHistoryDetail);
 

@@ -41,7 +41,6 @@
 	<classpathentry kind="lib" path="lib/jts-1.14.jar"/>
 	<classpathentry kind="lib" path="lib/msv-core-2010.2.jar"/>
 	<classpathentry kind="lib" path="lib/ojdbc6.jar"/>
-	<classpathentry kind="lib" path="lib/siardapi.jar" sourcepath="/SiardApi/src"/>
 	<classpathentry kind="lib" path="lib/sqljdbc41.jar"/>
 	<classpathentry kind="lib" path="lib/sqlparser.jar" sourcepath="/SqlParser/src"/>
 	<classpathentry kind="lib" path="lib/stax2-api-3.1.1.jar"/>
@@ -54,5 +53,6 @@
 	<classpathentry kind="lib" path="lib/cubird.jar"/>
 	<classpathentry kind="lib" path="lib/jdbccubrid.jar"/>
 	<classpathentry kind="lib" path="lib/jsch-0.1.55.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/SiardApi"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>
