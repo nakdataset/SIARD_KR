@@ -90,7 +90,8 @@ begin
      if RegKeyExists(HKEY_LOCAL_MACHINE,
        'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\' + vCurID + '_is1') then
      begin
-       if MsgBox(vCurAppName + ' 프로그램은 이미 설치되어있습니다. 기존 프로그램을 삭제하고 재설치 하시겠습니까?',
+       //개행문자 : #13#10
+       if MsgBox(vCurAppName + ' 프로그램은 이미 설치되어있습니다. 기존 프로그램을 삭제하고 재설치 하시겠습니까?'+#13#10#13#10+'단, 삭제 시 기존 설정값 및 사용이력이 전부 삭제됩니다.(필요 시 먼저 백업 해주세요)',
            mbConfirmation, MB_YESNO) = IDYES then
          begin
              RegQueryStringValue(HKEY_LOCAL_MACHINE,
