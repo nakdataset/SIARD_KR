@@ -590,8 +590,14 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
 		HistoryDAO dao = new HistoryDAO();
 		Map<String, String> tableParams = null;
 
-    for (int iTable = 0; (iTable < schema.getTables()) && (!cancelRequested()); iTable++)
+		//20201007 - 실행결과에 '취소'(2)값 추가 by.pks
+		String str_execute_result = "1"; //성공
+    for (int iTable = 0; iTable < schema.getTables(); iTable++)
     {
+    	if(cancelRequested()) {
+				str_execute_result = "2"; //취소
+			}
+    	
     	try {
 
     		try {
@@ -612,7 +618,8 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
 							continue;
 					}
 		      putTable(table,sm);
-		      tableParams.put("execute_result", "1");
+//		      tableParams.put("execute_result", "1");
+		      tableParams.put("execute_result", str_execute_result);
 
     		}catch(Exception e) {
     			tableParams.put("execute_result", "0");
@@ -624,7 +631,9 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
     	}catch(Exception e) {
     		e.printStackTrace();
     	}
-
+    	
+    	//취소한 경우 break
+			if("2".equals(str_execute_result)) break;
     }
 
     _conn.commit();

@@ -43,6 +43,9 @@ public class SFTPConnection{
 		}
 
 		try {
+			System.out.println("cd root");
+			channelSftp.cd("/");
+			System.out.println("fileDownloadModel.getSourceFile() => " + fileDownloadModel.getSourceFile());
 			channelSftp.stat(fileDownloadModel.getSourceFile()); // => No such file
 		}catch(Exception e) {
 			try {
@@ -90,7 +93,7 @@ public class SFTPConnection{
 
 	}
 
-	private void initSFTPConnection(FileDownloadModel fileDownloadModel) throws Exception{
+	public void initSFTPConnection(FileDownloadModel fileDownloadModel) throws Exception{
 		System.out.println();
 		System.out.println("connecting... " + host);
 

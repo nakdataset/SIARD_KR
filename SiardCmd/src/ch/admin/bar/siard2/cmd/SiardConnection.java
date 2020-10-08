@@ -65,11 +65,14 @@ public class SiardConnection extends Properties
       fileDrivers = new File(sFileDrivers);
     else
     {
-      fileDrivers = SpecialFolder.getMainJar();
+//      fileDrivers = SpecialFolder.getMainJar();
+    	//20200924 - main jar의 경로를 (사용자)설치 경로로 설정함. by.pks
+    	fileDrivers = new File(System.getProperty("user.dir"));
+    	
       // System.out.println("Main JAR: "+fileDrivers.getAbsolutePath());
-      if (fileDrivers.isFile())
-        fileDrivers = fileDrivers.getParentFile();
-      fileDrivers = fileDrivers.getParentFile();
+//      if (fileDrivers.isFile())
+//        fileDrivers = fileDrivers.getParentFile();
+//      fileDrivers = fileDrivers.getParentFile();
       fileDrivers = new File(fileDrivers.getAbsolutePath()+File.separator+
         sCONFIG_FOLDER+File.separator+
         sJDBCDRIVERS_PROPERTIES);
