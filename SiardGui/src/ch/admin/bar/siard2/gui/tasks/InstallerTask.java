@@ -10,16 +10,22 @@ Created    : 09.06.2017, Hartwig Thomas
 ======================================================================*/
 package ch.admin.bar.siard2.gui.tasks;
 
-import java.io.*;
-import java.util.*;
-import javafx.concurrent.*;
-import javafx.event.*;
-import ch.enterag.utils.*;
-import ch.enterag.utils.desktop.*;
-import ch.enterag.utils.io.*;
-import ch.enterag.utils.lang.*;
-import ch.enterag.utils.logging.*;
-import ch.admin.bar.siard2.gui.actions.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import ch.admin.bar.siard2.gui.actions.InstallUninstallHandler;
+import ch.enterag.utils.EU;
+import ch.enterag.utils.FU;
+import ch.enterag.utils.desktop.Desktop;
+import ch.enterag.utils.io.SpecialFolder;
+import ch.enterag.utils.lang.Execute;
+import ch.enterag.utils.logging.IndentLogger;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 
 /*====================================================================*/
 /** InstallerTask executes the SIARD Suite installation on a "worker" thread.
@@ -56,10 +62,13 @@ public class InstallerTask
     {
       File fileSource = afile[i];
       File fileTarget = new File(folderTarget.getAbsolutePath() + File.separator + fileSource.getName());
-      if (fileSource.isDirectory())
-        bCopied = copyFolder(fileSource,fileTarget);
-      else
-      {
+      
+      if (fileSource.isDirectory()) {
+    	  //20200924 - log폴더는 복사 제외. by.pks
+    	  if(fileSource.getAbsolutePath().contains("log")) continue;
+
+    	  bCopied = copyFolder(fileSource,fileTarget);
+      } else {
         try { FU.copy(fileSource, fileTarget); }
         catch(IOException ie) { bCopied = false; }
       }

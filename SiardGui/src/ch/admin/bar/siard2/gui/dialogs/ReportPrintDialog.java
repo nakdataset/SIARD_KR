@@ -28,6 +28,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.print.PrinterJob;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
@@ -54,6 +55,8 @@ public class ReportPrintDialog extends ScrollableDialog implements EventHandler<
 
 	private Button _btnDefault;
 	private Button _btnCancel;
+	
+	private Button printButton;
 
 	private BrowserRegion br;
 
@@ -162,16 +165,9 @@ public class ReportPrintDialog extends ScrollableDialog implements EventHandler<
 		hbox.setAlignment(Pos.TOP_RIGHT);
 		SiardBundle sb = SiardBundle.getSiardBundle();
 
-		//웹뷰 프린트 사용으로 해당 기능 제거.
-//		printSetupButton = new Button("인쇄");
-//		printSetupButton.setOnAction(new EventHandler <ActionEvent>()
-//		{
-//            public void handle(ActionEvent event)
-//            {
-//            	pageSetup(br, stageOwner);
-//            }
-//        });
-//		hbox.getChildren().add(printSetupButton);
+		/* print button */
+		//20200924 - BrowserRegion에 생성된 프린트 버튼을 가져옴. by.pks
+	    hbox.getChildren().add(br.printButton);
 
 		/* OK button */
 		_btnDefault = new Button(sb.getOk());
@@ -245,12 +241,14 @@ public class ReportPrintDialog extends ScrollableDialog implements EventHandler<
 	  	  jsonBuf.append(",dbConUrlTitle:\""+SiardBundle.getSiardBundle().getTableColumnName("db_con_url")+"\"");
 	  	  jsonBuf.append(",dbNameTitle:\""+SiardBundle.getSiardBundle().getTableColumnName("db_name")+"\"");
 
-	  	  //TODO text properties 로 변경
-	  	  jsonBuf.append(",executeDivTitle:\"" + "구분" + "\"");
+	  	  jsonBuf.append(",executeDivTitle:\""+SiardBundle.getSiardBundle().getHistoryExecuteType()+"\"");
 	  	  jsonBuf.append(",executeDateTitle:\""+SiardBundle.getSiardBundle().getTableColumnName("execute_date")+"\"");
 	  	  jsonBuf.append(",executeResultTitle:\""+SiardBundle.getSiardBundle().getTableColumnName("execute_result")+"\"");
 	  	  jsonBuf.append(",schemaNameTitle:\""+SiardBundle.getSiardBundle().getTableColumnName("schema_name")+"\"");
 	  	  jsonBuf.append(",tableCountTitle:\""+SiardBundle.getSiardBundle().getTableColumnName("table_count")+"\"");
+	  	  
+	  	  //보고서 상단 타이틀
+	  	  jsonBuf.append(",executeHeader:\""+SiardBundle.getSiardBundle().getHistoryExecuteHeader()+"\"");
 
 	  	  //이력 상세
 	  	  StringBuilder sbHistoryDetail = new StringBuilder();
@@ -284,7 +282,7 @@ public class ReportPrintDialog extends ScrollableDialog implements EventHandler<
 					sbHistoryDetail.append("<td align='left'>"+historyDetailModel.getTable_name()+"</td>");
 					sbHistoryDetail.append("<td align='right'>"+historyDetailModel.getTable_column_count()+"</td>");
 					sbHistoryDetail.append("<td align='right'>"+historyDetailModel.getTable_record_count()+"</td>");
-					sbHistoryDetail.append("<td align='right'>"+historyDetailModel.getExecute_result()+"</td>");
+					sbHistoryDetail.append("<td align='center'>"+historyDetailModel.getExecute_result()+"</td>");
 					sbHistoryDetail.append("</tr>");
 				}
 

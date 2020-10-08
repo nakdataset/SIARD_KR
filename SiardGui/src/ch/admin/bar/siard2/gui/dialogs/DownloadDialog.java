@@ -10,7 +10,6 @@ package ch.admin.bar.siard2.gui.dialogs;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Optional;
 
 import org.apache.log4j.Logger;
 
@@ -23,9 +22,6 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -48,13 +44,13 @@ public class DownloadDialog
 	// download task
 	private DownloadTask _dt = null;
 
-	// 검증 진행 여부
-	boolean verify_process = false;
+//	 검증 진행 여부
+//	boolean verify_process = false;
 
-	public boolean getVerify()
-	{
-		return verify_process;
-	}
+//	public boolean getVerify()
+//	{
+//		return verify_process;
+//	}
 
 	/* ================================================================== */
 	private class WorkerStateEventHandler
@@ -133,17 +129,17 @@ public class DownloadDialog
 				_btnCancel.setDisable(true);
 
 			} else if (ae.getSource() == _btnDefault) {
-				Alert alert = new Alert(AlertType.CONFIRMATION);
-				alert.setTitle("검증");
-				alert.setHeaderText("SIARD 파일 검증");
-				alert.setContentText("다운로드한 SIARD 파일을 검증하시겠습니까?");
-				Optional<ButtonType> result = alert.showAndWait();
-
-				if (result.get() == ButtonType.OK) {
-					verify_process = true;
-				} else {
-					verify_process = false;
-				}
+//				Alert alert = new Alert(AlertType.CONFIRMATION);
+//				alert.setTitle("검증");
+//				alert.setHeaderText("SIARD 파일 검증");
+//				alert.setContentText("다운로드한 SIARD 파일을 검증하시겠습니까?");
+//				Optional<ButtonType> result = alert.showAndWait();
+//
+//				if (result.get() == ButtonType.OK) {
+//					verify_process = true;
+//				} else {
+//					verify_process = false;
+//				}
 
 				close();
 			}

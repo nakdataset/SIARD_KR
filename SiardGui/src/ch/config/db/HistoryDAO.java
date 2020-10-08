@@ -21,14 +21,15 @@ public class HistoryDAO extends AbstractDAO{
 		sb.append("	DB_CON_URL, ");
 		sb.append("	SCHEMA_NAME, ");
 		sb.append("	TABLE_COUNT, ");
-		sb.append("	CASE EXECUTE_RESULT");
-		sb.append("		WHEN (SELECT COUNT(1) FROM HISTORY_DETAIL X WHERE X.HISTORY_IDX = HISTORY_IDX AND X.EXECUTE_RESULT = 0 ) > 0 THEN '" + SiardBundle.getSiardBundle().getHistoryExecuteReulstSuccess() + "'");
-		sb.append("		ELSE '" + SiardBundle.getSiardBundle().getHistoryExecuteReulstFail() + "'");
+		sb.append("	CASE ");
+		sb.append("		WHEN (SELECT COUNT(1) FROM HISTORY_DETAIL X WHERE X.HISTORY_IDX = HISTORY_IDX AND X.EXECUTE_RESULT = 2 ) > 0 THEN '" + SiardBundle.getSiardBundle().getHistoryExecuteReulstCancel() + "'");
+		sb.append("		WHEN (SELECT COUNT(1) FROM HISTORY_DETAIL X WHERE X.HISTORY_IDX = HISTORY_IDX AND X.EXECUTE_RESULT = 0 ) > 0 THEN '" + SiardBundle.getSiardBundle().getHistoryExecuteReulstFail() + "'");
+		sb.append("		ELSE '" + SiardBundle.getSiardBundle().getHistoryExecuteReulstSuccess() + "'");
 		sb.append("	END AS EXECUTE_RESULT, ");
 		sb.append("	EXECUTE_DATE ");
 		sb.append("FROM HISTORY ");
 		sb.append("ORDER BY HISTORY_IDX DESC ");
-
+		
 		return selectList(sb.toString());
 	}
 
@@ -47,14 +48,18 @@ public class HistoryDAO extends AbstractDAO{
 		sb.append("	A.SCHEMA_NAME, ");
 		sb.append("	A.TABLE_COUNT, ");
 		sb.append("	CASE ");
-		sb.append("		WHEN (SELECT COUNT(1) FROM HISTORY_DETAIL X WHERE X.HISTORY_IDX = A.HISTORY_IDX AND X.EXECUTE_RESULT = 0 ) < 1 THEN '" + SiardBundle.getSiardBundle().getHistoryExecuteReulstSuccess() + "'");
-		sb.append("		ELSE '" + SiardBundle.getSiardBundle().getHistoryExecuteReulstFail() + "'");
+		sb.append("		WHEN (SELECT COUNT(1) FROM HISTORY_DETAIL X WHERE X.HISTORY_IDX = A.HISTORY_IDX AND X.EXECUTE_RESULT = 0 ) > 0 THEN '" + SiardBundle.getSiardBundle().getHistoryExecuteReulstFail() + "'");
+		sb.append("		WHEN (SELECT COUNT(1) FROM HISTORY_DETAIL X WHERE X.HISTORY_IDX = A.HISTORY_IDX AND X.EXECUTE_RESULT = 2 ) > 0 THEN '" + SiardBundle.getSiardBundle().getHistoryExecuteReulstCancel() + "'");
+		sb.append("		ELSE '" + SiardBundle.getSiardBundle().getHistoryExecuteReulstSuccess() + "'");
 		sb.append("	END AS EXECUTE_RESULT, ");
 		sb.append("	A.EXECUTE_DATE ");
 		sb.append("FROM HISTORY A ");
 		sb.append("WHERE 1=1 ");
 		sb.append("AND A.DIV = #{div} ");
 		sb.append("ORDER BY A.HISTORY_IDX DESC ");
+		
+		System.out.println(sb.toString());
+		System.out.println("div :: " + params.get("div"));
 
 		return selectList(sb.toString(), params);
 	}
@@ -69,6 +74,7 @@ public class HistoryDAO extends AbstractDAO{
 		sb.append("	TABLE_COLUMN_COUNT, ");
 		sb.append("	TABLE_RECORD_COUNT, ");
 		sb.append("	CASE EXECUTE_RESULT ");
+		sb.append("		WHEN 2 THEN '" + SiardBundle.getSiardBundle().getHistoryExecuteReulstCancel() + "'");
 		sb.append("		WHEN 1 THEN '" + SiardBundle.getSiardBundle().getHistoryExecuteReulstSuccess() + "'");
 		sb.append("		WHEN 0 THEN '" + SiardBundle.getSiardBundle().getHistoryExecuteReulstFail() + "'");
 		sb.append("		ELSE EXECUTE_RESULT ");

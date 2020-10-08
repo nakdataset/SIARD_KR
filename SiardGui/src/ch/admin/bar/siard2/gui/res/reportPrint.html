@@ -2,47 +2,59 @@
 <html>
 <head>
 	<META http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>행정정보데이터세트 실행 결과</title>
+	<title>DSRMS EXECUTION RESULT</title>
 	<meta charset="utf-8">
 	<style>
-		    dl { margin: 0; padding: 0; }
-		    dt, dd { padding: 1mm; margin-top: 0; margin-bottom: 0; }
-		    /* puts dt and dd on same line and right-adjusts dt */
-			dt{
-				float: left;
-				width: 7em;
-				text-align: right;
-			}
-			dt:after { content: " : "; }
-			/* handles empty values */
-			dd:after{
-				content: " "; /* nbsp */
-			}
 			/* extend header styles beyond h6 */
 			h1 { margin-left:  0mm; display: block; font-size: 2.0em; font-weight: bold; margin-top: 0; margin-bottom: 1em; text-align: center;}
 			h2 { margin-left:  5mm; display: block; font-size: 1.8em; font-weight: bold; margin-top: 0; margin-bottom: 0; }
 			div {margin: 0px auto;}
+			
 /*   	    	  table { border: 1px; border-color: black; }        */
 	</style>
 </head>
 <body>
-<h1>행정정보데이터세트 실행 결과</h1>
-<dl>
-	<dt id="dbConUrlTitle">DB 접속URL</dt>
-	<dd id="dbConUrl"></dd>
-	<dt id="dbNameTitle">DB명</dt>
-	<dd id="dbName"></dd>
-	<dt id="executeDivTitle">구분</dt>
-	<dd id="executeDiv"></dd>
-	<dt id="executeDateTitle">실행 일시</dt>
-	<dd id="executeDate"></dd>
-	<dt id="executeResultTitle">실행 결과</dt>
-	<dd id="executeResult"></dd>
-	<dt id="schemaNameTitle">스키마</dt>
-	<dd id="schemaName"></dd>
-	<dt id="tableCountTitle">테이블 수</dt>
-	<dd id="tableCount"></dd>
-</dl>
+<div>
+	<h1 id="executeHeader"></h1>
+</div>
+<div>
+	<table>
+		<colgroup>
+			<col width="25%"/>
+			<col width="72%"/>
+		</colgroup>
+		<tbody>
+			<tr>
+				<th id="dbConUrlTitle" align="right"></th>
+				<td id="dbConUrl"></td>
+			</tr>
+			<tr>
+				<th id="dbNameTitle" align="right"></th>
+				<td id="dbName"></td>
+			</tr>
+			<tr>
+				<th id="executeDivTitle" align="right"></th>
+				<td id="executeDiv"></td>
+			</tr>
+			<tr>
+				<th id="executeDateTitle" align="right"></th>
+				<td id="executeDate"></td>
+			</tr>
+			<tr>
+				<th id="executeResultTitle" align="right"></th>
+				<td id="executeResult"></td>
+			</tr>
+			<tr>
+				<th id="schemaNameTitle" align="right"></th>
+				<td id="schemaName"></td>
+			</tr>
+			<tr>
+				<th id="tableCountTitle" align="right"></th>
+				<td id="tableCount"></td>
+			</tr>
+		</tbody>
+	</table>
+</div>
 <div id="historyDetailTable"></div>
 </body>
 <script type="text/javascript">
@@ -60,7 +72,9 @@
         	
         	for(key in json) {
 //         		eval("document.getElementById(" + key + ").innerHTML = json[0]." + key);
-        		document.getElementById(key).innerHTML = json[key];
+				var equalStr = "";
+				if(key.indexOf("Title") > -1) equalStr = " :";
+        		document.getElementById(key).innerHTML = json[key] + equalStr;
     		}
         	
         	/*

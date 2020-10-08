@@ -100,7 +100,8 @@ public class InstallUninstallHandler
 
       _il.event("Storing installation ...");
       up.store();
-      _il.event("Stored "+up.getInstalledVersion(null)+" ("+up.getInstalledPath(null)+") to "+ up.getFile().getAbsolutePath());
+//      _il.event("Stored "+up.getInstalledVersion(null)+" ("+up.getInstalledPath(null)+") to "+ up.getFile().getAbsolutePath());
+      _il.event("Stored "+up.getInstalledVersion(null)+" ("+up.getInstalledPath(null)+") to "+ System.getProperty("user.dir"));
 
       SiardGui.getSiardGui().exit();
     }
@@ -192,13 +193,16 @@ public class InstallUninstallHandler
     SiardBundle sb = SiardBundle.getSiardBundle();
     Stage stage = SiardGui.getSiardGui().getStage();
 
+    //20200924 - main jar의 경로를 (사용자)설치 경로로 설정함. by.pks
+    File folderSource = new File(System.getProperty("user.dir"));
+    
     /* folder of running instance */
-    File folderSource = SpecialFolder.getMainJar();
-
-    if (folderSource.isFile())
-      folderSource = folderSource.getParentFile().getParentFile();
-    else
-      folderSource = folderSource.getParentFile();
+//    File folderSource = SpecialFolder.getMainJar();
+    
+//    if (folderSource.isFile())
+//      folderSource = folderSource.getParentFile().getParentFile();
+//    else
+//      folderSource = folderSource.getParentFile();
 
     _il.event("folderSource: "+folderSource.getAbsolutePath());
 

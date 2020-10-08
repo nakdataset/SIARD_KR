@@ -40,8 +40,6 @@ import ch.enterag.utils.fx.dialogs.FS;
 import ch.enterag.utils.fx.dialogs.MB;
 import ch.enterag.utils.logging.IndentLogger;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
 /* ==================================================================== */
@@ -227,30 +225,27 @@ public class UploadDownloadAction {
 
 					if (dd.wasSuccessful() && (dd.getArchive().isValid() || dcd.isMetaDataOnly())) {
 						// SIARD 파일 검증 진행 여부
-						boolean verify = dd.getVerify();
-
+//						boolean verify = dd.getVerify();
+//
 						if (dd.getArchive().isValid()) {
 							dd.getArchive().close();
 							dd.getArchive().open(fileArchive);
 						}
-
 						SiardGui.getSiardGui().setArchive(dd.getArchive());
-
 						if (!dcd.isMetaDataOnly()) {
 							MruFile mf = MruFile.getMruFile();
 							mf.setMruFile(archive.getFile().getAbsolutePath());
-
 							MainMenuBar.getMainMenuBar().setFileMru();
 						}
-
-						if(verify == true) {
-							process = false;
-							Alert alert = new Alert(AlertType.INFORMATION);
-							alert.setTitle("검증 완료");
-							alert.setHeaderText("Siard 파일 검증 완료");
-							alert.setContentText("Siard 파일 검증이 완료되었습니다.");
-							alert.showAndWait();
-						}
+//
+//						if(verify == true) {
+//							process = false;
+//							Alert alert = new Alert(AlertType.INFORMATION);
+//							alert.setTitle("검증 완료");
+//							alert.setHeaderText("Siard 파일 검증 완료");
+//							alert.setContentText("Siard 파일 검증이 완료되었습니다.");
+//							alert.showAndWait();
+//						}
 
 					} else {
 						try {

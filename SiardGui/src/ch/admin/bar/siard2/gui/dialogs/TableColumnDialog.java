@@ -18,6 +18,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import ch.admin.bar.siard2.api.primary.FileDownloadModel;
+import ch.admin.bar.siard2.cmd.SFTPConnection;
 import ch.admin.bar.siard2.cmd.SiardConnection;
 import ch.admin.bar.siard2.gui.SiardBundle;
 import ch.admin.bar.siard2.gui.models.ColumnModel;
@@ -26,6 +27,7 @@ import ch.enterag.utils.fx.FxSizes;
 import ch.enterag.utils.fx.FxStyles;
 import ch.enterag.utils.fx.ScrollableDialog;
 import ch.enterag.utils.fx.dialogs.FS;
+import ch.enterag.utils.fx.dialogs.MB;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
@@ -135,13 +137,35 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		if (event.getSource() == _btnCancel) {
 			close();
 
+		// OK
 		} else if (event.getSource() == _btnDefault) {
 
-			setColumnListByChooseColumn();
+			try {
 
-			_iResult = iRESULT_SUCCESS;
+				if(_rbSFTP.isSelected()) {
+					//TODO SFTP Connection Validation
+					FileDownloadModel model = new FileDownloadModel();
+					model.setHost(_tfSFTPHost.getText());
+					model.setUser(_tfSFTPUser.getText());
+					model.setPassword(_tfSFTPPassword.getText());
+					model.setPort(Integer.parseInt("".equals(_tfSFTPPort.getText().trim())  ? "0" : _tfSFTPPort.getText()));
 
-			close();
+					SFTPConnection sftpConnection = new SFTPConnection(_tfSFTPHost.getText(), _tfSFTPUser.getText(), _tfSFTPPassword.getText(), Integer.parseInt("".equals(_tfSFTPPort.getText().trim())  ? "0" : _tfSFTPPort.getText()));
+					sftpConnection.initSFTPConnection(model);
+				}
+
+				setColumnListByChooseColumn();
+
+				_iResult = iRESULT_SUCCESS;
+
+				close();
+			}catch(Exception e) {
+				MB.show(this,
+					sb.getConnectionErrorTitle(),
+					"SFTP access information is incorrect.",
+					sb.getOk(), null);
+			}
+
 
 		} else if (event.getSource() == _btnTargetFileBrowser) {
 
@@ -199,9 +223,9 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		fileDownloadModel.setFileCopyFlag(_rbFileCopy.isSelected());
 
 		fileDownloadModel.setHost(_tfSFTPHost.getText());
+		fileDownloadModel.setPort(Integer.parseInt("".equals(_tfSFTPPort.getText().trim())  ? "0" : _tfSFTPPort.getText()));
 		fileDownloadModel.setUser(_tfSFTPUser.getText());
 		fileDownloadModel.setPassword(_tfSFTPPassword.getText());
-		fileDownloadModel.setPort(Integer.parseInt("".equals(_tfSFTPPort.getText().trim())  ? "0" : _tfSFTPPort.getText()));
 
 		fileDownloadModel.setTargetFilePath(_tfTargetFilePath.getText());
 
@@ -376,6 +400,12 @@ public class TableColumnDialog extends ScrollableDialog implements EventHandler<
 		vbox.getChildren().add(hboxSFTPPassword);
 
 		getMaxLabelPrefWidth(lblSFTPHost, lblSFTPPort, lblSFTPUser, lblSFTPPassword);
+
+		//TODO 테스트 후 삭제
+//		_tfSFTPHost.setText("10.65.209.193");
+//		_tfSFTPPort.setText("22");
+//		_tfSFTPUser.setText("dsrms_db");
+//		_tfSFTPPassword.setText("1234");
 
 		vbox.getChildren().add(new Separator());
 

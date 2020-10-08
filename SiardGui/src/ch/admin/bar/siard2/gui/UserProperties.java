@@ -610,7 +610,9 @@ public class UserProperties extends Properties
 		_il.enter();
 		File fileBinEditor = getFile(sBIN_EDITOR_KEY, fileBIN_EDITOR);
 		if (Execute.isOsWindows()) {
-			File fileHxd = SpecialFolder.getMainJar();
+//			File fileHxd = SpecialFolder.getMainJar();
+			//20200924 - main jar의 경로를 (사용자)설치 경로로 설정함. by.pks
+			File fileHxd = new File(System.getProperty("user.dir"));
 			if (fileHxd.isFile())
 				fileHxd = fileHxd.getParentFile();
 			fileHxd = new File(fileHxd.getParentFile().getAbsolutePath() +
@@ -694,10 +696,14 @@ public class UserProperties extends Properties
 	public File getConfigFolder()
 	{
 		_il.enter();
-		File fileConfigFolder = SpecialFolder.getMainJar();
+//		File fileConfigFolder = SpecialFolder.getMainJar();
+		//20200924 - main jar의 경로를 (사용자)설치 경로로 설정함. by.pks
+		File fileConfigFolder = new File(System.getProperty("user.dir"));
 		if (fileConfigFolder.isFile())
 			fileConfigFolder = fileConfigFolder.getParentFile();
-		fileConfigFolder = new File(fileConfigFolder.getParentFile().getAbsolutePath() +
+//		fileConfigFolder = new File(fileConfigFolder.getParentFile().getAbsolutePath() +
+//			File.separator + sCONFIG_FOLDER);
+		fileConfigFolder = new File(fileConfigFolder.getAbsolutePath() +
 			File.separator + sCONFIG_FOLDER);
 		fileConfigFolder = getFile(sCONFIG_FOLDER_KEY, fileConfigFolder);
 		_il.exit(fileConfigFolder);

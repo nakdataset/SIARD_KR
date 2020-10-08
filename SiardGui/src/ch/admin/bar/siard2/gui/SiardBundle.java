@@ -539,5 +539,8 @@ public class SiardBundle extends FxBundle
   public String getHistoryDivUpload() { return getProperty("history.div.upload"); }
   public String getHistoryExecuteReulstSuccess() { return getProperty("history.execute.result.success"); }
   public String getHistoryExecuteReulstFail() { return getProperty("history.execute.result.fail"); }
+  public String getHistoryExecuteReulstCancel() { return getProperty("history.execute.result.cancel"); }
+  public String getHistoryExecuteType() { return getProperty("history.execute.type"); }
+  public String getHistoryExecuteHeader() { return getProperty("history.execute.header"); }
 
 } /* SiardBundle */

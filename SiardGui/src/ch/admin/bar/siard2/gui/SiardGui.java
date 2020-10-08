@@ -375,7 +375,8 @@ public class SiardGui extends Application
 		MruFile.getMruFile().store();
 		/* save user properties */
 		UserProperties up = UserProperties.getUserProperties();
-		_il.event("Properties for version " + up.getInstalledVersion(null) + " are being stored to \"" + up.getFile().getAbsolutePath() + "\"");
+//		_il.event("Properties for version " + up.getInstalledVersion(null) + " are being stored to \"" + up.getFile().getAbsolutePath() + "\"");
+		_il.event("Properties for version " + up.getInstalledVersion(null) + " are being stored to \"" + System.getProperty("user.dir") + "\"");
 		SiardBundle sb = SiardBundle.getSiardBundle();
 		up.setUiLanguage(sb.getLanguage());
 		up.setStageMaximized(_stage.isFullScreen());

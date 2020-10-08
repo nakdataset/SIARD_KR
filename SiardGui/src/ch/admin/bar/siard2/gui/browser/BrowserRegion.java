@@ -33,8 +33,8 @@ public class BrowserRegion
   /** for communication from the Javascript engine. */
   private JavaConnector javaConnector = new JavaConnector();
 
-  private HBox toolBar;
-  private Button printButton;
+  private HBox toolBar = new HBox();
+  public Button printButton;
   //Create the JobStatus Label
   private final Label jobStatus = new Label();
 

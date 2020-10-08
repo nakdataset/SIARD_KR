@@ -67,10 +67,12 @@ public class HelpDialog
 	public static void showHelpDialog(Stage stageOwner, String sPath)
 	{
 		/* find the manual in either "doc/manual/" (Eclipse) or "../doc/manual/" (JAR) */
-		File fileManual = SpecialFolder.getJarFromClass(HelpDialog.class, false);
-		if (fileManual.isFile())
-			fileManual = fileManual.getParentFile();
-		String sManual = fileManual.getParentFile().getAbsolutePath() +
+//		File fileManual = SpecialFolder.getJarFromClass(HelpDialog.class, false);
+		//20200924 - main jar의 경로를 (사용자)설치 경로로 설정함. by.pks
+		File fileManual = new File(System.getProperty("user.dir"));
+//		if (fileManual.isFile())
+//			fileManual = fileManual.getParentFile();
+		String sManual = fileManual.getAbsolutePath() +
 			File.separator + "doc" + File.separator + "manual" +
 			File.separator + SiardBundle.getSiardBundle().getLanguage();
 		fileManual = new File(sManual + File.separator + sPath);
