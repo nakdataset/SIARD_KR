@@ -6,6 +6,7 @@
 <JVMSearchPath>jdkpath</JVMSearchPath>
 <JVMSearchPath>exepath</JVMSearchPath>
 <JVMSearchPath>jview</JVMSearchPath>
+<bundledJVMPath>java\jre\bin</bundledJVMPath>
 <classPath>lib\activation-1.1.1.jar</classPath>
 <classPath>lib\antlr-runtime-4.5.2.jar</classPath>
 <classPath>lib\apache-logging-log4j.jar</classPath>
