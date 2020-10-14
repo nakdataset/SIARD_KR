@@ -1,8 +1,10 @@
 package com.firstinfo.eraser.gui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Hashtable;
@@ -21,51 +23,56 @@ import com.firstinfo.eraser.serviceimpl.EraserServiceImpl;
 
 /**
  * DBMS 접속정보 등록화면
- * 
+ *
  * @author 국가기록원
  *
  */
+@SuppressWarnings("serial")
 public class EraserManager extends JPanel
 {
-	private int		label_x				= 230;
-	private int		label_x_position	= label_x;
-	private int		label_y_position	= 10;
-	private int		label_width			= 100;
-	private int		label_height		= 25;
+	private int label_x = 30;
+	private int label_x_position = label_x;
+	private int label_y_position = 30;
+	private int label_width = 160;
+	private int label_height = 25;
 
-	private int		input_x				= 320;
-	private int		input_x_position	= input_x;
-	private int		input_y_position	= 10;
-	private int		input_width			= 300;
-	private int		input_height		= 25;
+	private int input_x = 200;
+	private int input_x_position = input_x;
+	private int input_y_position = 30;
+	private int input_width = 300;
+	private int input_height = 25;
 
-	private int		line_interval		= 5;
+	private int line_interval = 5;
 
-	JButton			btn_save			= new JButton("저장");
+	JButton btn_save = new JButton("저장");
 
-	JTextField		text_depart			= new JTextField();
-	JTextField		text_grade			= new JTextField();
-	JTextField		text_name			= new JTextField();
+	JTextField text_depart = new JTextField();
+	JTextField text_grade = new JTextField();
+	JTextField text_name = new JTextField();
 
-	JPasswordField	password1			= new JPasswordField();
-	JPasswordField	password2			= new JPasswordField();
+	JPasswordField password1 = new JPasswordField();
+	JPasswordField password2 = new JPasswordField();
 
 	EraserManager()
 	{
-		BoxLayout	layout	= new BoxLayout(this, BoxLayout.Y_AXIS);
-		JLabel		label	= new JLabel("관리자 정보");
+		BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
+
+		JLabel label = new JLabel("관리자 정보");
 		label.setFont(new Font(label.getFont().getName(), Font.PLAIN, 12));
 		label.setAlignmentX(Component.CENTER_ALIGNMENT);
+		label.setForeground(Color.WHITE);
+
+		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+		input_width = (int)(dimension.getWidth() / 2) - (30 * 2) - (label_width + 20) - 52;
 
 		JPanel panel_content = new JPanel();
-
 		panel_content.setLayout(null);
 
-		JLabel	label_depart	= new JLabel("기관명");
-		JLabel	label_grade		= new JLabel("부서명");
-		JLabel	label_name		= new JLabel("실행자(이름)");
-		JLabel	label_password1	= new JLabel("암호");
-		JLabel	label_password2	= new JLabel("암호확인");
+		JLabel label_depart = new JLabel("기관명");
+		JLabel label_grade = new JLabel("부서명");
+		JLabel label_name = new JLabel("실행자(이름)");
+		JLabel label_password1 = new JLabel("암호");
+		JLabel label_password2 = new JLabel("암호확인");
 
 		label_depart.setFont(new Font("돋움체", Font.PLAIN, 12));
 		label_grade.setFont(new Font("돋움체", Font.PLAIN, 12));
@@ -75,69 +82,69 @@ public class EraserManager extends JPanel
 
 		label_depart.setBounds(label_x_position, label_y_position, label_width, label_height);
 		text_depart.setBounds(input_x_position, input_y_position, input_width, input_height);
-		label_y_position	+= label_height + line_interval;
-		input_y_position	+= input_height + line_interval;
+		label_y_position += label_height + line_interval;
+		input_y_position += input_height + line_interval;
 		panel_content.add(label_depart);
 		panel_content.add(text_depart);
 
 		label_grade.setBounds(label_x_position, label_y_position, label_width, label_height);
 		text_grade.setBounds(input_x_position, input_y_position, input_width, input_height);
-		label_y_position	+= label_height + line_interval;
-		input_y_position	+= input_height + line_interval;
+		label_y_position += label_height + line_interval;
+		input_y_position += input_height + line_interval;
 		panel_content.add(label_grade);
 		panel_content.add(text_grade);
 
 		label_name.setBounds(label_x_position, label_y_position, label_width, label_height);
 		text_name.setBounds(input_x_position, input_y_position, input_width, input_height);
-		label_y_position	+= label_height + line_interval;
-		input_y_position	+= input_height + line_interval;
+		label_y_position += label_height + line_interval;
+		input_y_position += input_height + line_interval;
 		panel_content.add(label_name);
 		panel_content.add(text_name);
 
 		label_password1.setBounds(label_x_position, label_y_position, label_width, label_height);
 		password1.setBounds(input_x_position, input_y_position, input_width, input_height);
-		label_y_position	+= label_height + line_interval;
-		input_y_position	+= input_height + line_interval;
+		label_y_position += label_height + line_interval;
+		input_y_position += input_height + line_interval;
 		panel_content.add(label_password1);
 		panel_content.add(password1);
 
 		label_password2.setBounds(label_x_position, label_y_position, label_width, label_height);
 		password2.setBounds(input_x_position, input_y_position, input_width, input_height);
-		label_y_position	+= label_height + line_interval;
-		input_y_position	+= input_height + line_interval;
+		label_y_position += label_height + line_interval;
+		input_y_position += input_height + line_interval;
 		panel_content.add(label_password2);
 		panel_content.add(password2);
 
-		btn_save.setBounds(input_x_position, input_y_position, 80, 20);
+		btn_save.setBounds(input_x_position, input_y_position, 120, input_height);
 		panel_content.add(btn_save);
 
 		this.setLayout(layout);
 
-		this.add(Box.createRigidArea(new Dimension(5, 20)));
+		this.setOpaque(true);
+		this.setBackground(Color.darkGray);
+		this.add(Box.createRigidArea(new Dimension(0, 10)));
 		this.add(label);
-		this.add(Box.createRigidArea(new Dimension(5, 10)));
+		this.add(Box.createRigidArea(new Dimension(0, 10)));
 		this.add(panel_content);
 
-		btn_save.addActionListener(new ActionListener()
-		{
+		btn_save.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				EraserService service = new EraserServiceImpl();
 
-				if(password1.getText().equals(password2.getText()) == false)
-				{
+				if (password1.getText().equals(password2.getText()) == false) {
 					JOptionPane.showMessageDialog(null, "암호와 암호확인이 다릅니다.");
 					return;
 				}
 
-				if(password1.getText().length() < 4)
-				{
+				if (password1.getText().length() < 4) {
 					JOptionPane.showMessageDialog(null, "암호는 4자리 이상으로 해주세요.");
 					return;
 				}
 
 				service.managersave(text_depart.getText(), text_grade.getText(), text_name.getText(),
-				        password1.getText());
+					password1.getText());
 				JOptionPane.showMessageDialog(null, "관리자 정보가 수정되었습니다.");
 
 			}
@@ -146,33 +153,29 @@ public class EraserManager extends JPanel
 
 	public void view()
 	{
-		EraserService	service		= new EraserServiceImpl();
-		Hashtable		hash		= service.managerview();
+		EraserService service = new EraserServiceImpl();
+		Hashtable hash = service.managerview();
 
-		String			depart		= null;
-		String			grade		= null;
-		String			name		= null;
-		String			password	= null;
+		String depart = null;
+		String grade = null;
+		String name = null;
+		String password = null;
 
-		depart		= (String) hash.get("depart");
-		grade		= (String) hash.get("grade");
-		name		= (String) hash.get("name");
-		password	= (String) hash.get("password");
+		depart = (String) hash.get("depart");
+		grade = (String) hash.get("grade");
+		name = (String) hash.get("name");
+		password = (String) hash.get("password");
 
-		if(depart == null)
-		{
+		if (depart == null) {
 			depart = "";
 		}
-		if(grade == null)
-		{
+		if (grade == null) {
 			grade = "";
 		}
-		if(name == null)
-		{
+		if (name == null) {
 			name = "";
 		}
-		if(password == null)
-		{
+		if (password == null) {
 			password = "";
 		}
 

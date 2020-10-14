@@ -25,64 +25,67 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
+import com.firstinfo.eraser.config.Constants;
 import com.firstinfo.eraser.service.EraserService;
 import com.firstinfo.eraser.serviceimpl.EraserServiceImpl;
 
+@SuppressWarnings("serial")
 public class EraserReport extends JDialog
 {
-	Hashtable		hash_history				= null;
+	Hashtable hash_history = null;
 
-	EraserService	service						= new EraserServiceImpl();
+	EraserService service = new EraserServiceImpl();
 
-	JPanel			panel_main					= new JPanel();
+	JPanel panel_main = new JPanel();
 
-	JPanel			panel_printer_button		= new JPanel();
-	JPanel			panel_printarea				= new JPanel();
-	JPanel			panel_top					= new JPanel();
-	JPanel			panel_center				= new JPanel();
-	JPanel			panel_bottom				= new JPanel();
-	JPanel			panel_icon					= new JPanel();
+	JPanel panel_printer_button = new JPanel();
+	JPanel panel_printarea = new JPanel();
+	JPanel panel_top = new JPanel();
+	JPanel panel_center = new JPanel();
+	JPanel panel_bottom = new JPanel();
+	JPanel panel_icon = new JPanel();
 
-	JButton			button_printer				= new JButton(" 인쇄 ");
+	JButton button_printer = new JButton(" 인쇄 ");
 
-	JLabel			label_top_title				= new JLabel("기록물 처분 결과(행정데이터세트)");
+	JLabel label_top_title = new JLabel("기록물 처분 결과 (행정데이터세트)");
 
-	JLabel			label_depart_left			= new JLabel("기관명:");
-	JLabel			label_grade_left			= new JLabel("부서명:");
-	JLabel			label_name_left				= new JLabel("실행자:");
-	JLabel			label_present_left			= new JLabel("입회자:");
-	JLabel			label_script_id_left		= new JLabel("처분 스크립트 아이디:");
-	JLabel			label_script_title_left		= new JLabel("처분대상:");
-	JLabel			label_datetime_left			= new JLabel("처분일시:");
-	JLabel			label_count_left			= new JLabel("처분건수:");
-	JLabel			label_comment_left			= new JLabel("심의결과:");
-	JLabel			label_sql_left				= new JLabel("처분스크립트:");
+	JLabel label_depart_left = new JLabel("기관명:");
+	JLabel label_grade_left = new JLabel("부서명:");
+	JLabel label_name_left = new JLabel("실행자:");
+	JLabel label_present_left = new JLabel("입회자:");
+	JLabel label_script_id_left = new JLabel("처분 스크립트 아이디:");
+	JLabel label_script_title_left = new JLabel("처분대상:");
+	JLabel label_datetime_left = new JLabel("처분일시:");
+	JLabel label_count_left = new JLabel("처분건수:");
+	JLabel label_comment_left = new JLabel("심의결과:");
+	JLabel label_sql_left = new JLabel("처분스크립트:");
 
-	JLabel			label_depart_right			= new JLabel("");
-	JLabel			label_grade_right			= new JLabel("");
-	JLabel			label_name_right			= new JLabel("");
-	JLabel			label_present_right			= new JLabel("");
-	JLabel			label_script_id_right		= new JLabel("");
-	JLabel			label_script_title_right	= new JLabel("");
-	JLabel			label_datetime_right		= new JLabel("");
-	JLabel			label_count_right			= new JLabel("");
-	JLabel			label_comment_right			= new JLabel("");
-	JLabel			label_sql_right				= new JLabel("");
+	JLabel label_depart_right = new JLabel("");
+	JLabel label_grade_right = new JLabel("");
+	JLabel label_name_right = new JLabel("");
+	JLabel label_present_right = new JLabel("");
+	JLabel label_script_id_right = new JLabel("");
+	JLabel label_script_title_right = new JLabel("");
+	JLabel label_datetime_right = new JLabel("");
+	JLabel label_count_right = new JLabel("");
+	JLabel label_comment_right = new JLabel("");
+	JLabel label_sql_right = new JLabel("");
 
-	int				label_left_x				= 150;
-	int				label_left_y				= 20;
-	int				label_left_width			= 200;
-	int				label_left_height			= 24;
+	//20201008 - 좌표값 일부 수정 by.IntraDIGM
+	int label_left_x = 50;
+	int label_left_y = 20;
+	int label_left_width = 100;
+	int label_left_height = 24;
 
-	int				label_right_x				= 240;
-	int				label_right_y				= 20;
-	int				label_right_width			= 260;
-	int				label_right_height			= 24;
+	int label_right_x = 150;
+	int label_right_y = 20;
+	int label_right_width = 400;
+	int label_right_height = 24;
 
-	JLabel			label_bottom_title			= new JLabel("행정 안전부 국가기록원");
+	JLabel label_bottom_title = new JLabel("행정안전부 국가기록원");
 
-	ImageIcon		icon_logo					= new ImageIcon("images/document.jpg");
-	JLabel			label_icon					= new JLabel(icon_logo);
+	ImageIcon icon_logo = new ImageIcon("images/document.jpg");
+	JLabel label_icon = new JLabel(icon_logo);
 
 	EraserReport(JFrame owner, String sqltime)
 	{
@@ -90,34 +93,30 @@ public class EraserReport extends JDialog
 
 		Vector vector = service.historyview();
 
-		for(int ix = 0; ix < vector.size(); ix++)
-		{
+		for (int ix = 0; ix < vector.size(); ix++) {
 
 			Hashtable hash = (Hashtable) vector.get(ix);
 
-			if(sqltime.equals((String) hash.get("DATE")))
-			{
+			if (sqltime.equals(hash.get("DATE"))) {
 				this.hash_history = (Hashtable) vector.get(ix);
 				System.out.println("sqltime=" + sqltime);
 				break;
 			}
 		}
 
-		sqltime	= sqltime.replace(":", "");
-		sqltime	= sqltime.replace("-", "");
-		sqltime	= sqltime.replace(" ", "_");
+		sqltime = sqltime.replace(":", "");
+		sqltime = sqltime.replace("-", "");
+		sqltime = sqltime.replace(" ", "_");
 
 		String str_comment = service.commentview(sqltime);
 
-		if(str_comment == null)
-		{
+		if (str_comment == null) {
 			str_comment = "";
 		}
 
 		String str_sql = service.historysqlview(sqltime);
 
-		if(str_sql == null)
-		{
+		if (str_sql == null) {
 			str_sql = "";
 		}
 
@@ -319,19 +318,18 @@ public class EraserReport extends JDialog
 		panel_main.add(panel_printer_button);
 		panel_main.add(panel_printarea);
 
-		button_printer.addMouseListener(new java.awt.event.MouseAdapter()
-		{
+		button_printer.addMouseListener(new java.awt.event.MouseAdapter() {
+			@Override
 			public void mouseClicked(java.awt.event.MouseEvent event)
 			{
 				PrinterJob pj = PrinterJob.getPrinterJob();
 				pj.setJobName(" Print Component ");
 
-				pj.setPrintable(new Printable()
-				{
+				pj.setPrintable(new Printable() {
+					@Override
 					public int print(Graphics pg, PageFormat pf, int pageNum)
 					{
-						if(pageNum > 0)
-						{
+						if (pageNum > 0) {
 							return Printable.NO_SUCH_PAGE;
 						}
 
@@ -341,21 +339,21 @@ public class EraserReport extends JDialog
 						return Printable.PAGE_EXISTS;
 					}
 				});
-				if(pj.printDialog() == false)
+				if (pj.printDialog() == false)
 					return;
 
-				try
-				{
+				try {
 					pj.print();
-				}
-				catch(PrinterException ex)
-				{
+				} catch (PrinterException ex) {
 					// handle exception
 				}
 			}
 		});
 
-		this.setTitle("국가 기록원 처분 스크립트 실행 결과");
+		ImageIcon img = new ImageIcon(Constants.IMAGE_PATH + "/favicon.png");
+
+		this.setTitle("국가기록원 처분 스크립트 실행 결과");
+		this.setIconImage(img.getImage());
 		this.add(panel_main);
 		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		this.pack();
@@ -363,12 +361,11 @@ public class EraserReport extends JDialog
 		this.setResizable(false);
 		this.setSize(575, 830);
 
-		Dimension	dimension	= Toolkit.getDefaultToolkit().getScreenSize();
-		int			x			= (int) ((dimension.getWidth() - this.getWidth()) / 2);
-		int			y			= (int) ((dimension.getHeight() - this.getHeight()) / 2);
+		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+		int x = (int) ((dimension.getWidth() - this.getWidth()) / 2);
+		int y = (int) ((dimension.getHeight() - this.getHeight()) / 2);
 		this.setLocation(x, y);
 
 		this.setVisible(true);
 	}
-
 }

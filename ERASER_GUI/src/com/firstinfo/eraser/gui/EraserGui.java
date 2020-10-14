@@ -11,14 +11,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.UIManager;
 
@@ -28,61 +26,61 @@ import com.firstinfo.eraser.config.Constants;
  * 처분 프로그램 실행 및 메뉴 클릭 이벤트 작성
  *
  * @author 국가기록원
- *
  */
+@SuppressWarnings("serial")
 public class EraserGui extends JFrame implements ActionListener
 {
-	JMenuBar	menubar		= new JMenuBar();
-	JMenu		menu1		= new JMenu("스크립트 목록");
-	JMenu		menu2		= new JMenu("스크립트 등록");
-	JMenu		menu3		= new JMenu("스크립트 실행이력");
-	JMenu		menu4		= new JMenu("DB 접속설정");
-	JMenu		menu5		= new JMenu("관리자 정보");
+	JMenuBar menubar = new JMenuBar();
+	JMenu menu1 = new JMenu("스크립트 목록");
+	JMenu menu2 = new JMenu("스크립트 등록");
+	JMenu menu3 = new JMenu("스크립트 실행이력");
+	JMenu menu4 = new JMenu("DB 접속설정");
+	JMenu menu5 = new JMenu("관리자 정보");
 
-	JMenuItem	item1		= new JMenuItem("스크립트 목록");
-	JMenuItem	item2		= new JMenuItem("스크립트 등록");
-	JMenuItem	item3		= new JMenuItem("스크립트 실행이력");
-	JMenuItem	item4		= new JMenuItem("DB 접속설정");
-	JMenuItem	item5		= new JMenuItem("관리자 정보");
+	JMenuItem item1 = new JMenuItem("스크립트 목록");
+	JMenuItem item2 = new JMenuItem("스크립트 등록");
+	JMenuItem item3 = new JMenuItem("스크립트 실행이력");
+	JMenuItem item4 = new JMenuItem("DB 접속설정");
+	JMenuItem item5 = new JMenuItem("관리자 정보");
 
-	EraserMain	main		= null;
+	EraserMain main = null;
 
-//	JButton		btnlist		= new JButton(new ImageIcon("images/script_list.jpg"));
-//	JButton		btncreate	= new JButton(new ImageIcon("images/script_create.jpg"));
-//	JButton		btnhistory	= new JButton(new ImageIcon("images/script_history.jpg"));
-//	JButton		btndbconfig	= new JButton(new ImageIcon("images/dbconfig.jpg"));
-//	JButton		btnmanager	= new JButton(new ImageIcon("images/manager.jpg"));
+	// JButton btnlist = new JButton(new ImageIcon("images/script_list.jpg"));
+	// JButton btncreate = new JButton(new ImageIcon("images/script_create.jpg"));
+	// JButton btnhistory = new JButton(new ImageIcon("images/script_history.jpg"));
+	// JButton btndbconfig = new JButton(new ImageIcon("images/dbconfig.jpg"));
+	// JButton btnmanager = new JButton(new ImageIcon("images/manager.jpg"));
 
-	JButton		btnlist		= new JButton(new ImageIcon(Constants.IMAGE_PATH + "/script_list.jpg"));
-	JButton		btncreate	= new JButton(new ImageIcon(Constants.IMAGE_PATH + "/script_create.jpg"));
-	JButton		btnhistory	= new JButton(new ImageIcon(Constants.IMAGE_PATH + "/script_history.jpg"));
-	JButton		btndbconfig	= new JButton(new ImageIcon(Constants.IMAGE_PATH + "/dbconfig.jpg"));
-	JButton		btnmanager	= new JButton(new ImageIcon(Constants.IMAGE_PATH + "/manager.jpg"));
+	JButton btnlist = new JButton(new ImageIcon(Constants.IMAGE_PATH + "/script_list.jpg"));
+	JButton btncreate = new JButton(new ImageIcon(Constants.IMAGE_PATH + "/script_create.jpg"));
+	JButton btnhistory = new JButton(new ImageIcon(Constants.IMAGE_PATH + "/script_history.jpg"));
+	JButton btndbconfig = new JButton(new ImageIcon(Constants.IMAGE_PATH + "/dbconfig.jpg"));
+	JButton btnmanager = new JButton(new ImageIcon(Constants.IMAGE_PATH + "/manager.jpg"));
 
-	JToolBar	toolbar		= new JToolBar("Eraser ToolBar");
+	JToolBar toolbar = new JToolBar("Eraser ToolBar", JToolBar.VERTICAL);
 
-//	public static void main(String args[])
-//	{
-//		//처분 프로그램 실행
-//		EraserGui gui = new EraserGui();
-//	}
+	// public static void main(String args[])
+	// {
+	// //처분 프로그램 실행
+	// EraserGui gui = new EraserGui();
+	// }
 
 	/**
 	 * 처분 프로그램 초기화
 	 */
 	public EraserGui()
 	{
-
-		try
-		{
+		try {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		this.setTitle("국가기록원 처분스크립트");
+		ImageIcon img = new ImageIcon(Constants.IMAGE_PATH + "/favicon.png");
+
+		this.setTitle("국가기록원 처분도구");
+		this.setIconImage(img.getImage());
+		this.setResizable(false);
 
 		menu1.setFont(new Font("돋움체", Font.PLAIN, 12));
 		menu2.setFont(new Font("돋움체", Font.PLAIN, 12));
@@ -90,11 +88,17 @@ public class EraserGui extends JFrame implements ActionListener
 		menu4.setFont(new Font("돋움체", Font.PLAIN, 12));
 		menu5.setFont(new Font("돋움체", Font.PLAIN, 12));
 
-		menubar.add(menu5);
-		menubar.add(menu4);
-		menubar.add(menu2);
+//		menubar.add(menu5);
+//		menubar.add(menu4);
+//		menubar.add(menu2);
+//		menubar.add(menu1);
+//		menubar.add(menu3);
+
 		menubar.add(menu1);
+		menubar.add(menu2);
 		menubar.add(menu3);
+		menubar.add(menu4);
+		menubar.add(menu5);
 
 		this.setJMenuBar(menubar);
 
@@ -111,11 +115,10 @@ public class EraserGui extends JFrame implements ActionListener
 		toolbar.add(btndbconfig);
 		toolbar.add(btnmanager);
 
-		getContentPane().add(toolbar, BorderLayout.NORTH);
+		getContentPane().add(toolbar, BorderLayout.WEST);
 
-		JPanel		panel_main	= new JPanel();
-
-		BoxLayout	layout_main	= new BoxLayout(panel_main, BoxLayout.X_AXIS);
+//		JPanel panel_main = new JPanel();
+//		BoxLayout layout_main = new BoxLayout(panel_main, BoxLayout.X_AXIS);
 
 		main = new EraserMain(this);
 		EraserMenu menu = new EraserMenu(main);
@@ -128,44 +131,40 @@ public class EraserGui extends JFrame implements ActionListener
 		// menu.setAlignmentX(Component.LEFT_ALIGNMENT);
 		// main.setAlignmentX(Component.LEFT_ALIGNMENT);
 		menu.setAlignmentX(Component.TOP_ALIGNMENT);
-//		panel_main.add(menu);
-//		panel_main.add(main);
+		// panel_main.add(menu);
+		// panel_main.add(main);
 
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		// this.add(panel_main);
 		this.add(main);
 		this.pack();
 
-		this.setSize(800, 660);
+		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+//		this.setSize((int)(dimension.getWidth() / 2), (int)(dimension.getHeight() / 1.5));
+		this.setSize((int)(dimension.getWidth() / 2), 600);
 
-		Dimension	dimension	= Toolkit.getDefaultToolkit().getScreenSize();
-		int			x			= (int) ((dimension.getWidth() - this.getWidth()) / 2);
-		int			y			= (int) ((dimension.getHeight() - this.getHeight()) / 2);
+		int x = (int) ((dimension.getWidth() - this.getWidth()) / 2);
+		int y = (int) ((dimension.getHeight() - this.getHeight()) / 2);
 		this.setLocation(x, y);
 
 		this.setVisible(true);
 
-		menu1.addMouseListener(new MouseListener()
-		{
+		menu1.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mousePressed(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseExited(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseEntered(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseClicked(MouseEvent e)
@@ -174,32 +173,25 @@ public class EraserGui extends JFrame implements ActionListener
 				card.show(main, "list");
 				EraserList panel = (EraserList) main.getSubPanel("list");
 				panel.listrefresh();
-
 			}
-
 		});
 
-		btnlist.addMouseListener(new MouseListener()
-		{
+		btnlist.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mousePressed(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseExited(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseEntered(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseClicked(MouseEvent e)
@@ -208,32 +200,25 @@ public class EraserGui extends JFrame implements ActionListener
 				card.show(main, "list");
 				EraserList panel = (EraserList) main.getSubPanel("list");
 				panel.listrefresh();
-
 			}
-
 		});
 
-		menu2.addMouseListener(new MouseListener()
-		{
+		menu2.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mousePressed(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseExited(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseEntered(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseClicked(MouseEvent e)
@@ -243,30 +228,24 @@ public class EraserGui extends JFrame implements ActionListener
 				EraserCreate panel = (EraserCreate) main.getSubPanel("create");
 				panel.refresh();
 			}
-
 		});
 
-		btncreate.addMouseListener(new MouseListener()
-		{
+		btncreate.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mousePressed(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseExited(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseEntered(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseClicked(MouseEvent e)
@@ -276,30 +255,24 @@ public class EraserGui extends JFrame implements ActionListener
 				EraserCreate panel = (EraserCreate) main.getSubPanel("create");
 				panel.refresh();
 			}
-
 		});
 
-		menu3.addMouseListener(new MouseListener()
-		{
+		menu3.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mousePressed(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseExited(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseEntered(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseClicked(MouseEvent e)
@@ -309,30 +282,24 @@ public class EraserGui extends JFrame implements ActionListener
 				EraserHistory panel = (EraserHistory) main.getSubPanel("history");
 				panel.listrefresh();
 			}
-
 		});
 
-		btnhistory.addMouseListener(new MouseListener()
-		{
+		btnhistory.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mousePressed(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseExited(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseEntered(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseClicked(MouseEvent e)
@@ -342,30 +309,24 @@ public class EraserGui extends JFrame implements ActionListener
 				EraserHistory panel = (EraserHistory) main.getSubPanel("history");
 				panel.listrefresh();
 			}
-
 		});
 
-		menu4.addMouseListener(new MouseListener()
-		{
+		menu4.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mousePressed(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseExited(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseEntered(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseClicked(MouseEvent e)
@@ -374,32 +335,25 @@ public class EraserGui extends JFrame implements ActionListener
 				card.show(main, "config");
 				EraserConfig panel = (EraserConfig) main.getSubPanel("config");
 				panel.view();
-
 			}
-
 		});
 
-		btndbconfig.addMouseListener(new MouseListener()
-		{
+		btndbconfig.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mousePressed(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseExited(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseEntered(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseClicked(MouseEvent e)
@@ -408,32 +362,25 @@ public class EraserGui extends JFrame implements ActionListener
 				card.show(main, "config");
 				EraserConfig panel = (EraserConfig) main.getSubPanel("config");
 				panel.view();
-
 			}
-
 		});
 
-		menu5.addMouseListener(new MouseListener()
-		{
+		menu5.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mousePressed(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseExited(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseEntered(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseClicked(MouseEvent e)
@@ -442,32 +389,25 @@ public class EraserGui extends JFrame implements ActionListener
 				card.show(main, "manager");
 				EraserManager panel = (EraserManager) main.getSubPanel("manager");
 				panel.view();
-
 			}
-
 		});
 
-		btnmanager.addMouseListener(new MouseListener()
-		{
+		btnmanager.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mousePressed(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseExited(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseEntered(MouseEvent e)
-			{
-			}
+			{}
 
 			@Override
 			public void mouseClicked(MouseEvent e)
@@ -476,11 +416,8 @@ public class EraserGui extends JFrame implements ActionListener
 				card.show(main, "manager");
 				EraserManager panel = (EraserManager) main.getSubPanel("manager");
 				panel.view();
-
 			}
-
 		});
-
 	} // EraserGui() End
 
 	/**
@@ -494,38 +431,33 @@ public class EraserGui extends JFrame implements ActionListener
 	{
 		System.out.println("actionPerformed");
 
-		if(e.getSource() == menu1)
-		{
+		if (e.getSource() == menu1) {
 			CardLayout card = (CardLayout) main.getLayout();
 			card.show(main, "list");
 			EraserList panel = (EraserList) main.getSubPanel("list");
 			panel.listrefresh();
 		}
 
-		if(e.getSource() == menu2)
-		{
+		if (e.getSource() == menu2) {
 			CardLayout card = (CardLayout) main.getLayout();
 			card.show(main, "create");
 			EraserCreate panel = (EraserCreate) main.getSubPanel("create");
 			panel.refresh();
 		}
 
-		if(e.getSource() == menu3)
-		{
+		if (e.getSource() == menu3) {
 			CardLayout card = (CardLayout) main.getLayout();
 			card.show(main, "history");
 			EraserHistory panel = (EraserHistory) main.getSubPanel("history");
 			panel.listrefresh();
 		}
 
-		if(e.getSource() == menu4)
-		{
+		if (e.getSource() == menu4) {
 			CardLayout card = (CardLayout) main.getLayout();
 			card.show(main, "config");
 			EraserConfig panel = (EraserConfig) main.getSubPanel("config");
 			panel.view();
 		}
-
 	}
 
 	public EraserMain getMain()

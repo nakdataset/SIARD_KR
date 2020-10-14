@@ -11,25 +11,20 @@ import javax.swing.JPanel;
 
 /**
  * 처분 프로그램 메뉴 생성 및 이벤트 작성
- * 
+ *
  * @author 국가기록원
  *
  */
+@SuppressWarnings("serial")
 public class EraserMenu extends JPanel implements ActionListener
 {
-	JButton		btn1			= null;
-	JButton		btn2			= null;
-	JButton		btn3			= null;
-	JButton		btn4			= null;
-	JButton		btn5			= null;
+	JButton btn1 = null;
+	JButton btn2 = null;
+	JButton btn3 = null;
+	JButton btn4 = null;
+	JButton btn5 = null;
 
-	EraserMain	panel_main		= null;
-
-	private int	btn_position_x	= 0;
-	private int	btn_position_y	= 0;
-
-	private int	btn_width		= 80;
-	private int	btn_height		= 20;
+	EraserMain panel_main = null;
 
 	EraserMenu(EraserMain panel)
 	{
@@ -40,11 +35,11 @@ public class EraserMenu extends JPanel implements ActionListener
 		this.setLayout(layout_menu);
 		Dimension btn_size = new Dimension(300, 25);
 
-		btn1	= new JButton("스크립트 목록");
-		btn2	= new JButton("스크립트 등록");
-		btn3	= new JButton("스크립트 실행이력");
-		btn4	= new JButton("DB 접속 설정");
-		btn5	= new JButton("관리자 정보");
+		btn1 = new JButton("스크립트 목록");
+		btn2 = new JButton("스크립트 등록");
+		btn3 = new JButton("스크립트 실행이력");
+		btn4 = new JButton("DB 접속 설정");
+		btn5 = new JButton("관리자 정보");
 
 		btn1.setMaximumSize(btn_size);
 		btn2.setMaximumSize(btn_size);
@@ -71,36 +66,32 @@ public class EraserMenu extends JPanel implements ActionListener
 	public void actionPerformed(ActionEvent e)
 	{
 		// 액션 리스너 재정의
-		if(e.getSource().equals(btn1)) // list
+		if (e.getSource().equals(btn1)) // list
 		{
 			CardLayout card = (CardLayout) this.panel_main.getLayout();
 			card.show(panel_main, "list");
 			EraserList panel = (EraserList) panel_main.getSubPanel("list");
 			panel.listrefresh();
-		}
-		else if(e.getSource().equals(btn2)) // create
+		} else if (e.getSource().equals(btn2)) // create
 		{
 			CardLayout card = (CardLayout) this.panel_main.getLayout();
 			card.show(panel_main, "create");
 			EraserCreate panel = (EraserCreate) panel_main.getSubPanel("create");
 			panel.refresh();
 
-		}
-		else if(e.getSource().equals(btn3)) // history
+		} else if (e.getSource().equals(btn3)) // history
 		{
 			CardLayout card = (CardLayout) this.panel_main.getLayout();
 			card.show(panel_main, "history");
 			EraserHistory panel = (EraserHistory) panel_main.getSubPanel("history");
 			panel.listrefresh();
-		}
-		else if(e.getSource().equals(btn4)) // dbconfig
+		} else if (e.getSource().equals(btn4)) // config
 		{
 			CardLayout card = (CardLayout) this.panel_main.getLayout();
 			card.show(panel_main, "config");
 			EraserConfig panel = (EraserConfig) panel_main.getSubPanel("config");
 			panel.view();
-		}
-		else if(e.getSource().equals(btn5)) // dbconfig
+		} else if (e.getSource().equals(btn5)) // manager
 		{
 			CardLayout card = (CardLayout) this.panel_main.getLayout();
 			card.show(panel_main, "manager");
