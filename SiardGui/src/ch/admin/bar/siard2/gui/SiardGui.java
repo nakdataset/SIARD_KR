@@ -200,15 +200,16 @@ public class SiardGui extends Application
 	/** setTitle sets the title with file name and change indicator */
   public void setTitle()
   {
-    String sTitle = getClass().getSimpleName() + " " + sVERSION;
-    if (_archive != null)
-    {
-      sTitle = sTitle + ": " + _archive.getFile().getName();
-      if (!_archive.isMetaDataUnchanged())
-        sTitle = sTitle + "*";
-    }
-    _stage.setTitle(sTitle);
-	} /* setTitle */
+//    String sTitle = getClass().getSimpleName() + " " + sVERSION;
+//    if (_archive != null)
+//    {
+//      sTitle = sTitle + ": " + _archive.getFile().getName();
+//      if (!_archive.isMetaDataUnchanged())
+//        sTitle = sTitle + "*";
+//    }
+//    _stage.setTitle(sTitle);
+    _stage.setTitle("SIARD_KR v1.1"); //20201013 - 타이틀 강제 수정. 요청 by.IntraDIGM
+  } /* setTitle */
 
 	private Cursor _cursor = Cursor.DEFAULT;
 
