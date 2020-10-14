@@ -1,6 +1,8 @@
 package ch.admin.bar.siard2.cmd;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
@@ -43,10 +45,7 @@ public class SFTPConnection{
 		}
 
 		try {
-			System.out.println("cd root");
-			channelSftp.cd("/");
-			System.out.println("fileDownloadModel.getSourceFile() => " + fileDownloadModel.getSourceFile());
-			channelSftp.stat(fileDownloadModel.getSourceFile()); // => No such file
+			isFileExists(fileDownloadModel.getSourceFile());
 		}catch(Exception e) {
 			try {
 				System.out.println("No Such File ! -> " + fileDownloadModel.getSourceFile());
@@ -115,6 +114,48 @@ public class SFTPConnection{
 			session.disconnect();
 			System.out.println();
 		}
+	}
+
+	private void isFileExists(String sourceFile) throws Exception{
+		if(isFileNameExistsKor(sourceFile)) {
+			setEncoding(sourceFile);
+		}
+		channelSftp.stat(sourceFile); // => No such file
+	}
+
+	private boolean isFileNameExistsKor(String sourceFile) throws Exception{
+		String regExp = ".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*";
+		if(sourceFile.matches(regExp)) {
+    		return true;
+    	}
+		return false;
+	}
+
+	private void setEncoding(String sourceFile) throws Exception{
+		boolean fileExistsFlag = false;
+
+		List<String> encodingList = new ArrayList<String>();
+		encodingList.add("UTF-8");
+		encodingList.add("ASCII");
+		encodingList.add("EUC-KR");
+		encodingList.add("CP949");
+		encodingList.add("MS949");
+		encodingList.add("KSC5601");
+		encodingList.add("ISO-8859-1");
+
+		for(int i=0; i<encodingList.size(); i++) {
+			channelSftp.setFilenameEncoding(encodingList.get(i));
+
+			try {
+				channelSftp.stat(sourceFile);
+				fileExistsFlag = true;
+				System.out.println(fileExistsFlag + " encoding => " + encodingList.get(i));
+				return;
+			}catch(Exception e) {}
+		}
+
+		if(!fileExistsFlag) throw new Exception("No Such File ! -> " + sourceFile);
+
 	}
 
 	class MyProgressMonitor implements SftpProgressMonitor {
