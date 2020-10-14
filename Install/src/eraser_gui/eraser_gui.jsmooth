@@ -6,20 +6,21 @@
 <JVMSearchPath>jdkpath</JVMSearchPath>
 <JVMSearchPath>exepath</JVMSearchPath>
 <JVMSearchPath>jview</JVMSearchPath>
-<arguments></arguments>
-<classPath>..\..\..\ERASER_GUI\apps\lib\JDBC-10.1.2.7694-cubrid.jar</classPath>
-<classPath>..\..\..\ERASER_GUI\apps\lib\commons-codec-1.13.jar</classPath>
-<classPath>..\..\..\ERASER_GUI\apps\lib\jcalendar-1.4.jar</classPath>
-<classPath>..\..\..\ERASER_GUI\apps\lib\jgoodies-common-1.2.0.jar</classPath>
-<classPath>..\..\..\ERASER_GUI\apps\lib\jgoodies-looks-2.4.1.jar</classPath>
-<classPath>..\..\..\ERASER_GUI\apps\lib\junit-4.6.jar</classPath>
-<classPath>..\..\..\ERASER_GUI\apps\lib\mysql-connector-java-8.0.11.jar</classPath>
-<classPath>..\..\..\ERASER_GUI\apps\lib\ojdbc8.jar</classPath>
-<classPath>..\..\..\ERASER_GUI\apps\lib\tibero6-jdbc-14.jar</classPath>
+<bundledJVMPath>..\java\jre\bin</bundledJVMPath>
+<classPath>apps\lib\JDBC-10.1.2.7694-cubrid.jar</classPath>
+<classPath>apps\lib\commons-codec-1.13.jar</classPath>
+<classPath>apps\lib\jcalendar-1.4.jar</classPath>
+<classPath>apps\lib\jgoodies-common-1.2.0.jar</classPath>
+<classPath>apps\lib\jgoodies-looks-2.4.1.jar</classPath>
+<classPath>apps\lib\junit-4.6.jar</classPath>
+<classPath>apps\lib\mysql-connector-java-8.0.11.jar</classPath>
+<classPath>apps\lib\ojdbc8.jar</classPath>
+<classPath>apps\lib\tibero6-jdbc-14.jar</classPath>
 <embeddedJar>true</embeddedJar>
-<executableName>행정정보데이터세트 처분도구_debug.exe</executableName>
+<executableName>행정정보데이터세트 처분도구.exe</executableName>
+<iconLocation>..\siardgui.ico</iconLocation>
 <initialMemoryHeap>-1</initialMemoryHeap>
-<jarLocation>apps\lib\eraser_gui.jar</jarLocation>
+<jarLocation>eraser_gui.jar</jarLocation>
 <javaProperties>
 <name>file.encoding</name>
 <value>UTF-8</value>
@@ -51,6 +52,6 @@
 </skeletonProperties>
 <skeletonProperties>
 <key>Debug</key>
-<value>1</value>
+<value>0</value>
 </skeletonProperties>
 </jsmoothproject>
