@@ -1,2 +1,1 @@
-Install/src/java/jre/bin/jfxwebkit.dll filter=lfs diff=lfs merge=lfs -text
-Install/src/java/jre/lib/rt.jar filter=lfs diff=lfs merge=lfs -text
+Install/SIARD_KR[[:space:]]v1.1[[:space:]]Setup.exe filter=lfs diff=lfs merge=lfs -text
