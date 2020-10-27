@@ -741,8 +741,22 @@ public class MetaDataToDb
         {
           QualifiedId qiTable = new QualifiedId(null,
           sm.getMappedSchemaName(),tm.getMappedTableName());
+          
+          //20201021 - Addon
+          if(_todb.equals("CUBRID")) {
+          	qiTable = new QualifiedId(null,
+                null,tm.getMappedTableName());
+          }
+          
           /* CASCADE must always drop! */
-          String sSql = "DROP TABLE "+qiTable.format() +" CASCADE";
+          String sSql = "DROP TABLE "+qiTable.format();
+          
+          //20201021 - Addon
+          if(!_todb.equals("CUBRID")) {
+          	sSql += " CASCADE";
+          }
+          System.out.println("  sSql: "+sSql);
+          
           _il.event(sSql);
           stmt.executeUpdate(sSql);
           System.out.println("  Dropped: "+qiTable.format());
