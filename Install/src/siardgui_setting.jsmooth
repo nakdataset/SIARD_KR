@@ -6,6 +6,7 @@
 <JVMSearchPath>jdkpath</JVMSearchPath>
 <JVMSearchPath>exepath</JVMSearchPath>
 <JVMSearchPath>jview</JVMSearchPath>
+<arguments></arguments>
 <bundledJVMPath>java\jre\bin</bundledJVMPath>
 <classPath>lib\activation-1.1.1.jar</classPath>
 <classPath>lib\antlr-runtime-4.5.2.jar</classPath>
@@ -54,7 +55,7 @@
 <classPath>lib\xsdlib-2010.1.jar</classPath>
 <classPath>lib\zip64.jar</classPath>
 <embeddedJar>true</embeddedJar>
-<executableName>행정정보데이터세트 관리도구.exe</executableName>
+<executableName>행정정보데이터세트 관리도구_debug.exe</executableName>
 <iconLocation>siardgui.ico</iconLocation>
 <initialMemoryHeap>-1</initialMemoryHeap>
 <jarLocation>lib\siardgui.jar</jarLocation>
@@ -93,6 +94,6 @@
 </skeletonProperties>
 <skeletonProperties>
 <key>Debug</key>
-<value>0</value>
+<value>1</value>
 </skeletonProperties>
 </jsmoothproject>
