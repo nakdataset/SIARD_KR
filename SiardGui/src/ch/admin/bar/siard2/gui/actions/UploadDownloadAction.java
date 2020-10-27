@@ -36,6 +36,7 @@ import ch.admin.bar.siard2.gui.dialogs.DownloadDialog;
 import ch.admin.bar.siard2.gui.dialogs.TableDialog;
 import ch.admin.bar.siard2.gui.dialogs.UploadConnectionDialog;
 import ch.admin.bar.siard2.gui.dialogs.UploadDialog;
+import ch.admin.bar.siard2.jdbc.CUBRIDDriver;
 import ch.enterag.utils.fx.dialogs.FS;
 import ch.enterag.utils.fx.dialogs.MB;
 import ch.enterag.utils.logging.IndentLogger;
@@ -100,6 +101,11 @@ public class UploadDownloadAction {
 			String sError = SiardConnection.getSiardConnection().loadDriver(dcd.getConnectionUrl());
 			if (sError == null) {
 				_il.event("Driver for " + dcd.getConnectionUrl() + " loaded!");
+				
+				//siard용 cubrid jdbc 클래스 세팅
+				if(sConnectionUrl.contains("cubrid")) {
+					CUBRIDDriver.register();
+				}
 
 				/* test connection */
 				DriverManager.setLoginTimeout(UserProperties.getUserProperties().getLoginTimeoutSeconds());
@@ -306,6 +312,11 @@ public class UploadDownloadAction {
 			/* try and load appropriate driver */
 			String sError = SiardConnection.getSiardConnection().loadDriver(ucd.getConnectionUrl());
 			if (sError == null) {
+				//siard용 cubrid jdbc 클래스 세팅
+				if(sConnectionUrl.contains("cubrid")) {
+					CUBRIDDriver.register();
+				}
+				
 				/* test connection */
 				DriverManager.setLoginTimeout(UserProperties.getUserProperties().getLoginTimeoutSeconds());
 				try {
