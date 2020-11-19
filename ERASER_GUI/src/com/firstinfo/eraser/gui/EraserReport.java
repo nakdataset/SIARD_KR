@@ -47,18 +47,18 @@ public class EraserReport extends JDialog
 
 	JButton button_printer = new JButton(" 인쇄 ");
 
-	JLabel label_top_title = new JLabel("기록물 처분 결과 (행정데이터세트)");
+	JLabel label_top_title = new JLabel("기록물 삭제 결과 (행정데이터세트)");
 
 	JLabel label_depart_left = new JLabel("기관명:");
 	JLabel label_grade_left = new JLabel("부서명:");
 	JLabel label_name_left = new JLabel("실행자:");
 	JLabel label_present_left = new JLabel("입회자:");
-	JLabel label_script_id_left = new JLabel("처분 스크립트 아이디:");
-	JLabel label_script_title_left = new JLabel("처분대상:");
-	JLabel label_datetime_left = new JLabel("처분일시:");
-	JLabel label_count_left = new JLabel("처분건수:");
+	JLabel label_script_id_left = new JLabel("삭제 스크립트 아이디:");
+	JLabel label_script_title_left = new JLabel("삭제대상:");
+	JLabel label_datetime_left = new JLabel("삭제일시:");
+	JLabel label_count_left = new JLabel("삭제건수:");
 	JLabel label_comment_left = new JLabel("심의결과:");
-	JLabel label_sql_left = new JLabel("처분스크립트:");
+	JLabel label_sql_left = new JLabel("삭제스크립트:");
 
 	JLabel label_depart_right = new JLabel("");
 	JLabel label_grade_right = new JLabel("");
@@ -352,7 +352,7 @@ public class EraserReport extends JDialog
 
 		ImageIcon img = new ImageIcon(Constants.IMAGE_PATH + "/favicon.png");
 
-		this.setTitle("국가기록원 처분 스크립트 실행 결과");
+		this.setTitle("국가기록원 삭제 스크립트 실행 결과");
 		this.setIconImage(img.getImage());
 		this.add(panel_main);
 		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);

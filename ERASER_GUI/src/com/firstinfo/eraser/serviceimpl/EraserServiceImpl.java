@@ -30,7 +30,7 @@ import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
 /**
- * 처분 프로그램 기능구현 1. 스크립트 목록조회/상세조회 2. 스크립트 저장 파일 삭제/변경/실행 3. DBMS 접속정보 저장/조회 4.
+ * 삭제 프로그램 기능구현 1. 스크립트 목록조회/상세조회 2. 스크립트 저장 파일 삭제/변경/실행 3. DBMS 접속정보 저장/조회 4.
  * 스크립트 실행이력 조회/저장
  *
  * @author 국가기록원
@@ -46,12 +46,12 @@ public class EraserServiceImpl implements EraserService
 	private BASE64Decoder	decoder		= new BASE64Decoder();
 
 	/**
-	 * 처분 스크립트를 저장한다.
+	 * 삭제 스크립트를 저장한다.
 	 *
-	 * @title 처분 스크립트명
-	 * @date 처분 스크립트 저장 일자
-	 * @desc 처분 스크립트 설명
-	 * @sql 처분 스크립트
+	 * @title 삭제 스크립트명
+	 * @date 삭제 스크립트 저장 일자
+	 * @desc 삭제 스크립트 설명
+	 * @sql 삭제 스크립트
 	 */
 	@Override
 	public String erasercreate(String title, String date, String desc, String sql)
@@ -174,7 +174,7 @@ public class EraserServiceImpl implements EraserService
 	}
 
 	/**
-	 * 처분 스크립트 목록조회
+	 * 삭제 스크립트 목록조회
 	 */
 	@Override
 	public Vector eraserlist()
@@ -229,7 +229,7 @@ public class EraserServiceImpl implements EraserService
 	}
 
 	/**
-	 * 처분 스크립트 상세조회
+	 * 삭제 스크립트 상세조회
 	 */
 	@Override
 	public Hashtable eraserview(String number)
@@ -300,7 +300,7 @@ public class EraserServiceImpl implements EraserService
 	}
 
 	/**
-	 * 처분 스크립트 삭제
+	 * 삭제 스크립트 삭제
 	 */
 	@Override
 	public boolean eraserdelete(String number)
@@ -341,7 +341,7 @@ public class EraserServiceImpl implements EraserService
 	}
 
 	/**
-	 * 처분 스크립트 변경
+	 * 삭제 스크립트 변경
 	 */
 	@Override
 	public boolean eraserchange(String number, String title, String date, String desc, String sql)
@@ -520,12 +520,12 @@ public class EraserServiceImpl implements EraserService
 	}
 
 	/**
-	 * 처분 스크립트 실행
+	 * 삭제 스크립트 실행
 	 *
-	 * @number 처분 스크립트 저장파일 순번
-	 * @title 처분 스크립트 명
+	 * @number 삭제 스크립트 저장파일 순번
+	 * @title 삭제 스크립트 명
 	 * @test
-	 * @all 처분 스크립트 모두 수행 후 commit 여부
+	 * @all 삭제 스크립트 모두 수행 후 commit 여부
 	 */
 	@Override
 	public Hashtable eraserexecute(String number, String title, String test, String all, String comment)
@@ -709,7 +709,7 @@ public class EraserServiceImpl implements EraserService
 			// }
 			// else
 			// {
-			// //처분 스크립트 이력 저장
+			// //삭제 스크립트 이력 저장
 			// //삭제후 커밋이 되면
 			// this.eraserhistorysave(number, title, resultValue, sql);
 			// }
@@ -755,12 +755,12 @@ public class EraserServiceImpl implements EraserService
 	}
 
 	/**
-	 * 처분 스크립트 실행
+	 * 삭제 스크립트 실행
 	 *
-	 * @number 처분 스크립트 저장파일 순번
-	 * @title 처분 스크립트 명
+	 * @number 삭제 스크립트 저장파일 순번
+	 * @title 삭제 스크립트 명
 	 * @test
-	 * @all 처분 스크립트 모두 수행 후 commit 여부
+	 * @all 삭제 스크립트 모두 수행 후 commit 여부
 	 */
 	// public Hashtable eraserexecute(String number, String title, String test,
 	// String all, String comment)
@@ -977,7 +977,7 @@ public class EraserServiceImpl implements EraserService
 			// }
 			// else
 			// {
-			// //처분 스크립트 이력 저장
+			// //삭제 스크립트 이력 저장
 			// //삭제후 커밋이 되면
 			// this.eraserhistorysave(number, title, resultValue, sql);
 			// }
@@ -1023,7 +1023,7 @@ public class EraserServiceImpl implements EraserService
 	}
 
 	/**
-	 * 처분스크립트 실행이력 조회
+	 * 삭제스크립트 실행이력 조회
 	 */
 	@Override
 	public Vector historyview()
@@ -1108,7 +1108,7 @@ public class EraserServiceImpl implements EraserService
 	}
 
 	/**
-	 * 처분스크립트 실행이력 저장
+	 * 삭제스크립트 실행이력 저장
 	 */
 	private boolean eraserhistorysave(String number, String title, int count, String sql, String comment)
 	{
@@ -1137,7 +1137,7 @@ public class EraserServiceImpl implements EraserService
 
 			Date				date		= new Date();
 			SimpleDateFormat	formatter	= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			// 처분스크립트 번호,타이블,실행날짜,삭제건수
+			// 삭제스크립트 번호,타이블,실행날짜,삭제건수
 			String				str_history	= number + "|" + title + "|" + formatter.format(date) + "|" + count
 			        + "\r\n";
 
@@ -1216,7 +1216,7 @@ public class EraserServiceImpl implements EraserService
 	}
 
 	/**
-	 * 처분스크립트 실행이력 저장
+	 * 삭제스크립트 실행이력 저장
 	 */
 	// private boolean eraserhistorysave(String number, String title, int count,
 	// String sql, String comment)
@@ -1259,7 +1259,7 @@ public class EraserServiceImpl implements EraserService
 
 			Date				date		= new Date();
 			SimpleDateFormat	formatter	= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			// 처분스크립트 번호,타이블,실행날짜,삭제건수
+			// 삭제스크립트 번호,타이블,실행날짜,삭제건수
 			String				str_history	= number + "|" + title + "|" + formatter.format(date) + "|" + count + "|"
 			        + depart + "|" + grade + "|" + name + "|" + present + "\r\n";
 

@@ -5,7 +5,7 @@ import java.awt.CardLayout;
 import javax.swing.JPanel;
 
 /**
- * 처분 프로그램 화면 초기화 및 화면 호출
+ * 삭제 프로그램 화면 초기화 및 화면 호출
  *
  * @author 국가기록원
  *

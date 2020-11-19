@@ -25,7 +25,7 @@ import com.toedter.calendar.JDateChooser;
 import com.toedter.calendar.JTextFieldDateEditor;
 
 /**
- * 처분 스크립트 등록화면
+ * 삭제 스크립트 등록화면
  *
  * @author 국가기록원
  *

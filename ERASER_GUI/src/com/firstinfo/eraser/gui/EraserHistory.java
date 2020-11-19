@@ -30,7 +30,7 @@ import com.firstinfo.eraser.service.EraserService;
 import com.firstinfo.eraser.serviceimpl.EraserServiceImpl;
 
 /**
- * 처분 스크립트 실행이력을 조회한다.
+ * 삭제 스크립트 실행이력을 조회한다.
  *
  * @author 국가기록원
  *
@@ -57,7 +57,7 @@ public class EraserHistory extends JPanel
 		BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
 		this.setLayout(layout);
 
-		JLabel label = new JLabel("처분 스크립트 실행 이력입니다.");
+		JLabel label = new JLabel("삭제 스크립트 실행 이력입니다.");
 		label.setFont(new Font(label.getFont().getName(), Font.PLAIN, 12));
 		label.setAlignmentX(Component.CENTER_ALIGNMENT);
 		label.setForeground(Color.WHITE);
@@ -103,7 +103,7 @@ public class EraserHistory extends JPanel
 
 		Vector<Hashtable> v = service.historyview();
 		model.setRowCount(0);
-		// 처분 스크립트 목록 가져온다.
+		// 삭제 스크립트 목록 가져온다.
 		Object row_data[] = new Object[7];
 
 		for (int ix = 0; ix < v.size(); ix++) {
@@ -237,7 +237,7 @@ public class EraserHistory extends JPanel
 
 		Vector<Hashtable> v = service.historyview();
 		model.setRowCount(0);
-		// 처분 스크립트 목록 가져온다.
+		// 삭제 스크립트 목록 가져온다.
 		Object row_data[] = new Object[7];
 
 		for (int ix = 0; ix < v.size(); ix++) {

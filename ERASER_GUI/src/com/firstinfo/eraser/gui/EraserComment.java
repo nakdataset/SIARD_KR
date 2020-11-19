@@ -53,7 +53,7 @@ public class EraserComment extends JDialog implements ActionListener
 	JLabel label_grade_sample = new JLabel("예) 전자기록관리과");
 	JLabel label_name_sample = new JLabel("예) 전산주사 홍길동");
 	JLabel label_present_sample = new JLabel("예) 기록연구사 전우치");
-	JLabel label_comment_sample = new JLabel("예) 2020년 1월 1일 심의회의 결과에 따른 처분");
+	JLabel label_comment_sample = new JLabel("예) 2020년 1월 1일 심의회의 결과에 따른 삭제");
 
 	JTextArea textareaComment = new JTextArea();
 	JScrollPane scrollComment = new JScrollPane(textareaComment);
@@ -80,7 +80,7 @@ public class EraserComment extends JDialog implements ActionListener
 			+ "      각 시스템별로 행정정보데이터세트를 관리하기 위해 업무 담당자, \n" + "       기록관리 담당자,  시스템 담당자가 모두 참여하는 협의체를 구성하여 \n"
 			+ "       관리의 기준 확정 및 협의가 필요한 부분을 해결하도록 함\n" + "\n" + "단위기능\n"
 			+ "       행정정보데이터세트의 특성을 반영하여 데이터베이스의 구조별로 \n" + "       업무별로 물리적 또는 논리적으로 구분이 가능한 기록관리 단위로서 \n"
-			+ "       단위기능별로 보존 및 처분 실행\n" + "\n" + "처분단위\n" + "        단위기능별로 동일한 처분을 할 수 없을 때 처분을 달리하는 단위";
+			+ "       단위기능별로 보존 및 삭제 실행\n" + "\n" + "삭제단위\n" + "        단위기능별로 동일한 삭제를 할 수 없을 때 삭제를 달리하는 단위";
 
 		textareaMessage.setText(strmessage);
 		textareaMessage.setColumns(50);

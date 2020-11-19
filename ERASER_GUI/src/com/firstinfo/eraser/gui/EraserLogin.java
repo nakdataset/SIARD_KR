@@ -63,7 +63,7 @@ public class EraserLogin extends JDialog implements ActionListener, KeyListener
 
 		ImageIcon img = new ImageIcon(Constants.IMAGE_PATH + "/favicon.png");
 
-		this.setTitle("국가기록원 처분도구 로그인");
+		this.setTitle("국가기록원 삭제지원 도구 로그인");
 		this.setIconImage(img.getImage());
 		this.add(panel);
 		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);

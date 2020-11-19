@@ -10,7 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 /**
- * 처분 프로그램 메뉴 생성 및 이벤트 작성
+ * 삭제 프로그램 메뉴 생성 및 이벤트 작성
  *
  * @author 국가기록원
  *

@@ -23,7 +23,7 @@ import javax.swing.UIManager;
 import com.firstinfo.eraser.config.Constants;
 
 /**
- * 처분 프로그램 실행 및 메뉴 클릭 이벤트 작성
+ * 삭제 프로그램 실행 및 메뉴 클릭 이벤트 작성
  *
  * @author 국가기록원
  */
@@ -61,12 +61,12 @@ public class EraserGui extends JFrame implements ActionListener
 
 	// public static void main(String args[])
 	// {
-	// //처분 프로그램 실행
+	// //삭제 프로그램 실행
 	// EraserGui gui = new EraserGui();
 	// }
 
 	/**
-	 * 처분 프로그램 초기화
+	 * 삭제 프로그램 초기화
 	 */
 	public EraserGui()
 	{
@@ -78,7 +78,7 @@ public class EraserGui extends JFrame implements ActionListener
 
 		ImageIcon img = new ImageIcon(Constants.IMAGE_PATH + "/favicon.png");
 
-		this.setTitle("국가기록원 처분도구");
+		this.setTitle("국가기록원 삭제지원 도구");
 		this.setIconImage(img.getImage());
 		this.setResizable(false);
 
@@ -421,7 +421,7 @@ public class EraserGui extends JFrame implements ActionListener
 	} // EraserGui() End
 
 	/**
-	 * 처분프로그램 화면전환
+	 * 삭제프로그램 화면전환
 	 *
 	 * 메뉴 클릭 이벤트 menu1 : 스크립트 목록 menu2 : 스크립트 등록 menu3 : 스크립트 실행이력 menu4 : DB 접속설정
 	 *
