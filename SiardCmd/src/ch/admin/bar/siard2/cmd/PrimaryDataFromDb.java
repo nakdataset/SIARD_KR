@@ -51,6 +51,7 @@ import ch.admin.bar.siard2.api.Value;
 import ch.admin.bar.siard2.api.generated.CategoryType;
 import ch.admin.bar.siard2.api.primary.FileDownloadModel;
 import ch.admin.bar.siard2.cmd.util.FileUtils;
+import ch.admin.bar.siard2.cmd.util.HashProcess;
 import ch.config.db.HistoryDAO;
 import ch.enterag.sqlparser.identifier.QualifiedId;
 import ch.enterag.utils.StopWatch;
@@ -78,6 +79,8 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 	private java.time.Duration downtimesum = java.time.Duration.ZERO;
 	private int downcount = 0;
 	private long downsizesum = 0;
+	
+	String hash_targetFilePath = ""; //SIARD-HASH.txt 생성 경로
 
   /*------------------------------------------------------------------*/
   /** increment the number or records downloaded, issuing a notification,
@@ -368,6 +371,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 						if("".equals(targetFilePath.trim())) {
 							targetFilePath = _archive.getFile().getParent();
 						}
+						hash_targetFilePath = targetFilePath;
 						FileDownloadModel model = new FileDownloadModel();
 						model.setSourceFile(SOURCE_FILE);
 						model.setTargetFile(targetFilePath);
@@ -391,6 +395,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 						if("".equals(targetFilePath.trim())) {
 							targetFilePath = _archive.getFile().getParent();
 						}
+						hash_targetFilePath = targetFilePath;
 						FileUtils fileUtis = new FileUtils();
 						fileUtis.copy(SOURCE_FILE, targetFilePath + File.separator + SOURCE_FILE.substring(0, SOURCE_FILE.lastIndexOf("/") + 1));
 
@@ -761,6 +766,18 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
     if (cancelRequested())
       throw new IOException("\r\nDownload of primary data cancelled!");
     System.out.println("\r\nDownload terminated successfully.");
+    
+    //20201116 - SIARD-HASH.txt 생성  by IntraDIGM
+    if(!"".equals(hash_targetFilePath)) {
+    	System.out.println("\r\nSIARD-HASH.txt creating...");
+    	try {
+    		HashProcess hashProcess = new HashProcess();
+    		hashProcess.doHashFolders(hash_targetFilePath);
+    		System.out.println("SIARD-HASH.txt created successfully.\r\n");
+    	} catch (Exception e) {
+    		System.out.println("SIARD-HASH.txt create failed! - " + e.getMessage() + "\r\n");
+    	}
+    }
 
 		/* S: SIARD 업로드 종료시간 */
 		String siardDownloadEndTime = dateToString();
