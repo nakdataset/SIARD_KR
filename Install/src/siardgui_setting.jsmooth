@@ -55,7 +55,7 @@
 <classPath>lib\xsdlib-2010.1.jar</classPath>
 <classPath>lib\zip64.jar</classPath>
 <embeddedJar>true</embeddedJar>
-<executableName>행정정보데이터세트 관리도구_debug.exe</executableName>
+<executableName>행정정보데이터세트 이관도구.exe</executableName>
 <iconLocation>siardgui.ico</iconLocation>
 <initialMemoryHeap>-1</initialMemoryHeap>
 <jarLocation>lib\siardgui.jar</jarLocation>
@@ -94,6 +94,6 @@
 </skeletonProperties>
 <skeletonProperties>
 <key>Debug</key>
-<value>1</value>
+<value>0</value>
 </skeletonProperties>
 </jsmoothproject>
