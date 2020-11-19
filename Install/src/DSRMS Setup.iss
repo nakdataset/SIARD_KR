@@ -2,13 +2,13 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "SIARD_KR"
-#define MyAppDesktopName "행정정보데이터세트 관리도구"
-#define MyApp2Name "행정정보데이터세트 처분도구"
+#define MyAppDesktopName "행정정보데이터세트 이관도구"
+#define MyApp2Name "행정정보데이터세트 삭제지원도구"
 #define MyAppVersion "1.1"
 #define MyAppPublisher "국가기록원 2020년 행정정보데이터세트 기록관리 체계구축"
 #define MyAppURL "http://www.archives.go.kr/"
-#define MyAppExeName "행정정보데이터세트 관리도구.exe"
-#define MyApp2ExeName "행정정보데이터세트 처분도구.exe"
+#define MyAppExeName "행정정보데이터세트 이관도구.exe"
+#define MyApp2ExeName "행정정보데이터세트 삭제지원도구.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -46,11 +46,11 @@ Source: "D:\Developments-202006-v3.9\Workspaces_svn\Install\src\LICENSE.txt"; De
 Source: "D:\Developments-202006-v3.9\Workspaces_svn\Install\src\README.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\Developments-202006-v3.9\Workspaces_svn\Install\src\RELEASE.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\Developments-202006-v3.9\Workspaces_svn\Install\src\log4j.properties"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\Developments-202006-v3.9\Workspaces_svn\Install\src\행정정보데이터세트 관리도구.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\Developments-202006-v3.9\Workspaces_svn\Install\src\행정정보데이터세트 관리도구_debug.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\Developments-202006-v3.9\Workspaces_svn\Install\src\행정정보데이터세트 이관도구.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\Developments-202006-v3.9\Workspaces_svn\Install\src\행정정보데이터세트 이관도구_debug.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\Developments-202006-v3.9\Workspaces_svn\Install\src\eraser_gui\apps\*"; DestDir: "{app}\eraser_gui\apps"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "D:\Developments-202006-v3.9\Workspaces_svn\Install\src\eraser_gui\행정정보데이터세트 처분도구.exe"; DestDir: "{app}\eraser_gui"; Flags: ignoreversion
-Source: "D:\Developments-202006-v3.9\Workspaces_svn\Install\src\eraser_gui\행정정보데이터세트 처분도구_debug.exe"; DestDir: "{app}\eraser_gui"; Flags: ignoreversion
+Source: "D:\Developments-202006-v3.9\Workspaces_svn\Install\src\eraser_gui\행정정보데이터세트 삭제지원도구.exe"; DestDir: "{app}\eraser_gui"; Flags: ignoreversion
+Source: "D:\Developments-202006-v3.9\Workspaces_svn\Install\src\eraser_gui\행정정보데이터세트 삭제지원도구_debug.exe"; DestDir: "{app}\eraser_gui"; Flags: ignoreversion
 Source: "D:\Developments-202006-v3.9\Workspaces_svn\Install\src\etc\*"; DestDir: "{app}\etc"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "D:\Developments-202006-v3.9\Workspaces_svn\Install\src\etc\logging.properties"; DestDir: "{app}\etc"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "D:\Developments-202006-v3.9\Workspaces_svn\Install\src\lib\*"; DestDir: "{app}\lib"; Flags: ignoreversion recursesubdirs createallsubdirs
