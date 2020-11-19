@@ -6,7 +6,6 @@
 <JVMSearchPath>jdkpath</JVMSearchPath>
 <JVMSearchPath>exepath</JVMSearchPath>
 <JVMSearchPath>jview</JVMSearchPath>
-<arguments></arguments>
 <bundledJVMPath>..\java\jre\bin</bundledJVMPath>
 <classPath>apps\lib\JDBC-10.1.2.7694-cubrid.jar</classPath>
 <classPath>apps\lib\commons-codec-1.13.jar</classPath>
@@ -18,7 +17,7 @@
 <classPath>apps\lib\ojdbc8.jar</classPath>
 <classPath>apps\lib\tibero6-jdbc-14.jar</classPath>
 <embeddedJar>true</embeddedJar>
-<executableName>행정정보데이터세트 삭제지원도구.exe</executableName>
+<executableName>행정정보데이터세트 처분도구.exe</executableName>
 <iconLocation>..\siardgui.ico</iconLocation>
 <initialMemoryHeap>-1</initialMemoryHeap>
 <jarLocation>eraser_gui.jar</jarLocation>
