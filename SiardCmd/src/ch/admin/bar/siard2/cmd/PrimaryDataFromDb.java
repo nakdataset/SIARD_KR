@@ -395,9 +395,10 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
 						if("".equals(targetFilePath.trim())) {
 							targetFilePath = _archive.getFile().getParent();
 						}
+						
 						hash_targetFilePath = targetFilePath;
 						FileUtils fileUtis = new FileUtils();
-						fileUtis.copy(SOURCE_FILE, targetFilePath + File.separator + SOURCE_FILE.substring(0, SOURCE_FILE.lastIndexOf("/") + 1));
+						fileUtis.copy(SOURCE_FILE, targetFilePath + File.separator + oValue.toString());
 
 						map.put("sourceFileSize", map.get("sourceFileSize") + fileUtis.sourceFileSize);
 						map.put("executeTime", map.get("executeTime") + fileUtis.executeTime);

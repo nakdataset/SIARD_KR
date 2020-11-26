@@ -15,14 +15,18 @@ public class FileUtils {
 
 	public void copy(String sourceFile, String targetFilePath) {
 		File sourceFileObj = new File(sourceFile);
-		File targetFilePathObj = new File(targetFilePath);
+//		File targetFileObj = new File(targetFilePath);
+		
+		
+		String targetPath = targetFilePath.substring(0, targetFilePath.lastIndexOf("/") + 1);
+		File targetPathObj = new File(targetPath);
 
 		if(!sourceFileObj.exists()) {
 			return;
 		}
 
-		if(!targetFilePathObj.exists()) {
-			targetFilePathObj.mkdirs();
+		if(!targetPathObj.exists()) {
+			targetPathObj.mkdirs();
 		}
 
 		FileInputStream fis = null;
@@ -36,7 +40,7 @@ public class FileUtils {
 			long startTime = System.currentTimeMillis();
 
 			fis = new FileInputStream(sourceFileObj);
-			fos = new FileOutputStream(targetFilePath + File.separator + sourceFileObj.getName());
+			fos = new FileOutputStream(targetPath + File.separator + sourceFileObj.getName());
 
 			fcin = fis.getChannel();
 			fcout = fos.getChannel();
