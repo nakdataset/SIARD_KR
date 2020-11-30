@@ -1,0 +1,40 @@
+https://github.com/nakdataset/SIARD_KR.git
+
+보안USB
+NA015
+rlfhrdnjs1!
+
+D:\Users\vmfort\git\SIARD_KR
+
+//용량 큰 파일
+Install/SIARD_KR v1.1 Setup.exe
+Install/src/java/jre/bin/jfxwebkit.dll
+Install/src/java/jre/lib/rt.jar
+
+git lfs install
+
+git LFS 사용법
+
+D:\PortableGit\git-cmd.exe 실행
+cd D:\Users\vmfort\git\SIARD_KR
+
+LFS 파일 목록 확인
+git lfs ls-files
+
+초기화(예시)
+git lfs untrack "Install/SIARD_KR v1.1 Setup.exe"
+git rm --cache "Install/SIARD_KR v1.1 Setup.exe"
+.gitattributes 삭제
+
+//LFS파일 등록
+git lfs track "Install/src/java/jre/bin/jfxwebkit.dll"
+git lfs track "Install/src/java/jre/lib/rt.jar"
+git lfs track "Install/SIARD_KR v1.1 Setup.exe"
+
+git add .gitattributes
+
+git add "Install/src/java/jre/bin/jfxwebkit.dll"
+git add "Install/src/java/jre/lib/rt.jar"
+git add "Install/SIARD_KR v1.1 Setup.exe"
+git commit -m "setup file LFS update 20201126"
+git push origin +master
