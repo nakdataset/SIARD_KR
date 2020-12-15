@@ -1,0 +1,14 @@
+1. 폴더 구성
+ - /etc
+ - /lib
+ - siardfromdb.sh
+ - siardtodb.sh
+ 
+2. 추출명령(linux) - 예) mysql, sftp
+ - bash ./siardfromdb.sh -o -v -x="siard_test_lobs" -j="jdbc:mysql://127.0.0.1:3306/MYSQL?serverTimezone=UTC&zeroDateTimeBehavior=ConvertToNull"
+   -u="root" -p="root" -s="siard_test/test_ccg_sftp.siard" -t="mysql.ccg" 
+   -sftp -fc="mysql.ccg.fimePath" -tcp="/home/dsrms_db/siardCmd_test/attach_file/" -host="192.168.1.153" -port="22" -su="dsrms_db" -sp="1234"
+   
+3. 재현명령
+ - bash ./siardtodb.sh -o -x="siard_test_lobs" -j="jdbc:mysql://127.0.0.1:3306/MYSQL?serverTimezone=UTC&zeroDateTimeBehavior=ConvertToNull"
+   -u="root" -p="root" -s="siard_test/test_ccg_sftp.siard"
