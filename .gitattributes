@@ -1,1 +1,2 @@
-Install/SIARD_KR[[:space:]]v1.1[[:space:]]Setup.exe filter=lfs diff=lfs merge=lfs -text
+Install/32bit[[:space:]]Install/SIARD_KR-2020_32Bit.zip filter=lfs diff=lfs merge=lfs -text
+Install/32bit[[:space:]]Install/jdk-8u271-windows-i586.exe filter=lfs diff=lfs merge=lfs -text
